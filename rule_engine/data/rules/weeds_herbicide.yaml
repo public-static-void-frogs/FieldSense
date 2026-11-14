@@ -1,0 +1,108 @@
+version: "2026-11-14"
+rules:
+  - id: herbicide_plantback_violated_major
+    title: Herbicide plant-back interval missed by six months or more
+    category: weed
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: herbicide.shortfall_months, op: ge, value: 6}
+    effect: {kind: risk, level: high}
+    evidence_strength: strong
+    sources:
+      - "UW-Madison Extension 2024, Herbicide Rotational Restrictions for Cover and Forage Cropping Systems (label maxima, Wisconsin)"
+      - "Purdue Weed Science 2018, Factors Affecting Herbicide Carryover in 2018"
+    needs_local_review: true
+
+  - id: herbicide_plantback_violated
+    title: Herbicide plant-back interval not met
+    category: weed
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: herbicide.shortfall_months, op: gt, value: 0}
+      - {fact: herbicide.shortfall_months, op: lt, value: 6}
+    effect: {kind: risk, level: medium}
+    evidence_strength: strong
+    sources:
+      - "UW-Madison Extension 2024, Herbicide Rotational Restrictions for Cover and Forage Cropping Systems (label maxima, Wisconsin)"
+    needs_local_review: true
+
+  - id: herbicide_late_application_carryover
+    title: Late-season residual herbicide (carry-over even inside the label interval)
+    category: weed
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: herbicide.late_restricted_count, op: ge, value: 1}
+      - {fact: herbicide.shortfall_months, op: le, value: 0}
+    effect: {kind: risk, level: low}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension Crop News 2021, Fomesafen carryover to corn"
+      - "ISU Extension 2020, Herbicide carryover concerns for 2020"
+      - "Purdue Weed Science 2018, Factors Affecting Herbicide Carryover in 2018"
+    needs_local_review: true
+
+  - id: herbicide_carryover_high_ph_chlorimuron
+    title: Chlorimuron persists on high-pH soil
+    category: weed
+    applies_to: {groups: [warm_season_grain, small_grain, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: herbicide.restricted_actives, op: contains, value: chlorimuron}
+      - {fact: field.soil.ph, op: gt, value: 6.8}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "Purdue Weed Science 2018, Factors Affecting Herbicide Carryover in 2018 (Indiana)"
+    needs_local_review: true
+
+  - id: herbicide_carryover_high_ph_atrazine
+    title: Atrazine persists on high-pH soil
+    category: weed
+    applies_to: {groups: [small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: herbicide.restricted_actives, op: contains, value: atrazine}
+      - {fact: field.soil.ph, op: gt, value: 6.8}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "Purdue Weed Science 2018, Factors Affecting Herbicide Carryover in 2018 (Indiana)"
+    needs_local_review: true
+
+  - id: same_site_of_action_repeat
+    title: Same herbicide site of action two seasons running
+    category: weed
+    applies_to: {groups: [warm_season_grain, grain_legume]}
+    when:
+      - {fact: herbicide.repeated_group_count, op: ge, value: 1}
+    effect: {kind: advisory}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension 2015, Herbicide Guide for Iowa Corn and Soybean Production"
+      - "Hartzler, ISU ICM News 2017, herbicide resistance in Iowa waterhemp"
+    needs_local_review: false
+
+  - id: weed_escapes_row_crop
+    title: Weed escapes reported in a corn-soybean-only rotation
+    category: weed
+    applies_to: {groups: [warm_season_grain, grain_legume]}
+    when:
+      - {fact: field.practice.weed_escapes, op: eq, value: true}
+      - {fact: history.distinct_groups_5y, op: le, value: 2}
+    effect: {kind: risk, level: low}
+    evidence_strength: moderate
+    sources:
+      - "Nguyen and Liebman 2022, Frontiers in Agronomy 4:811359 (waterhemp, ISU Marsden Farm)"
+      - "Iowa Nutrient Research Center, Marsden Farm diversified rotations 2006-2016"
+    needs_local_review: false
+
+  - id: weed_escapes_cool_season_break
+    title: Small grain or forage suppresses the weeds that escaped
+    category: weed
+    applies_to: {groups: [small_grain, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: field.practice.weed_escapes, op: eq, value: true}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "Nguyen and Liebman 2022, Frontiers in Agronomy 4:811359 (waterhemp, ISU Marsden Farm)"
+      - "Goplen et al. 2017, Weed Science (giant ragweed, Minnesota)"
+    needs_local_review: false

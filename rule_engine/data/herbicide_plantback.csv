@@ -1,0 +1,15 @@
+active,wssa_group,product,corn,soybeans,alfalfa,wheat,oats,rye,note
+atrazine,5,Atrazine,0,12,24,24,24,24,"soybean interval is 12 months in one table of the source and 'following year' in another"
+mesotrione,27,Callisto,0,10,10,4,0,4,
+isoxaflutole,27,Balance Flexx,0,6,10,4,18,4,
+fomesafen,14,Flexstar,10,0,18,4,4,4,
+sulfentrazone,14,Spartan,10,0,12,4,12,4,
+flumioxazin,14,Valor SX,0.25,0,8,1,8,3,
+saflufenacil,14,Sharpen,0,6,9,3,3,3,
+imazethapyr,2,Pursuit,8.5,0,4,4,18,4,
+chlorimuron,2,Classic,10,0,12,4,4,4,
+cloransulam,2,FirstRate,9,0,9,4,9,18,
+clopyralid,4,Stinger,0,10.5,10.5,0,0,,"rye not listed in the source"
+dicamba,4,Engenia,0,1,4,1,1,1,
+pyroxasulfone,15,Zidua,0,0,10,6,18,18,
+s_metolachlor,15,Dual II Magnum,0,0,4,4.5,4.5,4.5,

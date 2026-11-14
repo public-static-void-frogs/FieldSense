@@ -1,0 +1,5 @@
+region,crop,level,low,mid,high,unit,source,as_of,verified
+IA,winter_wheat,state,45,55,65,bu/acre,"Approximate placeholder: NASS publishes no Iowa winter wheat yield; not a USDA value",2026-01-01,false
+IA,oats,state,80.0,87.2,100.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; Iowa, 2022-2026 (min, mean, max)",2026-11-11,true
+IA,alfalfa,state,3.2,3.84,4.3,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; Iowa, 2022-2026 (min, mean, max)",2026-11-11,true
+IA,other_hay,state,2.0,2.3,2.7,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; Iowa, 2022-2026 (min, mean, max)",2026-11-11,true

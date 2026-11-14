@@ -1,0 +1,196 @@
+region,crop,price_usd,unit,source,as_of,verified,level
+AR,oats,3.9,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; AR, marketing year 2023",2026-11-14,true,state
+CA,oats,3.9,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; CA, marketing year 2023",2026-11-14,true,state
+GA,oats,4.5,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; GA, marketing year 2024",2026-11-14,true,state
+IA,oats,3.55,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; IA, marketing year 2025",2026-11-14,true,state
+ID,oats,2.95,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; ID, marketing year 2025",2026-11-14,true,state
+IL,oats,4.19,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; IL, marketing year 2025",2026-11-14,true,state
+KS,oats,2.85,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; KS, marketing year 2025",2026-11-14,true,state
+ME,oats,3.5,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; ME, marketing year 2025",2026-11-14,true,state
+MI,oats,3.57,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; MI, marketing year 2025",2026-11-14,true,state
+MN,oats,2.9,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; MN, marketing year 2025",2026-11-14,true,state
+MO,oats,4.8,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; MO, marketing year 2023",2026-11-14,true,state
+MT,oats,3.61,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; MT, marketing year 2025",2026-11-14,true,state
+NC,oats,3.55,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; NC, marketing year 2025",2026-11-14,true,state
+ND,oats,3.17,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; ND, marketing year 2025",2026-11-14,true,state
+NE,oats,3.1,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; NE, marketing year 2025",2026-11-14,true,state
+NY,oats,3.75,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; NY, marketing year 2025",2026-11-14,true,state
+OH,oats,3.9,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; OH, marketing year 2025",2026-11-14,true,state
+OK,oats,3.7,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; OK, marketing year 2023",2026-11-14,true,state
+OR,oats,3.05,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; OR, marketing year 2025",2026-11-14,true,state
+OT,oats,3.54,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; OT, marketing year 2024",2026-11-14,true,state
+PA,oats,3.97,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; PA, marketing year 2025",2026-11-14,true,state
+SD,oats,3.11,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; SD, marketing year 2025",2026-11-14,true,state
+TX,oats,6.21,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; TX, marketing year 2024",2026-11-14,true,state
+WI,oats,3.67,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; WI, marketing year 2025",2026-11-14,true,state
+AK,barley,8.15,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; AK, marketing year 2025",2026-11-14,true,state
+AZ,barley,7.5,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; AZ, marketing year 2025",2026-11-14,true,state
+CA,barley,4.55,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; CA, marketing year 2025",2026-11-14,true,state
+CO,barley,6.14,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; CO, marketing year 2025",2026-11-14,true,state
+DE,barley,3.3,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; DE, marketing year 2025",2026-11-14,true,state
+ID,barley,5.66,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; ID, marketing year 2025",2026-11-14,true,state
+KS,barley,3.9,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; KS, marketing year 2025",2026-11-14,true,state
+MD,barley,3.3,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; MD, marketing year 2025",2026-11-14,true,state
+ME,barley,5.15,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; ME, marketing year 2025",2026-11-14,true,state
+MI,barley,3.6,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; MI, marketing year 2025",2026-11-14,true,state
+MN,barley,4.85,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; MN, marketing year 2025",2026-11-14,true,state
+MT,barley,5.45,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; MT, marketing year 2025",2026-11-14,true,state
+NC,barley,3.05,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; NC, marketing year 2025",2026-11-14,true,state
+ND,barley,4.76,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; ND, marketing year 2025",2026-11-14,true,state
+NY,barley,4.0,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; NY, marketing year 2025",2026-11-14,true,state
+OR,barley,3.05,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; OR, marketing year 2025",2026-11-14,true,state
+OT,barley,0.0,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; OT, marketing year 2025",2026-11-14,true,state
+PA,barley,4.0,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; PA, marketing year 2025",2026-11-14,true,state
+SD,barley,3.3,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; SD, marketing year 2025",2026-11-14,true,state
+UT,barley,6.3,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; UT, marketing year 2025",2026-11-14,true,state
+VA,barley,3.15,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; VA, marketing year 2025",2026-11-14,true,state
+WA,barley,3.84,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; WA, marketing year 2025",2026-11-14,true,state
+WI,barley,5.75,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; WI, marketing year 2025",2026-11-14,true,state
+WY,barley,5.83,bu,"USDA NASS Quick Stats: BARLEY - PRICE RECEIVED, MEASURED IN $ / BU; WY, marketing year 2025",2026-11-14,true,state
+AL,winter_wheat,5.35,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; AL, marketing year 2025",2026-11-14,true,state
+AR,winter_wheat,5.4,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; AR, marketing year 2025",2026-11-14,true,state
+CA,winter_wheat,5.6,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; CA, marketing year 2025",2026-11-14,true,state
+CO,winter_wheat,4.5,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; CO, marketing year 2025",2026-11-14,true,state
+DE,winter_wheat,4.7,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; DE, marketing year 2025",2026-11-14,true,state
+GA,winter_wheat,4.9,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; GA, marketing year 2025",2026-11-14,true,state
+ID,winter_wheat,5.39,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; ID, marketing year 2025",2026-11-14,true,state
+IL,winter_wheat,5.11,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; IL, marketing year 2025",2026-11-14,true,state
+IN,winter_wheat,5.38,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; IN, marketing year 2025",2026-11-14,true,state
+KS,winter_wheat,4.65,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; KS, marketing year 2025",2026-11-14,true,state
+KY,winter_wheat,5.6,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; KY, marketing year 2025",2026-11-14,true,state
+MD,winter_wheat,4.7,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; MD, marketing year 2025",2026-11-14,true,state
+MI,winter_wheat,5.14,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; MI, marketing year 2025",2026-11-14,true,state
+MO,winter_wheat,5.31,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; MO, marketing year 2025",2026-11-14,true,state
+MS,winter_wheat,5.4,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; MS, marketing year 2025",2026-11-14,true,state
+MT,winter_wheat,4.63,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; MT, marketing year 2025",2026-11-14,true,state
+NC,winter_wheat,5.09,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; NC, marketing year 2025",2026-11-14,true,state
+ND,winter_wheat,4.75,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; ND, marketing year 2025",2026-11-14,true,state
+NE,winter_wheat,4.5,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; NE, marketing year 2025",2026-11-14,true,state
+NJ,winter_wheat,6.26,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; NJ, marketing year 2023",2026-11-14,true,state
+NM,winter_wheat,4.75,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; NM, marketing year 2025",2026-11-14,true,state
+NY,winter_wheat,5.85,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; NY, marketing year 2025",2026-11-14,true,state
+OH,winter_wheat,5.19,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; OH, marketing year 2025",2026-11-14,true,state
+OK,winter_wheat,4.79,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; OK, marketing year 2025",2026-11-14,true,state
+OR,winter_wheat,6.05,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; OR, marketing year 2025",2026-11-14,true,state
+PA,winter_wheat,5.33,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; PA, marketing year 2025",2026-11-14,true,state
+SC,winter_wheat,5.0,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; SC, marketing year 2025",2026-11-14,true,state
+SD,winter_wheat,4.49,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; SD, marketing year 2025",2026-11-14,true,state
+TN,winter_wheat,5.55,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; TN, marketing year 2025",2026-11-14,true,state
+TX,winter_wheat,4.84,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; TX, marketing year 2025",2026-11-14,true,state
+UT,winter_wheat,4.9,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; UT, marketing year 2025",2026-11-14,true,state
+VA,winter_wheat,5.25,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; VA, marketing year 2025",2026-11-14,true,state
+WA,winter_wheat,5.16,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; WA, marketing year 2025",2026-11-14,true,state
+WI,winter_wheat,4.45,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; WI, marketing year 2025",2026-11-14,true,state
+WY,winter_wheat,4.75,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; WY, marketing year 2025",2026-11-14,true,state
+ID,spring_wheat,5.63,bu,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - PRICE RECEIVED, MEASURED IN $ / BU; ID, marketing year 2025",2026-11-14,true,state
+MN,spring_wheat,5.33,bu,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - PRICE RECEIVED, MEASURED IN $ / BU; MN, marketing year 2025",2026-11-14,true,state
+MT,spring_wheat,5.62,bu,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - PRICE RECEIVED, MEASURED IN $ / BU; MT, marketing year 2025",2026-11-14,true,state
+ND,spring_wheat,5.33,bu,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - PRICE RECEIVED, MEASURED IN $ / BU; ND, marketing year 2025",2026-11-14,true,state
+SD,spring_wheat,5.24,bu,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - PRICE RECEIVED, MEASURED IN $ / BU; SD, marketing year 2025",2026-11-14,true,state
+WA,spring_wheat,5.32,bu,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - PRICE RECEIVED, MEASURED IN $ / BU; WA, marketing year 2025",2026-11-14,true,state
+CO,sorghum,3.39,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; CO, marketing year 2025",2026-11-14,true,state
+KS,sorghum,3.37,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; KS, marketing year 2025",2026-11-14,true,state
+NE,sorghum,3.37,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; NE, marketing year 2025",2026-11-14,true,state
+OK,sorghum,3.4,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; OK, marketing year 2025",2026-11-14,true,state
+OT,sorghum,0.0,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; OT, marketing year 2025",2026-11-14,true,state
+SD,sorghum,3.14,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; SD, marketing year 2025",2026-11-14,true,state
+TX,sorghum,3.99,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; TX, marketing year 2025",2026-11-14,true,state
+ID,canola,9.6,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; ID, marketing year 2025",2026-11-14,true,state
+KS,canola,9.05,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; KS, marketing year 2022",2026-11-14,true,state
+MN,canola,15.7,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; MN, marketing year 2022",2026-11-14,true,state
+MT,canola,9.55,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; MT, marketing year 2025",2026-11-14,true,state
+ND,canola,10.6,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; ND, marketing year 2025",2026-11-14,true,state
+OK,canola,10.05,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; OK, marketing year 2025",2026-11-14,true,state
+OT,canola,9.2,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; OT, marketing year 2025",2026-11-14,true,state
+WA,canola,10.4,bu,"USDA NASS Quick Stats: CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT; WA, marketing year 2025",2026-11-14,true,state
+AR,alfalfa,228.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; AR, marketing year 2023",2026-11-14,true,state
+AZ,alfalfa,197.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; AZ, marketing year 2025",2026-11-14,true,state
+CA,alfalfa,236.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; CA, marketing year 2025",2026-11-14,true,state
+CO,alfalfa,164.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; CO, marketing year 2025",2026-11-14,true,state
+CT,alfalfa,250.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; CT, marketing year 2025",2026-11-14,true,state
+DE,alfalfa,240.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; DE, marketing year 2025",2026-11-14,true,state
+IA,alfalfa,108.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; IA, marketing year 2025",2026-11-14,true,state
+ID,alfalfa,156.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; ID, marketing year 2025",2026-11-14,true,state
+IL,alfalfa,161.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; IL, marketing year 2025",2026-11-14,true,state
+IN,alfalfa,196.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; IN, marketing year 2025",2026-11-14,true,state
+KS,alfalfa,122.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; KS, marketing year 2025",2026-11-14,true,state
+KY,alfalfa,234.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; KY, marketing year 2025",2026-11-14,true,state
+MA,alfalfa,255.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; MA, marketing year 2025",2026-11-14,true,state
+MD,alfalfa,235.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; MD, marketing year 2025",2026-11-14,true,state
+ME,alfalfa,235.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; ME, marketing year 2025",2026-11-14,true,state
+MI,alfalfa,160.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; MI, marketing year 2025",2026-11-14,true,state
+MN,alfalfa,110.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; MN, marketing year 2025",2026-11-14,true,state
+MO,alfalfa,170.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; MO, marketing year 2025",2026-11-14,true,state
+MT,alfalfa,150.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; MT, marketing year 2025",2026-11-14,true,state
+NC,alfalfa,229.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; NC, marketing year 2025",2026-11-14,true,state
+ND,alfalfa,92.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; ND, marketing year 2025",2026-11-14,true,state
+NE,alfalfa,102.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; NE, marketing year 2025",2026-11-14,true,state
+NH,alfalfa,245.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; NH, marketing year 2025",2026-11-14,true,state
+NJ,alfalfa,257.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; NJ, marketing year 2025",2026-11-14,true,state
+NM,alfalfa,246.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; NM, marketing year 2025",2026-11-14,true,state
+NV,alfalfa,162.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; NV, marketing year 2025",2026-11-14,true,state
+NY,alfalfa,250.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; NY, marketing year 2025",2026-11-14,true,state
+OH,alfalfa,195.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; OH, marketing year 2025",2026-11-14,true,state
+OK,alfalfa,164.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; OK, marketing year 2025",2026-11-14,true,state
+OR,alfalfa,183.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; OR, marketing year 2025",2026-11-14,true,state
+PA,alfalfa,255.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; PA, marketing year 2025",2026-11-14,true,state
+RI,alfalfa,245.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; RI, marketing year 2025",2026-11-14,true,state
+SD,alfalfa,97.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; SD, marketing year 2025",2026-11-14,true,state
+TN,alfalfa,236.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; TN, marketing year 2025",2026-11-14,true,state
+TX,alfalfa,232.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; TX, marketing year 2025",2026-11-14,true,state
+UT,alfalfa,176.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; UT, marketing year 2025",2026-11-14,true,state
+VA,alfalfa,223.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; VA, marketing year 2025",2026-11-14,true,state
+VT,alfalfa,235.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; VT, marketing year 2025",2026-11-14,true,state
+WA,alfalfa,162.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; WA, marketing year 2025",2026-11-14,true,state
+WI,alfalfa,133.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; WI, marketing year 2025",2026-11-14,true,state
+WV,alfalfa,213.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; WV, marketing year 2025",2026-11-14,true,state
+WY,alfalfa,167.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; WY, marketing year 2025",2026-11-14,true,state
+AK,other_hay,425.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; AK, marketing year 2025",2026-11-14,true,state
+AL,other_hay,117.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; AL, marketing year 2025",2026-11-14,true,state
+AR,other_hay,126.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; AR, marketing year 2025",2026-11-14,true,state
+AZ,other_hay,157.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; AZ, marketing year 2025",2026-11-14,true,state
+CA,other_hay,188.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; CA, marketing year 2025",2026-11-14,true,state
+CO,other_hay,153.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; CO, marketing year 2025",2026-11-14,true,state
+CT,other_hay,175.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; CT, marketing year 2025",2026-11-14,true,state
+DE,other_hay,175.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; DE, marketing year 2025",2026-11-14,true,state
+FL,other_hay,120.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; FL, marketing year 2025",2026-11-14,true,state
+GA,other_hay,101.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; GA, marketing year 2025",2026-11-14,true,state
+IA,other_hay,95.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; IA, marketing year 2025",2026-11-14,true,state
+ID,other_hay,170.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; ID, marketing year 2025",2026-11-14,true,state
+IL,other_hay,106.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; IL, marketing year 2025",2026-11-14,true,state
+IN,other_hay,160.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; IN, marketing year 2025",2026-11-14,true,state
+KS,other_hay,103.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; KS, marketing year 2025",2026-11-14,true,state
+KY,other_hay,183.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; KY, marketing year 2025",2026-11-14,true,state
+LA,other_hay,112.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; LA, marketing year 2025",2026-11-14,true,state
+MA,other_hay,180.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; MA, marketing year 2025",2026-11-14,true,state
+MD,other_hay,175.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; MD, marketing year 2025",2026-11-14,true,state
+ME,other_hay,175.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; ME, marketing year 2025",2026-11-14,true,state
+MI,other_hay,130.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; MI, marketing year 2025",2026-11-14,true,state
+MN,other_hay,76.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; MN, marketing year 2025",2026-11-14,true,state
+MO,other_hay,113.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; MO, marketing year 2025",2026-11-14,true,state
+MS,other_hay,123.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; MS, marketing year 2025",2026-11-14,true,state
+MT,other_hay,128.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; MT, marketing year 2025",2026-11-14,true,state
+NC,other_hay,157.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; NC, marketing year 2025",2026-11-14,true,state
+ND,other_hay,68.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; ND, marketing year 2025",2026-11-14,true,state
+NE,other_hay,86.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; NE, marketing year 2025",2026-11-14,true,state
+NH,other_hay,180.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; NH, marketing year 2025",2026-11-14,true,state
+NJ,other_hay,192.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; NJ, marketing year 2025",2026-11-14,true,state
+NM,other_hay,185.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; NM, marketing year 2025",2026-11-14,true,state
+NV,other_hay,175.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; NV, marketing year 2025",2026-11-14,true,state
+NY,other_hay,186.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; NY, marketing year 2025",2026-11-14,true,state
+OH,other_hay,159.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; OH, marketing year 2025",2026-11-14,true,state
+OK,other_hay,88.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; OK, marketing year 2025",2026-11-14,true,state
+OR,other_hay,204.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; OR, marketing year 2025",2026-11-14,true,state
+PA,other_hay,197.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; PA, marketing year 2025",2026-11-14,true,state
+RI,other_hay,190.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; RI, marketing year 2025",2026-11-14,true,state
+SC,other_hay,115.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; SC, marketing year 2025",2026-11-14,true,state
+SD,other_hay,88.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; SD, marketing year 2025",2026-11-14,true,state
+TN,other_hay,155.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; TN, marketing year 2025",2026-11-14,true,state
+TX,other_hay,130.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; TX, marketing year 2025",2026-11-14,true,state
+UT,other_hay,129.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; UT, marketing year 2025",2026-11-14,true,state
+VA,other_hay,171.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; VA, marketing year 2025",2026-11-14,true,state
+VT,other_hay,177.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; VT, marketing year 2025",2026-11-14,true,state
+WA,other_hay,208.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; WA, marketing year 2025",2026-11-14,true,state
+WI,other_hay,84.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; WI, marketing year 2025",2026-11-14,true,state
+WV,other_hay,154.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; WV, marketing year 2025",2026-11-14,true,state
+WY,other_hay,130.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; WY, marketing year 2025",2026-11-14,true,state

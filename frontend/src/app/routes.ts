@@ -74,6 +74,15 @@ export const appRoutes: RouteObject[] = [
             }),
           },
           {
+            id: 'recommendation',
+            path: 'fields/:fieldId/recommendation',
+            loader: fieldLoader,
+            handle: { navigationKey: '/fields' },
+            lazy: async () => ({
+              Component: (await import('../pages/FieldRecommendationPage')).FieldRecommendationPage,
+            }),
+          },
+          {
             id: 'strategy',
             path: 'fields/:fieldId/strategy',
             loader: fieldLoader,

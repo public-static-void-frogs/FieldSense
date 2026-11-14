@@ -1,0 +1,4 @@
+cover_crop,item,usd_per_acre,verified,source
+rye,seeding,19.05,true,"ISU Ag Decision Maker A3-10, 2026 Iowa Farm Custom Rate Survey: drilling cover crop seed, average"
+rye,termination,9.45,true,"ISU Ag Decision Maker A3-10, 2026 Iowa Farm Custom Rate Survey: spraying, liquid, average"
+rye,seed,20.00,false,"No fetched Iowa seed price; 17-23 USD/acre for 50-80 lb appeared only in a search snippet"

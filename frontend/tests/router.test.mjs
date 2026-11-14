@@ -20,6 +20,7 @@ test('the real route tree matches static, dynamic, optional and fallback routes'
     ['/fields', 'fields'],
     [`/fields/${fieldOne}`, 'field'],
     [`/fields/${fieldTwo}/strategy`, 'strategy'],
+    [`/fields/${fieldTwo}/recommendation`, 'recommendation'],
     ['/map', 'map'],
     ['/map/add', 'map-add'],
     [`/map/add/${fieldOne}`, 'catalog-field'],

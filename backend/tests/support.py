@@ -23,12 +23,13 @@ def create_field(client, **values):
     return response.json()
 
 
-def isolated_app():
+def isolated_app(**settings):
     directory = tempfile.TemporaryDirectory()
     config = Settings(
         database_url=f"sqlite:///{Path(directory.name) / 'test.db'}",
         jwt_secret=TEST_SECRET,
         jwt_issuer=TEST_ISSUER,
+        **{"rotation_data_root": "", "rotation_soil_lookup": False, **settings},
     )
     app = create_app(config)
     Base.metadata.create_all(app.state.engine)

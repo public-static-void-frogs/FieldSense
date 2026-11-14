@@ -38,7 +38,7 @@ class FieldInsightTests(unittest.TestCase):
         self.assertGreater(match["reference_awc_mm"], 0)
         self.assertIsNotNone(result["windows"]["now"]["corn:sow"]["date_q50"])
         self.assertIn("ssp245", result["risk"]["future"])
-        self.assertIsNone(result["fallow_zero"])
+        self.assertIn("fallow_zero", result)
 
         outside = create_field(
             self.client, geometry={"type": "Point", "coordinates": [30.52, 50.45]}

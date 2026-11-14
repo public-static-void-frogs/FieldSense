@@ -12,3 +12,5 @@ numpy>=1.26,<3
 rasterio>=1.3,<2
 pandas>=2.2,<4
 pyarrow>=17,<25
+PyYAML>=6,<7
+duckdb>=1.1,<2

@@ -1,0 +1,39 @@
+version: "2026-11-10"
+rules:
+  - id: continuous_corn_yield_penalty
+    title: Corn-after-corn yield drag
+    category: yield
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: history.consecutive_same_crop, op: ge, value: 1}
+    effect: {kind: risk, level: medium, yield_factor: [0.85, 0.96]}
+    evidence_strength: strong
+    sources:
+      - "ISU ICM, corn following corn; Seifert et al. 2017"
+    needs_local_review: false
+
+  - id: rotation_yield_benefit
+    title: Rotation yield boost
+    category: yield
+    applies_to: {crops: [corn, soybeans]}
+    when:
+      - {fact: history.prev1.crop, op: not_null}
+      - {fact: history.prev1.crop, op: ne, value: "@candidate.crop"}
+      - {fact: history.distinct_groups_5y, op: ge, value: 3}
+    effect: {kind: benefit, yield_factor: [1.00, 1.09]}
+    evidence_strength: strong
+    sources:
+      - "Davis et al. 2012, PLOS ONE (Marsden Farm)"
+    needs_local_review: false
+
+  - id: thin_local_market
+    title: Thin local market
+    category: market
+    applies_to: {crops: [oats, winter_wheat, spring_wheat, rye, sorghum]}
+    when:
+      - {fact: candidate.crop, op: not_null}
+    effect: {kind: advisory}
+    evidence_strength: moderate
+    sources:
+      - "Practical Farmers of Iowa oat enterprise budgets; rotation_economics.md"
+    needs_local_review: true

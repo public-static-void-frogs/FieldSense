@@ -1,0 +1,146 @@
+version: "2026-11-10"
+rules:
+  - id: heat_at_flowering
+    title: Heat at flowering or pollination
+    category: temperature
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    hazard:
+      stage: flowering
+      window_days: [-10, 10]
+      metric: tmax_ge35_days
+      aggregate: sum
+      compare: ge
+      threshold: 1
+    effect: {kind: risk, level_bands: {high: 0.5, medium: 0.25, low: 0.0}}
+    evidence_strength: strong
+    sources:
+      - "UNL CropWatch 2019, extended high heat and corn pollination"
+      - "Schlenker and Roberts 2009, PNAS"
+    needs_local_review: false
+
+  - id: warm_days_at_flowering
+    title: Warm spell at flowering
+    category: temperature
+    applies_to: {groups: [small_grain]}
+    hazard:
+      stage: flowering
+      window_days: [-7, 7]
+      metric: tmax_ge30_days
+      aggregate: sum
+      compare: ge
+      threshold: 3
+    effect: {kind: risk, level_bands: {high: 0.5, medium: 0.25, low: 0.0}}
+    evidence_strength: moderate
+    sources:
+      - "Plant Soil Environ 2017, wheat heat at anthesis; Thuenen heat-stress project"
+    needs_local_review: false
+
+  - id: frost_after_emergence
+    title: Late spring frost after emergence
+    category: temperature
+    applies_to: {groups: [warm_season_grain, grain_legume]}
+    hazard:
+      stage: emerged
+      window_days: [0, 30]
+      metric: tmin_min
+      aggregate: min
+      compare: le
+      threshold: -2.0
+    effect: {kind: risk, level_bands: {high: 0.5, medium: 0.25, low: 0.0}}
+    evidence_strength: strong
+    sources:
+      - "University of Kentucky AGR-192; Purdue Agronomy frost guidance"
+    needs_local_review: false
+
+  - id: early_fall_frost
+    title: Frost before maturity
+    category: temperature
+    applies_to: {groups: [warm_season_grain, grain_legume]}
+    hazard:
+      stage: mature
+      window_days: [-21, 0]
+      metric: tmin_min
+      aggregate: min
+      compare: le
+      threshold: 0.0
+    effect: {kind: risk, level_bands: {high: 0.5, medium: 0.25, low: 0.0}}
+    evidence_strength: moderate
+    sources:
+      - "U2U Corn GDD tool, first fall freeze frequency; Purdue frost guidance"
+    needs_local_review: false
+
+  - id: drought_in_critical_stage
+    title: Root-zone drought in the critical stage
+    category: water
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, perennial_forage_legume]}
+    hazard:
+      stage: flowering
+      window_days: [-7, 21]
+      metric: rz_lt20_days
+      aggregate: sum
+      compare: ge
+      threshold: 7
+    effect: {kind: risk, level_bands: {high: 0.5, medium: 0.25, low: 0.0}}
+    evidence_strength: strong
+    sources:
+      - "Purdue Kernel News 2022; Iowa State ICM 2012 soybean drought"
+      - "NASA SMAP L4 SPL4SMGP root-zone percentiles (9 km cell, not field-scale truth)"
+    needs_local_review: false
+
+  - id: drought_monitor_critical_stage
+    title: Drought Monitor D1 or worse in the critical stage
+    category: water
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    hazard:
+      stage: grain_fill
+      window_days: [-14, 14]
+      metric: dm_max
+      aggregate: max
+      compare: ge
+      threshold: 1
+    effect: {kind: risk, level_bands: {high: 0.5, medium: 0.25, low: 0.0}}
+    evidence_strength: moderate
+    sources:
+      - "US Drought Monitor weekly classification (county-scale context)"
+    needs_local_review: false
+
+  - id: wet_planting_window
+    title: Wet planting window
+    category: water
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    hazard:
+      stage: planted
+      window_days: [-7, 14]
+      metric: pr_ge25_days
+      aggregate: sum
+      compare: ge
+      threshold: 2
+    effect: {kind: risk, level_bands: {high: 0.5, medium: 0.25, low: 0.0}}
+    evidence_strength: weak
+    sources:
+      - "gridMET daily precipitation; threshold is a heuristic, not a published value"
+    needs_local_review: true
+
+  - id: high_water_demand_dry_field
+    title: High water demand on a drought-prone field
+    category: water
+    applies_to: {traits: ["water_demand=high"]}
+    when:
+      - {fact: county.rma_drought_share_lag1, op: ge, value: 0.3}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "USDA RMA cause-of-loss, county summary (previous year)"
+    needs_local_review: true
+
+  - id: county_excess_moisture_losses
+    title: Excess-moisture losses in the county last year
+    category: water
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    when:
+      - {fact: county.rma_excess_moisture_share_lag1, op: ge, value: 0.3}
+    effect: {kind: advisory}
+    evidence_strength: moderate
+    sources:
+      - "USDA RMA cause-of-loss, county summary (previous year)"
+    needs_local_review: true

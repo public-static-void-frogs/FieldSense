@@ -1,0 +1,55 @@
+version: "2026-11-10"
+rules:
+  - id: legume_n_credit
+    title: Nitrogen credit from last year's legume
+    category: soil_nutrient
+    applies_to: {traits: ["n_fixer=false"]}
+    when:
+      - {fact: history.prev1.n_fixer, op: eq, value: true}
+      - {fact: candidate.n_demand, op: in, value: [medium, high]}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "Nebraska and Wisconsin legume N credit tables (crop_coefficients.csv)"
+      - "Iowa State advises not to subtract a soybean credit; treat as regional advice"
+    uses_traits: [n_credit_kg_ha]
+    needs_local_review: true
+
+  - id: high_n_demand_after_high_n_demand
+    title: Back-to-back high nitrogen demand
+    category: soil_nutrient
+    applies_to: {traits: ["n_demand=high"]}
+    when:
+      - {fact: history.prev1.n_demand, op: eq, value: high}
+    effect: {kind: risk, level: low}
+    evidence_strength: moderate
+    sources:
+      - "ISU ICM, corn following corn guidance"
+    needs_local_review: false
+
+  - id: organic_matter_builder
+    title: Builds soil organic matter
+    category: soil_nutrient
+    applies_to: {traits: ["humus_balance>0"]}
+    when:
+      - {fact: candidate.humus_balance, op: gt, value: 0}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "VDLUFA 2014 humus balance standpoint (crop_coefficients.csv S1)"
+    uses_traits: [humus_balance]
+    needs_local_review: false
+
+  - id: organic_matter_drawdown_streak
+    title: Continued organic-matter drawdown
+    category: soil_nutrient
+    applies_to: {traits: ["humus_balance<0"]}
+    when:
+      - {fact: history.prev1.humus_balance, op: lt, value: 0}
+      - {fact: history.distinct_groups_5y, op: le, value: 2}
+    effect: {kind: risk, level: low}
+    evidence_strength: moderate
+    sources:
+      - "VDLUFA 2014 humus balance; Schmer et al. 2020 (rotation diversity and SOC)"
+    uses_traits: [humus_balance]
+    needs_local_review: false

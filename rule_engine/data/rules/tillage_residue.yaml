@@ -1,0 +1,83 @@
+# Rules over field.practice.tillage: conventional | reduced | strip_till | no_till, declared by
+# the farmer for the coming season. Measured C factors are from Missouri plots, not Iowa.
+version: "2026-11-14"
+rules:
+  - id: no_till_erosion_benefit
+    title: No-till or strip-till keeps residue on the surface
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.3"]}
+    when:
+      - {fact: field.practice.tillage, op: in, value: [no_till, strip_till]}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "Alberts et al. 1985, USDA-ARS (Missouri claypan plots): no-till C factor 0.01-0.02 against 0.08-0.18 conventional"
+      - "ISU Extension PM 1901 / IC-486(9), residue remaining after tillage passes"
+    needs_local_review: true
+
+  - id: low_residue_after_soybeans_tilled
+    title: Tilled soybean stubble leaves under 30 % residue cover
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.3"]}
+    when:
+      - {fact: history.prev1.crop, op: eq, value: soybeans}
+      - {fact: field.practice.tillage, op: in, value: [conventional, reduced]}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension PM 1901 / IC-486(9): chisel leaves 10-40 % of soybean residue; 30 % cover is the conservation-tillage line"
+      - "Alberts et al. 1985, USDA-ARS (Missouri): soybean C factor about twice corn"
+    needs_local_review: true
+
+  - id: conventional_tillage_on_slope
+    title: Full-width tillage on sloping land
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.3"]}
+    when:
+      - {fact: field.practice.tillage, op: eq, value: conventional}
+      - {fact: field.soil.slope_pct, op: ge, value: 5}
+    effect: {kind: risk, level: low}
+    evidence_strength: weak
+    sources:
+      - "Alberts et al. 1985, USDA-ARS (Missouri, 3-3.5 % slope). The 5 % cut-off is a design threshold"
+    needs_local_review: true
+
+  - id: residue_borne_disease_reduced_tillage
+    title: Surface corn residue carries leaf diseases into corn
+    category: pest_disease
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: history.consecutive_same_crop, op: ge, value: 1}
+      - {fact: field.practice.tillage, op: in, value: [no_till, strip_till, reduced]}
+    effect: {kind: risk, level: low}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension: gray leaf spot severity is directly associated with the amount of surface residue"
+      - "Ohio State Extension 2021: tillage helps but alone will not prevent tar spot, gray leaf spot or northern corn leaf blight"
+    needs_local_review: false
+
+  - id: no_till_corn_wet_soil_yield_drag
+    title: No-till corn yields less on poorly drained soil
+    category: yield
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: field.practice.tillage, op: eq, value: no_till}
+      - {fact: field.soil.wetness, op: eq, value: wet}
+    effect: {kind: risk, level: medium, yield_factor: [0.84, 0.93]}
+    evidence_strength: strong
+    sources:
+      - "Al-Kaisi et al. 2015, Agronomy Journal 107:1411 (7 Iowa sites, 2003-2013): no-till corn 7-16 % below moldboard at the poorly drained northern and central sites, not significant at the better-drained southern sites"
+    needs_local_review: true
+
+  - id: strip_till_on_wet_soil
+    title: Strip-till as the reduced-tillage option on poorly drained soil
+    category: yield
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: field.practice.tillage, op: eq, value: no_till}
+      - {fact: field.soil.wetness, op: eq, value: wet}
+    effect: {kind: advisory}
+    evidence_strength: moderate
+    sources:
+      - "Al-Kaisi et al. 2015, Agronomy Journal 107:1411: strip-till corn not significantly different from conventional in corn-soybean"
+    needs_local_review: true

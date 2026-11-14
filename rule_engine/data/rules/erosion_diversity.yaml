@@ -1,0 +1,68 @@
+version: "2026-11-10"
+rules:
+  - id: low_rotation_diversity
+    title: Low rotation diversity (weeds and herbicide resistance)
+    category: diversity
+    applies_to: {groups: [warm_season_grain, grain_legume]}
+    when:
+      - {fact: history.years, op: ge, value: 3}
+      - {fact: history.distinct_groups_5y, op: le, value: 2}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "Soltani et al. 2023, Weed Technology (Ontario 9-year study)"
+      - "Frontiers in Agronomy 2022, rotation length and weed suppression"
+    needs_local_review: false
+
+  - id: diversity_benefit
+    title: Adds a new crop group to the rotation
+    category: diversity
+    applies_to: {groups: [small_grain, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: history.years, op: ge, value: 2}
+      - {fact: history.candidate_group_in_5y, op: eq, value: false}
+    effect: {kind: benefit}
+    evidence_strength: strong
+    sources:
+      - "Bowles et al. 2020, One Earth 2(3)"
+    needs_local_review: false
+
+  - id: erosion_exposure_bare_soil
+    title: Erosion exposure from bare soil
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.4"]}
+    when:
+      - {fact: candidate.bare_soil_months, op: ge, value: 6}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "OMAFRA RUSLE C-factor table; RUSLE definition"
+    uses_traits: [bare_soil_months, rusle_c]
+    needs_local_review: true
+
+  - id: erosion_protection_benefit
+    title: Year-round soil cover
+    category: erosion
+    applies_to: {traits: ["rusle_c<0.1"]}
+    when:
+      - {fact: candidate.bare_soil_months, op: le, value: 1}
+    effect: {kind: benefit}
+    evidence_strength: strong
+    sources:
+      - "RUSLE C-factor definition (crop_coefficients.csv S14)"
+    uses_traits: [rusle_c]
+    needs_local_review: false
+
+  - id: cover_crop_suggested
+    title: Consider a cereal rye cover crop
+    category: erosion
+    applies_to: {traits: ["bare_soil_months>=6"]}
+    when:
+      - {fact: candidate.lifecycle, op: eq, value: annual}
+      - {fact: field.practice.cover_planned, op: eq, value: false}
+    effect: {kind: advisory}
+    evidence_strength: moderate
+    sources:
+      - "ISU Plant Pathology repository 219; NRCS/Iowa Learning Farms webinar"
+    uses_traits: [bare_soil_months]
+    needs_local_review: true

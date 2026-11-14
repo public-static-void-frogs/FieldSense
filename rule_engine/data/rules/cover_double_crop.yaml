@@ -1,0 +1,125 @@
+# Cover crops and double cropping.
+# field.practice.cover_crop is the cover seeded after last season's crop and growing ahead of the
+# candidate (rye | winter_wheat | triticale | oats | clover | radish | none).
+# field.practice.cover_termination_days is days between killing it and planting the candidate.
+version: "2026-11-14"
+rules:
+  - id: winter_cover_nitrate_benefit
+    title: Overwintering cover crop cuts nitrate loss
+    category: soil_nutrient
+    applies_to: {traits: ["bare_soil_months>=6"]}
+    when:
+      - {fact: field.practice.cover_crop, op: in, value: [rye, winter_wheat, triticale]}
+    effect: {kind: benefit}
+    evidence_strength: strong
+    sources:
+      - "Iowa Nutrient Reduction Strategy science assessment, as tabulated in ISU SP 435: rye cover nitrate-N loss -31 % (SD 29), P loss -29 % (SD 37)"
+    uses_traits: [bare_soil_months]
+    needs_local_review: false
+
+  - id: winter_cover_soil_protection
+    title: Overwintering cover crop protects bare soil
+    category: erosion
+    applies_to: {traits: ["bare_soil_months>=6"]}
+    when:
+      - {fact: field.practice.cover_crop, op: in, value: [rye, winter_wheat, triticale]}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "NRCS / ISU CROP 3244 (2024), cereal rye cover crop fact sheet: 2,500-6,000 lb/ac biomass. No field-measured erosion percentage was found"
+    uses_traits: [bare_soil_months]
+    needs_local_review: true
+
+  - id: early_cover_after_small_grain_benefit
+    title: Cover crop seeded after small-grain harvest
+    category: soil_nutrient
+    applies_to: {traits: ["bare_soil_months>=6"]}
+    when:
+      - {fact: field.practice.cover_crop, op: in, value: [oats, clover, radish]}
+      - {fact: history.prev1.group, op: eq, value: small_grain}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "NRCS / ISU CROP 3243 (2024), oat cover crop fact sheet: fall seeding mid-August to mid-September, 1,000-4,000 lb/ac, winter-kills in Iowa"
+    uses_traits: [bare_soil_months]
+    needs_local_review: true
+
+  - id: cover_seeded_too_late
+    title: This cover crop cannot establish after a fall-harvested crop
+    category: soil_nutrient
+    applies_to: {traits: ["bare_soil_months>=6"]}
+    when:
+      - {fact: field.practice.cover_crop, op: in, value: [oats, clover, radish]}
+      - {fact: history.prev1.crop, op: in, value: [corn, soybeans, sorghum]}
+    effect: {kind: advisory}
+    evidence_strength: strong
+    sources:
+      - "Iowa Soybean Association 2022: after harvest only rye, wheat or triticale can be drilled; oats, clover and radish are too late"
+      - "ISU ICM: rye seeded mid-September reached 3,200 lb/ac, mid-October under 500 lb/ac"
+    needs_local_review: false
+
+  - id: rye_before_corn_planted_green
+    title: Corn planted into rye terminated under 10 days earlier
+    category: yield
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: field.practice.cover_crop, op: eq, value: rye}
+      - {fact: field.practice.cover_termination_days, op: lt, value: 10}
+    effect: {kind: risk, level: medium, yield_factor: [0.87, 0.94]}
+    evidence_strength: moderate
+    sources:
+      - "ISU ICM: terminate rye 10-14 days before corn planting (black cutworm, armyworm, Pythium green bridge)"
+      - "Practical Farmers of Iowa / Iowa Learning Farms 10-year trials: planting corn green cost 14 bu/ac on average (5 trials)"
+      - "ISU SP 435 (INRS science assessment): corn yield after rye -6 % (SD 7); used for the yield range"
+    needs_local_review: true
+
+  - id: rye_before_corn_termination_unknown
+    title: Rye ahead of corn, termination timing not given
+    category: yield
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: field.practice.cover_crop, op: eq, value: rye}
+      - {fact: field.practice.cover_termination_days, op: is_null}
+    effect: {kind: risk, level: low, yield_factor: [0.87, 1.00]}
+    evidence_strength: moderate
+    sources:
+      - "ISU SP 435 (INRS science assessment): corn yield after rye -6 % (SD 7)"
+      - "Practical Farmers of Iowa / Iowa Learning Farms 10-year trials: no corn yield effect in 32 of 39 trials when terminated early"
+    needs_local_review: true
+
+  - id: cover_window_after_small_grain
+    title: July harvest opens the widest cover-crop window
+    category: soil_nutrient
+    applies_to: {groups: [small_grain]}
+    when:
+      - {fact: candidate.lifecycle, op: eq, value: annual}
+    effect: {kind: advisory}
+    evidence_strength: moderate
+    sources:
+      - "NRCS / ISU CROP 3243 (2024): oats seeded mid-August to mid-September"
+      - "Iowa Soybean Association 2022: oats, clover and radish need seeding before corn or soybean harvest"
+    needs_local_review: false
+
+  - id: double_crop_soybean_short_season
+    title: Double-crop soybeans rarely mature in Iowa
+    category: temperature
+    applies_to: {crops: [double_crop_winter_wheat_soybeans]}
+    when:
+      - {fact: candidate.crop, op: not_null}
+    effect: {kind: risk, level: high}
+    evidence_strength: moderate
+    sources:
+      - "ISU ICM double-crop trials, Ames and Kalona 2018-19: rated very high risk; soybean 16.3-33.0 bu/ac, the 2019 Kalona crop never matured"
+    needs_local_review: true
+
+  - id: relay_instead_of_double_crop
+    title: Relay planting soybeans into wheat as the alternative
+    category: yield
+    applies_to: {crops: [double_crop_winter_wheat_soybeans]}
+    when:
+      - {fact: candidate.crop, op: not_null}
+    effect: {kind: advisory}
+    evidence_strength: weak
+    sources:
+      - "ISU ICM double-crop trials, Ames and Kalona 2018-19: relay planting out-yielded double cropping in 2019"
+    needs_local_review: true

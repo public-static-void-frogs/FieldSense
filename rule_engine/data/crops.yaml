@@ -1,0 +1,335 @@
+# Crop catalog for the rotation rule engine.
+#
+# Rules are written against GROUPS and TRAITS, so adding a crop means adding an entry here,
+# not a rule. A crop-level trait always overrides the group value. A trait is either a bare
+# value (treated as verified, no citation) or a mapping:
+#   value: <scalar or list>; verified: true|false; source: <citation>; text: <original range>
+# Values marked verified: false come from local-notes/research/crop_coefficients.csv rows the
+# researcher flagged UNVERIFIED, or from group-level proxies. Rules that depend on them are
+# downgraded to weak evidence and listed under data gaps.
+#
+# Group default calendars are day-of-year medians for the pilot region (Iowa) used only when
+# no NASS crop-progress calendar exists for the crop; the response labels them "group default".
+version: "2026-11-10"
+
+groups:
+  warm_season_grain:
+    label: Warm-season grain
+    traits:
+      family: Poaceae
+      season: warm
+      lifecycle: annual
+      n_fixer: false
+      n_demand: high
+      water_demand: high
+      residue: high
+      rusle_c: {value: 0.40, verified: true, source: "OMAFRA C-factor table, grain corn (crop_coefficients.csv S5)"}
+      bare_soil_months: {value: 6, verified: false, source: "harvest (Oct) to canopy closure (Jun) in Iowa; calendar estimate"}
+      min_return_years: {value: 1, verified: true, source: "crop_coefficients.csv: monoculture tolerated"}
+      humus_balance: {value: -800, verified: true, source: "VDLUFA 2014 humus balance, 'Mais/Hirse' group (crop_coefficients.csv S1)"}
+      heat_threshold_c: {value: 35, verified: true, source: "UNL CropWatch 2019; Canterra heat factsheet (climate_water_risk.md)"}
+      frost_threshold_c: {value: -2.2, verified: true, source: "UKY AGR-192: 28 F for 2 h kills growing point after ~V5"}
+      hosts: [corn_rootworm, gray_leaf_spot, northern_corn_leaf_blight, tar_spot]
+    calendar: {planted: 124, emerged: 136, flowering: 198, grain_fill: 214, mature: 258, harvested: 292}
+  small_grain:
+    label: Small grain
+    traits:
+      family: Poaceae
+      season: cool
+      lifecycle: annual
+      n_fixer: false
+      n_demand: medium
+      water_demand: medium
+      residue: medium
+      rusle_c: {value: 0.35, verified: true, source: "OMAFRA C-factor table, cereals (crop_coefficients.csv S5)"}
+      bare_soil_months: {value: 3, verified: false, source: "small grains cover the soil early and allow a late-summer cover crop; calendar estimate"}
+      min_return_years: {value: 2, verified: true, source: "crop_coefficients.csv: take-all, one-year break minimum"}
+      humus_balance: {value: -400, verified: true, source: "VDLUFA 2014, cereals conventional (crop_coefficients.csv S1)"}
+      heat_threshold_c: {value: 30, verified: true, source: "Plant Soil Environ 2017 wheat anthesis >30 C (climate_water_risk.md)"}
+      frost_threshold_c: {value: -4, verified: false, source: "no sourced value for spring cereal seedlings; placeholder"}
+      hosts: [take_all, fusarium_head_blight]
+    calendar: {planted: 104, emerged: 121, flowering: 157, grain_fill: 185, mature: 196, harvested: 208}
+  grain_legume:
+    label: Grain legume
+    traits:
+      family: Fabaceae
+      season: warm
+      lifecycle: annual
+      n_fixer: true
+      n_demand: low
+      water_demand: medium
+      residue: low
+      rusle_c: {value: 0.50, verified: false, source: "OMAFRA row-crop proxy (crop_coefficients.csv)"}
+      bare_soil_months: {value: 7, verified: false, source: "low residue after harvest; calendar estimate"}
+      min_return_years: {value: 1, verified: false, source: "SCN and white mold argue for >=1 non-host year (pest_disease_rules.md)"}
+      humus_balance: {value: 160, verified: true, source: "VDLUFA 2014, grain legumes (crop_coefficients.csv S1)"}
+      n_credit_kg_ha: {value: 35, verified: true, text: "28-50", source: "NE 25-45 lb/ac, WI 40 lb/ac (crop_coefficients.csv)"}
+      heat_threshold_c: {value: 35, verified: false, source: "no sourced soybean flowering heat threshold retrieved; corn value reused"}
+      frost_threshold_c: {value: -2, verified: false, source: "no sourced killing-frost value for soybean seedlings; placeholder"}
+      hosts: [soybean_cyst_nematode, white_mold, sudden_death_syndrome]
+    calendar: {planted: 127, emerged: 141, flowering: 192, grain_fill: 207, mature: 261, harvested: 291}
+  perennial_forage_legume:
+    label: Perennial forage legume
+    traits:
+      family: Fabaceae
+      season: cool
+      lifecycle: perennial
+      n_fixer: true
+      n_demand: low
+      water_demand: high
+      residue: high
+      rusle_c: {value: 0.02, verified: true, source: "RUSLE C for established forage legume (crop_coefficients.csv)"}
+      bare_soil_months: 0
+      min_return_years: {value: 3, verified: false, source: "clover rot interval 3-5 yr UNVERIFIED (crop_coefficients.csv)"}
+      humus_balance: {value: 800, verified: true, source: "VDLUFA 2014, forage legumes per main-use year (crop_coefficients.csv S1)"}
+      n_credit_kg_ha: {value: 150, verified: true, text: "146-213", source: "WI 130-190 lb/ac good-fair stand (crop_coefficients.csv)"}
+      heat_threshold_c: {value: 35, verified: false, source: "no sourced alfalfa heat threshold; placeholder"}
+      frost_threshold_c: {value: -6, verified: false, source: "alfalfa winterkill LT not retrieved; placeholder"}
+      hosts: [white_mold]
+    calendar: {planted: 110, emerged: 130, flowering: 165, grain_fill: 200, mature: 250, harvested: 280}
+  grass_hay_pasture:
+    label: Grass hay or pasture
+    traits:
+      family: Poaceae
+      season: cool
+      lifecycle: perennial
+      n_fixer: false
+      n_demand: medium
+      water_demand: medium
+      residue: high
+      rusle_c: {value: 0.02, verified: false, source: "RUSLE C for permanent grass cover; proxy"}
+      bare_soil_months: 0
+      min_return_years: 0
+      humus_balance: {value: 600, verified: false, source: "VDLUFA 'Ackergras' 600-800 HA; proxy"}
+      heat_threshold_c: {value: 35, verified: false, source: "placeholder"}
+      frost_threshold_c: {value: -8, verified: false, source: "placeholder"}
+      hosts: []
+    calendar: {planted: 110, emerged: 130, flowering: 165, grain_fill: 200, mature: 250, harvested: 280}
+  fallow:
+    label: Fallow
+    traits:
+      family: none
+      season: none
+      lifecycle: none
+      n_fixer: false
+      n_demand: low
+      water_demand: low
+      residue: low
+      rusle_c: {value: 1.0, verified: true, source: "RUSLE definition for bare fallow (crop_coefficients.csv S14)"}
+      bare_soil_months: 12
+      min_return_years: 0
+      humus_balance: {value: -200, verified: false, source: "VDLUFA lists no bare fallow; negative by inference"}
+      hosts: []
+    calendar: {}
+  non_crop:
+    label: Not cropland
+    traits:
+      family: none
+      season: none
+      lifecycle: none
+      n_fixer: false
+      n_demand: low
+      water_demand: low
+      residue: low
+      rusle_c: 0.0
+      bare_soil_months: 0
+      min_return_years: 0
+      humus_balance: 0
+      hosts: []
+    calendar: {}
+
+crops:
+  corn:
+    label: Corn (grain)
+    group: warm_season_grain
+    cdl_codes: [1, 12, 13]      # corn, sweet corn, pop/ornamental corn
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06277
+    stage_names: {flowering: silking, grain_fill: dough, mature: physiological maturity}
+    traits:
+      hosts: [corn_rootworm, gray_leaf_spot, northern_corn_leaf_blight, tar_spot, goss_wilt]
+  sorghum:
+    label: Sorghum (grain)
+    group: warm_season_grain
+    cdl_codes: [4]
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06277
+    stage_names: {flowering: heading, grain_fill: soft dough, mature: physiological maturity}
+    traits:
+      water_demand: medium
+      hosts: []
+      rusle_c: {value: 0.40, verified: false, source: "grain corn proxy (crop_coefficients.csv)"}
+      humus_balance: {value: -800, verified: true, source: "VDLUFA 'Mais/Hirse' group"}
+  soybeans:
+    label: Soybeans
+    group: grain_legume
+    cdl_codes: [5]
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06725
+    stage_names: {flowering: blooming (R1-R2), grain_fill: pod set to seed fill (R3-R6), mature: dropping leaves}
+    traits:
+      hosts: [soybean_cyst_nematode, white_mold, sudden_death_syndrome, corn_rootworm_variant]
+  oats:
+    label: Oats
+    group: small_grain
+    cdl_codes: [28]
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.03587
+    stage_names: {flowering: heading, grain_fill: coloring, mature: ripe}
+    traits:
+      min_return_years: {value: 2, verified: true, text: "2-3", source: "crop_coefficients.csv: nematodes"}
+      hosts: [cereal_nematodes]
+  winter_wheat:
+    label: Winter wheat
+    group: small_grain
+    cdl_codes: [24]
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06725
+    stage_names: {flowering: anthesis, grain_fill: grain fill, mature: ripe}
+    calendar:
+      source: "Fall-sown cereal, Iowa: planting and emergence fall in the previous autumn (outside the
+        Apr-Oct season window); heading early June, harvest mid-July. Calendar estimate, no NASS crop progress; unverified"
+      stages: {flowering: 155, grain_fill: 170, mature: 188, harvested: 198}
+    traits:
+      bare_soil_months: {value: 1, verified: false, source: "winter cereal covers the soil from autumn; calendar estimate"}
+      hosts: [take_all, fusarium_head_blight]
+  spring_wheat:
+    label: Spring wheat
+    group: small_grain
+    cdl_codes: [23]
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06725
+    stage_names: {flowering: anthesis, grain_fill: grain fill, mature: ripe}
+    traits:
+      hosts: [take_all, fusarium_head_blight]
+  rye:
+    label: Rye (grain)
+    group: small_grain
+    cdl_codes: [27]
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06277
+    stage_names: {flowering: anthesis, grain_fill: grain fill, mature: ripe}
+    calendar:
+      source: "Fall-sown cereal, Iowa: planting and emergence fall in the previous autumn (outside the
+        Apr-Oct season window); heading early June, harvest mid-July. Calendar estimate, no NASS crop progress; unverified"
+      stages: {flowering: 155, grain_fill: 170, mature: 188, harvested: 198}
+    traits:
+      min_return_years: {value: 1, verified: true, source: "crop_coefficients.csv: tolerates repeat"}
+      hosts: [take_all]
+  barley:
+    label: Barley
+    group: small_grain
+    cdl_codes: [21]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.05380
+    stage_names: {flowering: heading, grain_fill: grain fill, mature: ripe}
+    traits:
+      hosts: [take_all, fusarium_head_blight]
+  alfalfa:
+    label: Alfalfa
+    group: perennial_forage_legume
+    cdl_codes: [36]
+    regions: [IA]
+    display_unit: ton/acre
+    bu_to_t_ha: null
+    ton_to_t_ha: 2.2417
+    stage_names: {flowering: first bloom, grain_fill: regrowth, mature: last cutting}
+    traits: {}
+  other_hay:
+    label: Other hay (non-alfalfa)
+    group: grass_hay_pasture
+    cdl_codes: [37]
+    regions: [IA]
+    display_unit: ton/acre
+    bu_to_t_ha: null
+    ton_to_t_ha: 2.2417
+    stage_names: {}
+    traits: {}
+  grass_pasture:
+    label: Grassland or pasture
+    group: grass_hay_pasture
+    cdl_codes: [176, 62]
+    regions: [IA]
+    display_unit: ton/acre
+    bu_to_t_ha: null
+    ton_to_t_ha: 2.2417
+    stage_names: {}
+    traits: {}
+  dry_beans:
+    label: Dry beans
+    group: grain_legume
+    cdl_codes: [42]
+    regions: []
+    display_unit: cwt/acre
+    bu_to_t_ha: null
+    stage_names: {}
+    traits:
+      hosts: [soybean_cyst_nematode, white_mold]
+  canola:
+    label: Canola
+    group: small_grain
+    cdl_codes: [31]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.05604
+    stage_names: {flowering: early flowering, grain_fill: pod fill, mature: ripe}
+    traits:
+      family: Brassicaceae
+      min_return_years: {value: 3, verified: true, text: "3-4", source: "crop_coefficients.csv: clubroot, sclerotinia"}
+      heat_threshold_c: {value: 29.5, verified: true, source: "Morrison; Canola Council (climate_water_risk.md)"}
+      hosts: [white_mold, clubroot]
+  sunflower:
+    label: Sunflower
+    group: warm_season_grain
+    cdl_codes: [6]
+    regions: []
+    display_unit: lb/acre
+    bu_to_t_ha: null
+    stage_names: {}
+    traits:
+      family: Asteraceae
+      n_demand: medium
+      min_return_years: {value: 4, verified: false, text: "4-6", source: "crop_coefficients.csv UNVERIFIED"}
+      hosts: [white_mold]
+  fallow:
+    label: Fallow or idle cropland
+    group: fallow
+    cdl_codes: [61]
+    regions: []
+    display_unit: ""
+    bu_to_t_ha: null
+    stage_names: {}
+    traits: {}
+  double_crop_winter_wheat_soybeans:
+    label: Double crop winter wheat / soybeans
+    group: grain_legume
+    cdl_codes: [26]
+    regions: [IA]
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06725
+    stage_names: {flowering: blooming (R1-R2), grain_fill: pod set to seed fill, mature: dropping leaves}
+    components: [winter_wheat, soybeans]
+    calendar:
+      source: "Soybeans planted after wheat harvest, about 10 July (ISU ICM double-crop trials, Ames
+        and Kalona 2018-19); later stages are calendar estimates, no NASS crop progress; unverified"
+      stages: {planted: 191, emerged: 198, flowering: 232, grain_fill: 247, mature: 288, harvested: 300}
+    traits:
+      bare_soil_months: {value: 3, verified: false, source: "winter wheat covers autumn to July, soybeans to October; calendar estimate"}
+      hosts: [soybean_cyst_nematode, white_mold, sudden_death_syndrome, take_all, fusarium_head_blight]
+  non_crop:
+    label: Not cropland (developed, water, forest, wetland, barren)
+    group: non_crop
+    cdl_codes: [63, 64, 65, 81, 82, 83, 87, 88, 111, 112, 121, 122, 123, 124, 131, 141, 142, 143, 152, 190, 195]
+    regions: []
+    display_unit: ""
+    bu_to_t_ha: null
+    stage_names: {}
+    traits: {}
