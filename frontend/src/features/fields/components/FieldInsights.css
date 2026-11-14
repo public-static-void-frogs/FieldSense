@@ -1,0 +1,329 @@
+.field-insights-soil {
+  margin-top: 20px;
+}
+
+.field-insights-panel {
+  --field-insights-green: #315327;
+  --field-insights-green-range: #a9c39a;
+  --field-insights-risk-red: #963f34;
+
+  display: grid;
+  gap: 16px;
+}
+
+.field-insights-panel :is(p, h3, h4, dl) {
+  margin: 0;
+}
+
+.field-insights-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+
+.field-insights-heading > strong:not(.field-insights-signal-label) {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.field-insights-help-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.field-insights-help-button {
+  display: inline-grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #476b3c;
+  cursor: help;
+}
+
+.field-insights-help-button:hover,
+.field-insights-help-button:focus-visible {
+  background: #e9efdf;
+}
+
+.field-insights-help-button:focus-visible {
+  outline: 2px solid #476b3c;
+  outline-offset: 2px;
+}
+
+.field-insights-help-copy {
+  display: grid;
+  gap: 6px;
+}
+
+.field-insights-water-capacity {
+  display: grid;
+  gap: 10px;
+}
+
+.field-insights-water-capacity h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-insights-water-capacity h3 svg {
+  flex-shrink: 0;
+  color: #476b3c;
+}
+
+.field-insights-water-comparison {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.field-insights-water-comparison > div {
+  padding: 12px clamp(8px, 2vw, 18px);
+  border-radius: 8px;
+  background: #f3f6ef;
+  color: #315327;
+}
+
+.field-insights-water-comparison > div + div {
+  background: #f1f3f0;
+  color: #52624a;
+}
+
+.field-insights-water-comparison dt {
+  font-size: 0.875rem;
+  overflow-wrap: anywhere;
+}
+
+.field-insights-water-comparison dd {
+  margin: 4px 0 0;
+  font-size: clamp(1rem, 3vw, 1.5rem);
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.25;
+}
+
+.field-insights-water-difference {
+  color: #315327;
+  font-weight: 600;
+}
+
+.field-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+.field-insights-signals {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+
+.field-insights-crop-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.field-insights-season-stage {
+  display: grid;
+  gap: 4px;
+}
+
+.field-insights-season-dates {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+
+.field-insights-season-dates > span {
+  color: var(--field-insights-green);
+  font-weight: 600;
+}
+
+.field-insights-season-dates > small {
+  color: #52624a;
+}
+
+.field-insights-season-chart {
+  padding-block: 4px;
+  padding-inline: 4px;
+}
+
+.field-insights-season-track {
+  position: relative;
+  height: 8px;
+  border-radius: 4px;
+  background: #eef1eb;
+}
+
+.field-insights-season-range,
+.field-insights-season-marker {
+  position: absolute;
+  border-radius: 4px;
+}
+
+.field-insights-season-range {
+  top: 0;
+  height: 100%;
+  background: var(--field-insights-green-range);
+}
+
+.field-insights-season-marker {
+  top: -3px;
+  width: 4px;
+  height: 14px;
+  background: var(--field-insights-green);
+  transform: translateX(-50%);
+}
+
+.field-insights-season-axis {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 5px;
+  color: #52624a;
+  font-size: 0.75rem;
+}
+
+.field-insights-risk-track {
+  background: linear-gradient(
+    to right,
+    #e7f0e1 0 var(--risk-threshold),
+    #f7e0dc var(--risk-threshold) 100%
+  );
+}
+
+.field-insights-risk-range {
+  background: rgb(59 77 52 / 22%);
+}
+
+.field-insights-risk-value {
+  color: var(--field-insights-green);
+  font-weight: 600;
+}
+
+.field-insights-risk-value[data-elevated='true'] {
+  color: var(--field-insights-risk-red);
+}
+
+.field-insights-season-marker.field-insights-risk-value {
+  background: currentColor;
+}
+
+.field-insights-outlook {
+  display: grid;
+  gap: 14px;
+}
+
+.field-insights-sowing-chart {
+  margin: 0;
+  min-width: 0;
+}
+
+.field-insights-sowing-legend {
+  margin-block-start: 8px;
+  font-size: 0.875rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
+.field-insights-sowing-legend span {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.field-insights-sowing-line {
+  width: 18px;
+  border-top-width: 2px;
+}
+
+.field-insights-outlook-comparison {
+  display: grid;
+  gap: 6px;
+}
+
+.field-insights-outlook-comparison .field-insights-season-range {
+  min-width: 1px;
+}
+
+.field-insights-outlook-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 10px;
+}
+
+.field-insights-outlook-label small {
+  color: #52624a;
+}
+
+.field-insights-outlook-comparison .field-insights-season-axis {
+  margin-top: 0;
+  padding-inline: 4px;
+}
+
+.field-insights-metric {
+  min-width: 0;
+  height: 100%;
+}
+
+.field-insights-metric .ant-card-body {
+  display: grid;
+  gap: 8px;
+}
+
+.field-insights-metric .ant-progress {
+  line-height: 1;
+  margin: 0;
+}
+
+.field-insights-muted {
+  font-size: 0.875rem;
+}
+
+.field-insights-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.field-insights-table :is(th, td) {
+  text-align: start;
+  padding: 8px;
+  border-bottom: 1px solid #e2e7df;
+}
+
+.field-insights-table th[scope='row'] {
+  font-weight: 500;
+}
+
+.field-insights-notes {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+
+.field-insights-peaks {
+  max-height: 260px;
+  overflow: auto;
+}
+
+.field-insights-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.field-insights-panel details[open] > :not(summary) {
+  margin-top: 8px;
+}
+
+.field-insights-panel .ant-tabs-content-holder {
+  min-width: 0;
+}

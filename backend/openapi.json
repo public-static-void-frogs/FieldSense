@@ -1027,6 +1027,115 @@
         }
       }
     },
+    "/api/v1/fields/{field_id}/soil-depletion": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Soil Depletion",
+        "description": "Calculate or read the soil screening index at the selected parcel's reference point.",
+        "operationId": "soil_depletion_api_v1_fields__field_id__soil_depletion_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          },
+          {
+            "name": "part",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Part"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoilDepletion"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/m3-insights": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "M3 Insights",
+        "description": "Read precomputed crop timing and climate risks for the saved field coordinates.",
+        "operationId": "m3_insights_api_v1_fields__field_id__m3_insights_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/M3Insights"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/planning/context": {
       "get": {
         "tags": [
@@ -6006,6 +6115,898 @@
           "wind"
         ],
         "title": "WeatherUnits"
+      },
+      "JsonValue": {},
+      "M3CropRisk": {
+        "properties": {
+          "n_years": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Years"
+          },
+          "p_heat_overlap": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Heat Overlap"
+          },
+          "p_heat_lo80": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Heat Lo80"
+          },
+          "p_heat_hi80": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Heat Hi80"
+          },
+          "p_frost_before_maturity": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Frost Before Maturity"
+          },
+          "adaptation_margin_days": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Adaptation Margin Days"
+          },
+          "workable_days_q50": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Workable Days Q50"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "n_years",
+          "p_heat_overlap",
+          "p_heat_lo80",
+          "p_heat_hi80",
+          "p_frost_before_maturity",
+          "adaptation_margin_days",
+          "workable_days_q50"
+        ],
+        "title": "M3CropRisk"
+      },
+      "M3Error": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "outside_coverage",
+              "bad_input"
+            ],
+            "title": "Code"
+          },
+          "nearest_cell_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nearest Cell Km"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "M3Error"
+      },
+      "M3FutureRisk": {
+        "properties": {
+          "p_heat_median": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Heat Median"
+          },
+          "p_heat_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Heat Min"
+          },
+          "p_heat_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "P Heat Max"
+          },
+          "margin_min": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin Min"
+          },
+          "margin_max": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Margin Max"
+          },
+          "n_models": {
+            "type": "integer",
+            "title": "N Models"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "p_heat_median",
+          "p_heat_min",
+          "p_heat_max",
+          "margin_min",
+          "margin_max",
+          "n_models"
+        ],
+        "title": "M3FutureRisk"
+      },
+      "M3FutureWindow": {
+        "properties": {
+          "date_q50_median": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Q50 Median"
+          },
+          "date_q50_min": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Q50 Min"
+          },
+          "date_q50_max": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Q50 Max"
+          },
+          "n_models": {
+            "type": "integer",
+            "title": "N Models"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "date_q50_median",
+          "date_q50_min",
+          "date_q50_max",
+          "n_models"
+        ],
+        "title": "M3FutureWindow"
+      },
+      "M3Insights": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "query": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Query"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/M3Match"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "windows": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/M3Windows"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "risk": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/M3Risk"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "fallow_zero": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Fallow Zero"
+          },
+          "delay_scan": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Delay Scan"
+          },
+          "meta": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meta"
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings",
+            "default": []
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/M3Error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "query"
+        ],
+        "title": "M3Insights"
+      },
+      "M3Match": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "field",
+              "cell"
+            ],
+            "title": "Level"
+          },
+          "cell_id": {
+            "type": "string",
+            "title": "Cell Id"
+          },
+          "distance_km": {
+            "type": "number",
+            "title": "Distance Km"
+          },
+          "awc_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Awc Mm"
+          },
+          "reference_awc_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Awc Mm"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "level",
+          "cell_id",
+          "distance_km",
+          "awc_mm"
+        ],
+        "title": "M3Match"
+      },
+      "M3Risk": {
+        "properties": {
+          "now": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/M3CropRisk"
+            },
+            "type": "object",
+            "title": "Now"
+          },
+          "future": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/M3FutureRisk"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Future"
+          }
+        },
+        "type": "object",
+        "required": [
+          "now",
+          "future"
+        ],
+        "title": "M3Risk"
+      },
+      "M3Window": {
+        "properties": {
+          "date_q10": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Q10"
+          },
+          "date_q50": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Q50"
+          },
+          "date_q90": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Date Q90"
+          },
+          "n_years_fit": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Years Fit"
+          },
+          "calibrated": {
+            "anyOf": [
+              {
+                "type": "boolean"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calibrated"
+          }
+        },
+        "additionalProperties": true,
+        "type": "object",
+        "required": [
+          "date_q10",
+          "date_q50",
+          "date_q90",
+          "n_years_fit",
+          "calibrated"
+        ],
+        "title": "M3Window"
+      },
+      "M3Windows": {
+        "properties": {
+          "now": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/M3Window"
+            },
+            "type": "object",
+            "title": "Now"
+          },
+          "future": {
+            "additionalProperties": {
+              "additionalProperties": {
+                "$ref": "#/components/schemas/M3FutureWindow"
+              },
+              "type": "object"
+            },
+            "type": "object",
+            "title": "Future"
+          }
+        },
+        "type": "object",
+        "required": [
+          "now",
+          "future"
+        ],
+        "title": "M3Windows"
+      },
+      "SoilAssessment": {
+        "properties": {
+          "score": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Score"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "low",
+              "moderate",
+              "high",
+              "very_high",
+              "unknown"
+            ],
+            "title": "Level"
+          },
+          "coverage": {
+            "type": "number",
+            "title": "Coverage"
+          },
+          "components": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "propertyNames": {
+              "enum": [
+                "rotation",
+                "greenness",
+                "soil",
+                "county"
+              ]
+            },
+            "type": "object",
+            "title": "Components"
+          },
+          "drivers": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "rotation",
+                "greenness",
+                "soil",
+                "county"
+              ]
+            },
+            "type": "array",
+            "title": "Drivers"
+          },
+          "metrics": {
+            "$ref": "#/components/schemas/SoilMetrics"
+          },
+          "notes": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Notes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "score",
+          "level",
+          "coverage",
+          "components",
+          "drivers",
+          "metrics",
+          "notes"
+        ],
+        "title": "SoilAssessment"
+      },
+      "SoilDepletion": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "busy",
+              "ready"
+            ],
+            "title": "Status"
+          },
+          "coordinates": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Coordinates"
+          },
+          "assessment": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SoilAssessment"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "coordinates"
+        ],
+        "title": "SoilDepletion"
+      },
+      "SoilMetrics": {
+        "properties": {
+          "years_same_crop": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Years Same Crop"
+          },
+          "latest_crop": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Crop"
+          },
+          "top_crop_5y": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Top Crop 5Y"
+          },
+          "share_top_crop_5y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Share Top Crop 5Y"
+          },
+          "observed_years_5y": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Observed Years 5Y"
+          },
+          "peak_ndvi": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Ndvi"
+          },
+          "peak_evi": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Evi"
+          },
+          "ndvi_trend_pct_per_yr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ndvi Trend Pct Per Yr"
+          },
+          "mukey": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mukey"
+          },
+          "soil_component": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Soil Component"
+          },
+          "drainage_class": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Drainage Class"
+          },
+          "hydrologic_group": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Hydrologic Group"
+          },
+          "om_pct_0_30cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Om Pct 0 30Cm"
+          },
+          "aws0150_cm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Aws0150 Cm"
+          },
+          "slope_pct": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Slope Pct"
+          },
+          "kffact": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Kffact"
+          },
+          "county_fips": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "County Fips"
+          },
+          "county_yield_ratio_mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "County Yield Ratio Mean"
+          },
+          "county_yield_ratio_slope_pct_yr": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "County Yield Ratio Slope Pct Yr"
+          },
+          "county_yield_years": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "County Yield Years"
+          }
+        },
+        "type": "object",
+        "title": "SoilMetrics"
       }
     },
     "securitySchemes": {

@@ -1,0 +1,29 @@
+{
+ "hs_scale": 1.0750714810546345,
+ "hs_note": "Hargreaves x1.075 fitted to gridMET ETo (gridMET table, 5 yr, Apr-Oct; raw ratio 1.075)",
+ "n_triples": 4000,
+ "n_rows": 1623491,
+ "years": [
+  2023,
+  2024,
+  2025
+ ],
+ "notes": [
+  "Kc_bare=0.7 sits at the edge of the search grid - ledger physics may be off (ETo scale, SMAP range)",
+  "calibrated on Apr/Oct bare-soil days only; Nov-Mar behaviour (frozen soil, snow) is NOT validated"
+ ],
+ "kc_grid_mae_mm": {
+  "0.05": 23.04986228151719,
+  "0.15": 20.79104660663514,
+  "0.25": 18.55948182451772,
+  "0.35": 16.526310954683044,
+  "0.45": 14.882915740730033,
+  "0.55": 13.787045643790313,
+  "0.7": 13.367914368609679
+ },
+ "kc_bare": 0.7,
+ "cv_mae_plain_mm": 13.518225543109375,
+ "cv_mae_corrected_mm": 8.630039495654719,
+ "band_mm": 11.507672686476498,
+ "use_corrector": true
+}

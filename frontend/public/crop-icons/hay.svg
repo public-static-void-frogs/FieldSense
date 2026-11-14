@@ -1,0 +1,25 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Other Hay/Non Alfalfa">
+  <g transform="translate(31 57) rotate(-53)">
+  <path fill="#667B37" d="M0 0C-5 -7.20 -5 -21.90 0 -30C5 -21.60 5 -7.20 0 0Z"/>
+  <path fill="#85A54C" d="M0 -1C3.25 -10.20 3.10 -20.40 0 -29Z"/>
+  </g>
+  <g transform="translate(32 57) rotate(55)">
+  <path fill="#667B37" d="M0 0C-5 -7.68 -5 -23.36 0 -32C5 -23.04 5 -7.68 0 0Z"/>
+  <path fill="#85A54C" d="M0 -1C3.25 -10.88 3.10 -21.76 0 -31Z"/>
+  </g>
+  <path fill="none" stroke="#6C7139" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" d="M32 57Q20 34 20 31"/>
+  <g transform="translate(20 23) rotate(-22)">
+  <ellipse fill="#9F7B3F" cx="0" cy="0" rx="4.6" ry="9"/>
+  <ellipse fill="#C7A459" cx="0.75" cy="-1" rx="2.5" ry="6.8"/>
+  </g>
+  <path fill="none" stroke="#6C7139" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" d="M32 57Q31 34 31 18"/>
+  <g transform="translate(31 10) rotate(2)">
+  <ellipse fill="#9F7B3F" cx="0" cy="0" rx="4.6" ry="9"/>
+  <ellipse fill="#C7A459" cx="0.75" cy="-1" rx="2.5" ry="6.8"/>
+  </g>
+  <path fill="none" stroke="#6C7139" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" d="M32 57Q43 34 43 27"/>
+  <g transform="translate(43 19) rotate(24)">
+  <ellipse fill="#9F7B3F" cx="0" cy="0" rx="4.6" ry="9"/>
+  <ellipse fill="#C7A459" cx="0.75" cy="-1" rx="2.5" ry="6.8"/>
+  </g>
+</svg>

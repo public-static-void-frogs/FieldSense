@@ -1,16 +1,16 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Card, Typography } from 'antd';
-import { Bean, Sprout, Wheat } from 'lucide-react';
 import { useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fieldQueries } from '../../../api/fields/fields.queries.ts';
+import { CropIcon } from '../../../components/common/CropIcon';
 import { RouterButton } from '../../../components/common/RouterButton';
 import './FieldRecommendation.css';
 
 const strategyDetails = {
-  'soil-cover': { label: 'Soil cover', Icon: Wheat },
-  'nitrogen-fixation': { label: 'Nitrogen fixation', Icon: Bean },
-  'long-term-fertility': { label: 'Long-term fertility', Icon: Sprout },
+  'soil-cover': { label: 'Soil cover' },
+  'nitrogen-fixation': { label: 'Nitrogen fixation' },
+  'long-term-fertility': { label: 'Long-term fertility' },
 } as const;
 
 type FieldRecommendationProps = { fieldId: string };
@@ -27,13 +27,13 @@ export function FieldRecommendation({ fieldId }: FieldRecommendationProps) {
       </Typography.Title>
       <div className="field-strategies-grid">
         {strategies.map(({ id, crop, description }) => {
-          const { label, Icon } = strategyDetails[id];
+          const { label } = strategyDetails[id];
 
           return (
             <Card key={id} className="field-strategy-card" data-strategy={id}>
               <div className="field-strategy-banner">
                 <span className="field-strategy-icon">
-                  <Icon size={26} aria-hidden="true" />
+                  <CropIcon crop={crop} size={38} />
                 </span>
               </div>
               <div className="field-strategy-content">

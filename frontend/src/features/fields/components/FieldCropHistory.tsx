@@ -35,10 +35,12 @@ import type {
   CropHistoryYear,
   HistoricalCropClass,
 } from '../../../types/fields/crop-history.types.ts';
+import { CropIcon } from '../../../components/common/CropIcon';
 import type { Field } from '../../../types/fields/field.types.ts';
 import { satelliteTiles } from '../../maps/constants/maps.constants.ts';
 import { useCropPatterns } from '../hooks/useCropPatterns.ts';
 import { cropPatternAt, summarizeCropPattern } from '../utils/cropPatterns.ts';
+import { FieldSoilDepletion } from './FieldSoilDepletion';
 import './FieldCropHistory.css';
 
 const pinIcon = divIcon({
@@ -85,6 +87,7 @@ export function FieldCropHistory({ field }: FieldCropHistoryProps) {
           geometryKey={geometryKey}
         />
       </div>
+      <FieldSoilDepletion fieldId={field.id} part={activePart} geometryKey={geometryKey} />
     </Card>
   );
 }
@@ -332,7 +335,7 @@ function PointCropPatterns({ years }: PointCropPatternsProps) {
         {years.map(({ year, crop }) => (
           <li key={year}>
             <strong>{year}</strong>
-            <span className="crop-history-swatch" style={{ background: crop?.color }} />
+            <CropIcon crop={crop?.code} size={20} />
             {crop?.label ?? t('No data')}
           </li>
         ))}

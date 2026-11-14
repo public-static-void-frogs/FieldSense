@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Rice">
+  <path fill="none" stroke="#2E6244" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" d="M38 57C41 40 33 18 15 14M38 57C42 43 49 33 53 26"/>
+  <g transform="translate(38 57) rotate(-55)">
+  <path fill="#2E6244" d="M0 0C-4 -6.48 -4 -19.71 0 -27C4 -19.44 4 -6.48 0 0Z"/>
+  <path fill="#589044" d="M0 -1C2.60 -9.18 2.48 -18.36 0 -26Z"/>
+  </g>
+  <g transform="translate(39 57) rotate(48)">
+  <path fill="#2E6244" d="M0 0C-4 -6.00 -4 -18.25 0 -25C4 -18.00 4 -6.00 0 0Z"/>
+  <path fill="#589044" d="M0 -1C2.60 -8.50 2.48 -17.00 0 -24Z"/>
+  </g>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M15 15Q13 19 13 25"/>
+  <ellipse fill="#AC9B43" cx="13" cy="25" rx="2.6" ry="4.35" transform="rotate(-28 13 25)"/>
+  <ellipse fill="#DBBA5B" cx="12.55" cy="24.3" rx="1.2" ry="2.7" transform="rotate(-28 12.55 24.3)"/>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M20 17Q15 21 15 30"/>
+  <ellipse fill="#AC9B43" cx="15" cy="30" rx="2.6" ry="4.35" transform="rotate(-32 15 30)"/>
+  <ellipse fill="#DBBA5B" cx="14.55" cy="29.3" rx="1.2" ry="2.7" transform="rotate(-32 14.55 29.3)"/>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M25 21Q20 25 20 35"/>
+  <ellipse fill="#AC9B43" cx="20" cy="35" rx="2.6" ry="4.35" transform="rotate(-32 20 35)"/>
+  <ellipse fill="#DBBA5B" cx="19.55" cy="34.3" rx="1.2" ry="2.7" transform="rotate(-32 19.55 34.3)"/>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M30 25Q25 29 25 39"/>
+  <ellipse fill="#AC9B43" cx="25" cy="39" rx="2.6" ry="4.35" transform="rotate(-31 25 39)"/>
+  <ellipse fill="#DBBA5B" cx="24.55" cy="38.3" rx="1.2" ry="2.7" transform="rotate(-31 24.55 38.3)"/>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M33 31Q30 35 30 44"/>
+  <ellipse fill="#AC9B43" cx="30" cy="44" rx="2.6" ry="4.35" transform="rotate(-29 30 44)"/>
+  <ellipse fill="#DBBA5B" cx="29.55" cy="43.3" rx="1.2" ry="2.7" transform="rotate(-29 29.55 43.3)"/>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M35 37Q34 41 34 48"/>
+  <ellipse fill="#AC9B43" cx="34" cy="48" rx="2.6" ry="4.35" transform="rotate(-25 34 48)"/>
+  <ellipse fill="#DBBA5B" cx="33.55" cy="47.3" rx="1.2" ry="2.7" transform="rotate(-25 33.55 47.3)"/>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M52 27Q52 31 52 36"/>
+  <ellipse fill="#AC9B43" cx="52" cy="36" rx="2.6" ry="4.35" transform="rotate(20 52 36)"/>
+  <ellipse fill="#DBBA5B" cx="51.55" cy="35.3" rx="1.2" ry="2.7" transform="rotate(20 51.55 35.3)"/>
+  <path fill="none" stroke="#2E6244" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" d="M48 33Q48 37 48 42"/>
+  <ellipse fill="#AC9B43" cx="48" cy="42" rx="2.6" ry="4.35" transform="rotate(20 48 42)"/>
+  <ellipse fill="#DBBA5B" cx="47.55" cy="41.3" rx="1.2" ry="2.7" transform="rotate(20 47.55 41.3)"/>
+</svg>

@@ -204,7 +204,6 @@
   box-shadow: 0 2px 8px #17241040;
   cursor: pointer;
   user-select: none;
-  font-size: 23px;
   filter: grayscale(1);
   opacity: 0.6;
 }
@@ -231,9 +230,6 @@
   border-bottom: 1px solid #e4e7dc;
   cursor: pointer;
   font-size: 13px;
-}
-.map-detected-crop {
-  font-size: 21px;
 }
 @media (prefers-reduced-motion: reduce) {
   .map-section-analyzing {

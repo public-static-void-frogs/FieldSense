@@ -5,10 +5,12 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
+import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { CropRotationPlan } from '../features/fields/components/CropRotationPlan';
 import { FieldCropHistory } from '../features/fields/components/FieldCropHistory';
+import { FieldM3Insights } from '../features/fields/components/FieldM3Insights';
 import { FieldProperties } from '../features/fields/components/FieldProperties';
 import { FieldRecommendation } from '../features/fields/components/FieldRecommendation';
 import { FieldStatus } from '../features/fields/components/FieldStatus';
@@ -36,12 +38,15 @@ export function FieldDetailsPage() {
         title={field.crop || field.name}
         eyebrow=""
         titlePrefix={
-          <RouterButton
-            type="text"
-            icon={<ArrowLeft size={20} />}
-            aria-label={t('Back to my fields')}
-            to="/fields"
-          />
+          <>
+            <RouterButton
+              type="text"
+              icon={<ArrowLeft size={20} />}
+              aria-label={t('Back to my fields')}
+              to="/fields"
+            />
+            {field.crop && <CropIcon crop={field.crop} size={36} />}
+          </>
         }
         actions={
           <Space wrap>
@@ -97,8 +102,9 @@ export function FieldDetailsPage() {
       <div className="field-detail-stack">
         <CropRotationPlan field={field} />
         <FieldProperties field={field} />
-        <FieldCropHistory key={field.id} field={field} />
         <FieldRecommendation fieldId={field.id} />
+        <FieldCropHistory key={field.id} field={field} />
+        <FieldM3Insights field={field} />
       </div>
       <Modal
         open={confirmRemove}
