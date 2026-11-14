@@ -94,6 +94,11 @@ The example imports the `Field` entity from `src/types/fields/field.types.ts`; i
 - Invalidate or update all affected queries after mutations. Preserve loading, error, retry, and mutation-failure feedback.
 - Keep transient UI state, such as filters and selection, in feature hooks, subject to the simple-component exception above.
 
+## Crop icons
+
+- Use the shared `CropIcon` component in `src/components/common/CropIcon.tsx` for every icon that identifies a crop or a Crop history class. Pass the USDA Cropland Data Layer code when available, or the original crop label. Keep the crop label visible or included in the control's accessible name.
+- Keep the crop icon mapping in `CropIcon` and the SVGs in `public/crop-icons/`. Reuse its generic fallback for missing or unsupported crops. Map legend swatches still represent map layer colors.
+
 ## Translations
 
 - Use react-i18next and `useTranslation()` / `t()` for system UI, labels, controls, messages, and other application copy.

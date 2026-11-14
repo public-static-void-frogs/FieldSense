@@ -10,6 +10,7 @@ import { useTranslation } from 'react-i18next';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
 import { farmQueries } from '../api/farm/farm.queries.ts';
 import { weatherQueries } from '../api/weather/weather.queries.ts';
+import { CropIcon } from '../components/common/CropIcon';
 import { ForecastPanel } from '../features/weather/components/ForecastPanel';
 import { HistoryChart } from '../features/weather/components/HistoryChart';
 import { WeatherDayDetails } from '../features/weather/components/WeatherDayDetails';
@@ -48,16 +49,26 @@ export function HistoryPage() {
         <div className="weather-assessment-toolbar">
           <Select
             id="weather-crop"
+            className="weather-crop-select"
             aria-label={t('Crop for weather assessment')}
             value={crop?.value}
             onChange={selectCrop}
             disabled={!cropOptions.length}
             placeholder={t('No crops available')}
-            options={cropOptions}
+            options={cropOptions.map(({ value, label }) => ({
+              value,
+              label: (
+                <Space size={6}>
+                  <CropIcon crop={value} size={20} />
+                  {label}
+                </Space>
+              ),
+            }))}
           />
           {matchingFields.length > 1 && (
             <Select
               id="weather-field"
+              className="weather-field-select"
               aria-label={t('Field for crop assessment')}
               value={field?.id}
               onChange={selectField}
@@ -65,9 +76,16 @@ export function HistoryPage() {
               options={matchingFields.map((item) => {
                 const [longitude, latitude] = item.geometry.coordinates;
                 const location = `${latitude.toFixed(5)}, ${longitude.toFixed(5)}`;
+                const label = item.name === item.crop ? location : `${location} · ${item.name}`;
+
                 return {
                   value: item.id,
-                  label: item.name === item.crop ? location : `${location} · ${item.name}`,
+                  label: (
+                    <span className="weather-field-option">
+                      <CropIcon crop={item.crop} size={20} />
+                      <span title={label}>{label}</span>
+                    </span>
+                  ),
                 };
               })}
             />

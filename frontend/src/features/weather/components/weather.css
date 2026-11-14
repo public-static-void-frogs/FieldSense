@@ -51,10 +51,6 @@
   .environment-sticky-header .environment-tabs {
     flex-basis: 100%;
   }
-
-  .environment-sticky-header .weather-assessment-toolbar {
-    width: 100%;
-  }
 }
 
 .weather-forecast-card,
@@ -477,14 +473,36 @@
 .weather-assessment-toolbar {
   display: flex;
   align-items: center;
-  flex: 0 0 auto;
+  flex: 0 1 auto;
   gap: 8px;
-  width: clamp(230px, 40vw, 420px);
+  min-width: 0;
+  max-width: 100%;
 }
 
 .weather-assessment-toolbar .ant-select {
-  flex: 1;
   min-width: 0;
+}
+
+.weather-crop-select {
+  width: clamp(128px, 14vw, 152px);
+}
+
+.weather-field-select {
+  width: clamp(156px, 19vw, 196px);
+}
+
+.weather-field-option {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.weather-field-option > span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .weather-crop-note {

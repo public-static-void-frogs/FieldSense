@@ -183,7 +183,7 @@ def geojson(
 
 @router.get("/help/team", response_model=list[TeamMember], tags=["help"])
 def team(store: Store):
-    return []
+    return service.team()
 
 
 @router.get("/help/sources", response_model=list[DemoSource], tags=["help"])

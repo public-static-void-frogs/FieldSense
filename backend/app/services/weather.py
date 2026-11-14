@@ -85,7 +85,7 @@ class WeatherService:
             "precipitation_unit": "inch" if preferences.units == "imperial" else "mm",
         }
 
-    def _fetch(self, url, params, ttl):
+    def fetch_provider(self, url, params, ttl, validate=None):
         key = (url, tuple(sorted(params.items())))
         with self._lock:
             cached = self._cache.get(key)
@@ -109,7 +109,7 @@ class WeatherService:
                 raise ValueError("Invalid weather response")
             payload["fetchedAt"] = datetime.now(timezone.utc).isoformat()
             # Validate the provider boundary before caching an apparently successful response.
-            self._validate(payload, params)
+            (validate or self._validate)(payload, params)
             with self._lock:
                 self._cache[key] = (self.clock() + ttl, payload)
                 while len(self._cache) > self.config.weather_cache_size:
@@ -161,7 +161,7 @@ class WeatherService:
             hourly="relative_humidity_2m,soil_moisture_0_to_1cm",
             forecast_days=14,
         )
-        return self._fetch(
+        return self.fetch_provider(
             self.config.weather_forecast_url, params, self.config.weather_forecast_ttl_seconds
         )
 
@@ -277,7 +277,7 @@ class WeatherService:
             daily=DAILY,
             hourly="relative_humidity_2m,soil_moisture_0_to_7cm",
         )
-        payload = self._fetch(
+        payload = self.fetch_provider(
             self.config.weather_archive_url, params, self.config.weather_history_ttl_seconds
         )
         return dict(

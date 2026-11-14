@@ -1,3 +1,54 @@
+.field-detail-nav {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px 16px;
+  margin-bottom: 20px;
+  padding: 10px 0;
+  border-block: 1px solid #dfe5d5;
+}
+
+.field-detail-nav-label {
+  color: #465440;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.field-detail-nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 6px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.field-detail-nav a {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 6px;
+  color: #3e6133;
+  font-size: 13px;
+  text-decoration: none;
+}
+
+.field-detail-nav a:hover,
+.field-detail-nav a:focus-visible {
+  background: #eaf0df;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.field-detail-nav a:focus-visible {
+  outline: 2px solid #527445;
+  outline-offset: 2px;
+}
+
+.field-detail-anchor {
+  min-width: 0;
+  scroll-margin-top: 24px;
+}
+
 .field-detail-stack,
 .field-properties-stack {
   display: flex;

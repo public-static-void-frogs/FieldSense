@@ -76,7 +76,7 @@ def upstream(operation, params):
     return response
 
 
-def history(field, part, coordinates):
+def analysis_point(field, part, coordinates=None):
     bounds, polygon = extent(field, part)
     if coordinates is None:
         if polygon is None:
@@ -91,6 +91,11 @@ def history(field, part, coordinates):
     ):
         raise HTTPException(422, "Choose a point inside the displayed area")
 
+    return coordinates
+
+
+def history(field, part, coordinates):
+    coordinates = analysis_point(field, part, coordinates)
     try:
         rows = identify(*coordinates, int(time.time() // 3600))
     except (httpx.HTTPError, ValueError, TypeError, KeyError) as error:

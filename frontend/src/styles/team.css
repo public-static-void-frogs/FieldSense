@@ -186,3 +186,9 @@
     grid-template-columns: 1fr;
   }
 }
+
+.team-card .ant-card-body > a.ant-typography {
+  display: inline-block;
+  margin-top: 8px;
+  font-size: 16px;
+}

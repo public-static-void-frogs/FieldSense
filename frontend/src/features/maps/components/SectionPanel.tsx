@@ -13,7 +13,7 @@ import {
   sectionArea,
   type MapSection,
 } from '../utils/sectionSelection.ts';
-import { detectedCropIcons } from '../constants/maps.constants.ts';
+import { CropIcon } from '../../../components/common/CropIcon';
 
 type SectionPanelProps = {
   section: MapSection;
@@ -76,9 +76,7 @@ export function SectionPanel({
                 })}
                 onChange={(event) => onSelectCrop(section.id, group.crop, event.target.checked)}
               >
-                <span className="map-detected-crop" aria-hidden="true">
-                  {detectedCropIcons[group.crop] ?? '🌱'}
-                </span>
+                <CropIcon crop={group.crop} size={22} />
                 <span className="map-detected-crop-name">{group.crop}</span>
                 <span className="map-crop-group-count">
                   {group.selected}/{group.total}

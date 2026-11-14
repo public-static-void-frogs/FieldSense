@@ -1,0 +1,5 @@
+.crop-icon {
+  display: block;
+  flex: none;
+  object-fit: contain;
+}

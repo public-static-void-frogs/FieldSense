@@ -30,6 +30,11 @@ class Settings:
             "WEATHER_ARCHIVE_URL", "https://archive-api.open-meteo.com/v1/archive"
         )
     )
+    soil_moisture_power_url: str = field(
+        default_factory=lambda: os.getenv(
+            "SOIL_MOISTURE_POWER_URL", "https://power.larc.nasa.gov/api/temporal/daily/point"
+        )
+    )
     gemini_api_key: str = field(default_factory=lambda: os.getenv("GEMINI_API_KEY", ""), repr=False)
     gemini_enabled: bool = field(
         default_factory=lambda: os.getenv("GEMINI_ENABLED", "false").lower() == "true"
@@ -37,11 +42,19 @@ class Settings:
     gemini_model: str = field(
         default_factory=lambda: os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
     )
+
     assistant_prompt_file: Path = field(
         default_factory=lambda: Path(
             os.getenv("ASSISTANT_PROMPT_FILE", "") or BACKEND_ROOT / "app" / "prompts" / "assistant.txt"
         )
     )
+    m3_out: Path = field(
+        default_factory=lambda: Path(
+            os.getenv("M3_OUT") or Path(__file__).resolve().parents[3] / "data/m3_out"
+        )
+    )
+    nass_api_key: str = field(default_factory=lambda: os.getenv("NASS_API_KEY", ""), repr=False)
+      
     weather_timeout_seconds: float = 5
     weather_forecast_ttl_seconds: int = 600
     weather_history_ttl_seconds: int = 21600

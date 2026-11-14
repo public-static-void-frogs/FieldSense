@@ -2,9 +2,9 @@ import { ArrowRight, MapPin } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link } from 'react-router-dom';
 import type { Field } from '../../../types/fields/field.types.ts';
+import { CropIcon } from '../../../components/common/CropIcon';
 import { FarmlandBackdrop } from '../../../components/common/FarmlandBackdrop';
 import { RouterButton } from '../../../components/common/RouterButton';
-import { CropIllustration } from './CropIllustration.tsx';
 import './CropFieldCards.css';
 
 type CropFieldCardsProps = { fields: Field[]; compact?: boolean };
@@ -36,7 +36,7 @@ export function CropFieldCards({ fields, compact = false }: CropFieldCardsProps)
       {fields.map((field) => (
         <li key={field.id}>
           <Link className="crop-field-card" to={`/fields/${field.id}`}>
-            <CropIllustration crop={field.crop} />
+            <CropIcon crop={field.crop} size={compact ? 44 : 56} />
             <div className="crop-field-card-copy">
               <h2>{field.crop ?? t('Not supplied')}</h2>
               <p>{t('{{value0}} ha', { value0: number.format(field.area) })}</p>

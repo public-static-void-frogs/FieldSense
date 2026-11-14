@@ -1,24 +1,19 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { Card, Flex, Space, Tag, Typography } from 'antd';
 import { ArrowUpRight, CalendarDays, Sprout } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
-import { planningQueries } from '../../../api/planning/planning.queries.ts';
 import { RouterButton } from '../../../components/common/RouterButton';
 import type { Field } from '../../../types/fields/field.types.ts';
+import type { RotationPlan } from '../../../types/planning/planning.types.ts';
 
 import { formatPlanDate } from '../../planning/utils/planningDates.ts';
 
-type CropRotationPlanProps = { field: Field };
+type CropRotationPlanProps = { field: Field; plan: RotationPlan };
 
-export function CropRotationPlan({ field }: CropRotationPlanProps) {
+export function CropRotationPlan({ field, plan }: CropRotationPlanProps) {
   const { t } = useTranslation();
-  const { data: plan } = useSuspenseQuery(planningQueries.rotation(field.id));
-  if (!plan) {
-    return null;
-  }
 
   return (
-    <Card id="crop-rotation-plan" className="rotation-summary rotation-plan-anchor">
+    <Card className="rotation-summary rotation-plan-anchor">
       <Flex justify="space-between" align="center" gap={20} wrap>
         <div className="rotation-summary-copy">
           <Space size={8}>
