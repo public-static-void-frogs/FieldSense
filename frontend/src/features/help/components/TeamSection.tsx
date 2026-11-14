@@ -39,6 +39,14 @@ export function TeamSection() {
           >
             <Typography.Title level={4}>{frog.name}</Typography.Title>
             <Typography.Paragraph>{frog.roles}</Typography.Paragraph>
+            <Typography.Link
+              href={frog.linkedin}
+              target="_blank"
+              rel="noopener noreferrer"
+              aria-label={t('{{name}} on LinkedIn', { name: frog.name })}
+            >
+              LinkedIn
+            </Typography.Link>
           </Card>
         ))}
       </div>

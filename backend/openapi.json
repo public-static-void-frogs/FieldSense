@@ -5502,6 +5502,10 @@
           "alt": {
             "type": "string",
             "title": "Alt"
+          },
+          "linkedin": {
+            "type": "string",
+            "title": "Linkedin"
           }
         },
         "type": "object",
@@ -5509,7 +5513,8 @@
           "id",
           "name",
           "roles",
-          "alt"
+          "alt",
+          "linkedin"
         ],
         "title": "TeamMember"
       },

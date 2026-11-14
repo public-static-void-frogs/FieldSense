@@ -3,6 +3,7 @@ export interface TeamMember {
   name: string;
   roles: string;
   alt: string;
+  linkedin: string;
 }
 export interface DemoSource {
   key: string;
