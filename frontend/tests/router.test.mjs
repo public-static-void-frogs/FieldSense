@@ -21,6 +21,7 @@ test('the real route tree matches static, dynamic, optional and fallback routes'
     [`/fields/${fieldOne}`, 'field'],
     [`/fields/${fieldTwo}/strategy`, 'strategy'],
     [`/fields/${fieldTwo}/recommendation`, 'recommendation'],
+    [`/fields/${fieldTwo}/recommendation/alfalfa?priorities=soil`, 'recommendation-crop'],
     ['/map', 'map'],
     ['/map/guide', 'map-guide'],
     ['/map/add', 'map-add'],
@@ -100,6 +101,12 @@ test('router navigation preserves params, search state, and back/forward history
     await router.navigate(1);
     await idle(router);
     assert.equal(router.state.location.pathname, `/fields/${fieldTwo}/strategy`);
+    await router.navigate(`/fields/${fieldTwo}/recommendation/alfalfa?priorities=soil`);
+    assert.deepEqual(router.state.loaderData['recommendation-crop'], {
+      fieldId: fieldTwo,
+      cropId: 'alfalfa',
+    });
+    assert.equal(new URLSearchParams(router.state.location.search).get('priorities'), 'soil');
     const path = calendarPath('2026-05-24', fieldOne, eventId);
     await router.navigate(path, { preventScrollReset: true });
     assert.equal(router.state.location.pathname, '/calendar/2026-05-24');

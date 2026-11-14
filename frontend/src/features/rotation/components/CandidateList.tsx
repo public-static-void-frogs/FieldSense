@@ -1,5 +1,8 @@
-import { Collapse, Flex, Tag, Typography } from 'antd';
+import { Flex, Tag, Typography } from 'antd';
+import { ArrowRight } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useLocation } from 'react-router-dom';
+import { RouterButton } from '../../../components/common/RouterButton';
 import type { RotationAdvice, RotationCandidate } from '../../../types/rotation/rotation.types.ts';
 import { levelColors, levelLabels } from '../constants/rotationLabels.ts';
 import {
@@ -8,28 +11,28 @@ import {
   highestRiskLevel,
   rankedCandidates,
 } from '../utils/rotationPresentation.ts';
-import { CandidateDetails } from './CandidateDetails';
+import { recommendationPath } from '../utils/rotationRoutes.ts';
 
 type CandidateListProps = { advice: RotationAdvice };
 
 export function CandidateList({ advice }: CandidateListProps) {
+  const { t } = useTranslation();
+  const { search } = useLocation();
   const candidates = rankedCandidates(advice);
-  const open = candidates
-    .filter((candidate) => candidate.isIntended || candidate.rank === 1)
-    .map((candidate) => candidate.crop);
 
   return (
-    <Collapse
-      // Re-open the relevant crops when another intended crop is chosen.
-      key={advice.intendedCrop}
-      className="rotation-candidates"
-      defaultActiveKey={open}
-      items={candidates.map((candidate) => ({
-        key: candidate.crop,
-        label: <CandidateSummary candidate={candidate} />,
-        children: <CandidateDetails advice={advice} candidate={candidate} />,
-      }))}
-    />
+    <ul className="rotation-candidates">
+      {candidates.map((candidate) => (
+        <li className="rotation-candidate-row" key={candidate.crop}>
+          <CandidateSummary candidate={candidate} />
+          <RouterButton
+            to={{ pathname: recommendationPath(advice.fieldId, candidate.crop), search }}
+            icon={<ArrowRight size={18} />}
+            aria-label={t('View more about {{crop}}', { crop: t(candidate.label) })}
+          />
+        </li>
+      ))}
+    </ul>
   );
 }
 

@@ -12,6 +12,17 @@ export function fieldLoader({ params }: LoaderFunctionArgs): FieldRouteData {
   }
   return { fieldId: params.fieldId.toLowerCase() };
 }
+export type RecommendationCropRouteData = FieldRouteData & { cropId: string };
+
+export function recommendationCropLoader(args: LoaderFunctionArgs): RecommendationCropRouteData {
+  const { cropId } = args.params;
+  if (!cropId) {
+    throw new Response(null, { status: 404 });
+  }
+
+  return { ...fieldLoader(args), cropId };
+}
+
 export type StrategyOptionRouteData = FieldRouteData & { strategyId: string };
 
 export function strategyOptionLoader(args: LoaderFunctionArgs): StrategyOptionRouteData {

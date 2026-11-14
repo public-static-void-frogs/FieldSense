@@ -5,6 +5,7 @@
 }
 
 .field-strategy-card.ant-card {
+  position: relative;
   display: flex;
   overflow: hidden;
 }
@@ -16,43 +17,68 @@
   padding: 0;
 }
 
-.field-strategy-card[data-strategy='soil-cover'] {
-  --strategy-tint: #f7edce;
-  --strategy-ink: #76500e;
-}
-
-.field-strategy-card[data-strategy='nitrogen-fixation'] {
-  --strategy-tint: #e5efd9;
-  --strategy-ink: #315327;
-}
-
-.field-strategy-card[data-strategy='long-term-fertility'] {
-  --strategy-tint: #dfefea;
-  --strategy-ink: #315d54;
-}
-
 .field-strategy-banner {
   display: flex;
   align-items: center;
-  min-height: 96px;
-  padding: 16px 20px;
-  color: var(--strategy-ink);
-  background:
-    repeating-radial-gradient(
-      circle at 92% 0%,
-      transparent 0 26px,
-      rgb(255 255 255 / 55%) 27px 28px
-    ),
-    var(--strategy-tint);
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 18px;
+  background: #e5efd9;
 }
 
 .field-strategy-icon {
   display: grid;
-  width: 52px;
-  height: 52px;
+  width: 44px;
+  height: 44px;
   place-items: center;
   border-radius: 12px;
   background: rgb(255 255 255 / 88%);
+}
+
+.field-strategy-rank {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 11px;
+  border: 1px solid #c5cdd5;
+  border-radius: 999px;
+  background: #edf2f6;
+  color: #36495b;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.field-strategy-rank[data-rank='1'] {
+  border-color: #e6c779;
+  background: #fff4cf;
+  color: #694908;
+}
+
+.field-strategy-rank[data-rank='3'] {
+  border-color: #ddb293;
+  background: #fae9da;
+  color: #713e23;
+}
+
+.field-strategy-rank:hover,
+.field-strategy-rank:focus-visible {
+  border-color: currentColor;
+}
+
+.field-strategy-rank-info {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+  max-width: 240px;
+}
+
+.field-strategy-rank-info .ant-btn {
+  height: auto;
+  padding: 0;
 }
 
 .field-strategy-content {
@@ -60,18 +86,100 @@
   flex: 1;
   flex-direction: column;
   align-items: flex-start;
-  padding: 18px 20px 20px;
+  gap: 10px;
+  padding: 16px 18px;
 }
 
-.field-strategy-content h4.ant-typography {
+.field-strategy-content h4.ant-typography,
+.field-strategy-content .ant-tag {
   margin: 0;
 }
 
-.field-strategy-content .field-strategy-label {
-  margin-bottom: 8px;
-  color: var(--strategy-ink);
+.field-strategy-findings {
+  display: grid;
+  width: 100%;
+  gap: 10px;
+  margin: 2px 0 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #f6f8f3;
+  list-style: none;
+}
+
+.field-strategy-findings li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: 8px;
+}
+
+.field-strategy-findings li > div {
+  display: grid;
+  gap: 1px;
+}
+
+.field-strategy-findings li > div > span:first-child,
+.field-strategy-revenue dt {
+  color: #52604c;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.field-strategy-findings svg {
+  margin-top: 2px;
+}
+
+.field-strategy-benefit-icon {
+  color: #476b3c;
+}
+
+.field-strategy-risk-icon {
+  color: #995318;
+}
+
+.field-strategy-footer {
+  display: grid;
+  gap: 12px;
+  padding: 12px 18px 16px;
+  border-top: 1px solid #e5eadf;
+}
+
+.field-strategy-revenue {
+  display: grid;
+  gap: 2px;
+  margin: 0;
+}
+
+.field-strategy-revenue dd {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
 }
 
 .field-strategy-link.ant-btn {
-  margin-top: auto;
+  position: static;
+}
+
+.field-strategy-link.ant-btn:hover,
+.field-strategy-link.ant-btn:focus-visible {
+  border-color: #476b3c;
+  background: #476b3c;
+  color: #fff;
+}
+
+.field-strategy-link.ant-btn::after {
+  position: absolute;
+  inset: 0;
+  content: '';
+}
+
+.field-strategy-card.ant-card:hover {
+  border-color: #a5b798;
+}
+
+.field-strategies-explore.ant-btn {
+  display: flex;
+  width: fit-content;
+  margin: 16px auto 0;
 }
