@@ -1,6 +1,6 @@
 import type { InitOptions } from 'i18next';
 
-export const languageStorageKey = 'frogfarmers.language';
+export const languageStorageKey = 'fieldsense.language';
 
 export const i18nOptions: InitOptions = {
   supportedLngs: ['en', 'uk'],

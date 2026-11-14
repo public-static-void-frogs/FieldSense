@@ -12,7 +12,7 @@ export function PrivacyPage() {
     <PublicPageLayout
       title={t('Privacy policy')}
       description={t(
-        'How FrogFarmers handles demo data, browser storage, and the planned Google connection.',
+        'How FieldSense handles demo data, browser storage, and the planned Google connection.',
       )}
     >
       <PolicyDocument sections={privacySections} />
@@ -32,7 +32,7 @@ export function PrivacyPage() {
         </ul>
         <p>
           {t(
-            'The optional Calendar connection is planned to use the permission below to create a dedicated FrogFarmers calendar and manage events on calendars created by the app. It does not grant access to events in your existing personal or work calendars.',
+            'The optional Calendar connection is planned to use the permission below to create a dedicated FieldSense calendar and manage events on calendars created by the app. It does not grant access to events in your existing personal or work calendars.',
           )}
         </p>
         <p>

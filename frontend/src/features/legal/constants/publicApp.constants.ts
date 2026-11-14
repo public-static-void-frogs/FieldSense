@@ -1,5 +1,5 @@
 export const publicApp = {
-  name: 'FrogFarmers',
+  name: 'FieldSense',
   origin: 'https://nasa-fields-demo-app.vercel.app',
   contactEmail: 'olehzpr@gmail.com',
   policyUpdated: '2026-10-30',

@@ -19,7 +19,7 @@ export function AuthPage({ register = false }: AuthPageProps) {
       <FarmlandBackdrop />
       <div className="login-corner-brand" aria-hidden="true">
         <img src="/frog-farmer.png" width={32} height={32} alt="" />
-        <span>FrogFarmers</span>
+        <span>FieldSense</span>
       </div>
       <section
         className={`login-clearing ${register ? 'registration-clearing' : ''}`}
@@ -27,7 +27,7 @@ export function AuthPage({ register = false }: AuthPageProps) {
       >
         <div className="login-brand">
           <img src="/frog-farmer.png" width={64} height={64} alt="" />
-          <span>FrogFarmers</span>
+          <span>FieldSense</span>
         </div>
         <h1 id="login-heading">{heading}</h1>
         {register ? <RegistrationForm /> : <LoginForm />}

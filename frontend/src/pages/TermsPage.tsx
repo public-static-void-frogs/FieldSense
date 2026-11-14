@@ -9,7 +9,7 @@ export function TermsPage() {
   return (
     <PublicPageLayout
       title={t('Terms of service')}
-      description={t('Conditions for using the FrogFarmers prototype.')}
+      description={t('Conditions for using the FieldSense prototype.')}
     >
       <PolicyDocument sections={termsSections} />
     </PublicPageLayout>

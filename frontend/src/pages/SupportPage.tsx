@@ -36,7 +36,7 @@ export function SupportPage() {
         <h2>{t('Google Calendar and account access')}</h2>
         <p>
           {t(
-            'When the optional Google connection becomes available, you can revoke its access through your Google Account connections and remove the dedicated FrogFarmers calendar through Google Calendar settings. Removing access and deleting a calendar are separate actions.',
+            'When the optional Google connection becomes available, you can revoke its access through your Google Account connections and remove the dedicated FieldSense calendar through Google Calendar settings. Removing access and deleting a calendar are separate actions.',
           )}
         </p>
         <a href="https://myaccount.google.com/connections" target="_blank" rel="noreferrer">
@@ -44,7 +44,7 @@ export function SupportPage() {
         </a>
         <p>
           {t(
-            'For a request concerning any data retained by FrogFarmers after Google integration is enabled, contact the email above. We may ask you to confirm control of the relevant account before acting on the request.',
+            'For a request concerning any data retained by FieldSense after Google integration is enabled, contact the email above. We may ask you to confirm control of the relevant account before acting on the request.',
           )}
         </p>
       </section>

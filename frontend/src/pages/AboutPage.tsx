@@ -13,7 +13,7 @@ export function AboutPage() {
         'Weather uses live model data for your saved location. Field records and agronomic recommendations remain illustrative.',
       )}
     >
-      <section className="public-feature-grid" aria-label={t('What FrogFarmers does')}>
+      <section className="public-feature-grid" aria-label={t('What FieldSense does')}>
         <Feature
           title={t('Understand your fields')}
           description={t(
@@ -37,7 +37,7 @@ export function AboutPage() {
         <h2>{t('Google sign-in and Calendar connection')}</h2>
         <p>
           {t(
-            'We are preparing Google sign-in and an optional connection that exports field-plan actions to a dedicated FrogFarmers calendar in your Google Account.',
+            'We are preparing Google sign-in and an optional connection that exports field-plan actions to a dedicated FieldSense calendar in your Google Account.',
           )}
         </p>
         <p>
@@ -51,7 +51,7 @@ export function AboutPage() {
         <h2>{t('Who we are')}</h2>
         <p>
           {t(
-            'FrogFarmers is a prototype built by the FrogFarmers project team. It demonstrates a field-planning workflow with sample agronomy data and illustrative predictions.',
+            'FieldSense is a prototype built by the FieldSense project team. It demonstrates a field-planning workflow with sample agronomy data and illustrative predictions.',
           )}
         </p>
         <p>

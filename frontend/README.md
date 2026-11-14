@@ -1,4 +1,4 @@
-# FrogFarmers
+# FieldSense
 
 A frontend crop field management dashboard built with React, TypeScript, Vite, Ant Design, and Lucide icons.
 
@@ -247,7 +247,7 @@ invalidation, response persistence, failure recovery, and architecture boundarie
 
 ## UI languages
 
-The app uses react-i18next with English as the default fallback and Ukrainian as the second locale. On first use it follows the browser’s preferred supported language (`en` or `uk`, including regional variants). The language selector in Settings applies immediately and saves the choice in local storage under `frogfarmers.language`; that choice takes precedence on later visits.
+The app uses react-i18next with English as the default fallback and Ukrainian as the second locale. On first use it follows the browser’s preferred supported language (`en` or `uk`, including regional variants). The language selector in Settings applies immediately and saves the choice in local storage under `fieldsense.language`; that choice takes precedence on later visits.
 
 UI strings live in `src/i18n/locales/en.json` and `src/i18n/locales/uk.json`. Each JSON catalog is loaded through a dynamic import, so Ukrainian is only downloaded when needed. English also loads as the fallback. Ant Design controls, calendar dates, the document language, and page metadata follow the selected language. Demo field data, user-entered values, and sample recommendation content stay unchanged.
 
@@ -256,9 +256,9 @@ Use `useTranslation()` and `t()` for new UI text. Keys are English phrases with 
 ## Google OAuth registration pages
 
 Public, localized routes are available at `/about`, `/privacy`, `/terms`, and
-`/support`. They identify FrogFarmers, describe the demo, disclose browser storage
+`/support`. They identify FieldSense, describe the demo, disclose browser storage
 and third-party map requests, and explain the planned Google sign-in and optional
-export to a dedicated FrogFarmers calendar. Support/privacy contact is
+export to a dedicated FieldSense calendar. Support/privacy contact is
 `olehzpr@gmail.com`. Login, Overview, and Help link to these pages.
 
 Google OAuth and Calendar synchronization are not implemented. The pages describe

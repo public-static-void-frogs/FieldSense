@@ -6,7 +6,7 @@ export function ProductNotice() {
   const { t } = useTranslation();
 
   return (
-    <section className="product-notice" aria-label={t('About FrogFarmers')}>
+    <section className="product-notice" aria-label={t('About FieldSense')}>
       <p>
         {t(
           'Weather uses live model data for your saved location. Field records and agronomic recommendations remain illustrative.',

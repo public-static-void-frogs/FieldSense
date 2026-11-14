@@ -1,5 +1,16 @@
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Button, Card, ConfigProvider, Empty, Select, Slider, Spin, theme } from 'antd';
+import {
+  Alert,
+  Button,
+  Card,
+  ConfigProvider,
+  Empty,
+  Segmented,
+  Select,
+  Slider,
+  Spin,
+  theme,
+} from 'antd';
 import {
   divIcon,
   type LatLngBoundsExpression,
@@ -17,15 +28,17 @@ import {
   useMap,
   useMapEvents,
 } from 'react-leaflet';
-import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from 'recharts';
 import { cropHistoryQueries } from '../../../api/fields/crop-history.queries.ts';
 import type {
   CropHistoryLayer,
   CropHistoryPoint,
-  CropLayerClass,
+  CropHistoryYear,
+  HistoricalCropClass,
 } from '../../../types/fields/crop-history.types.ts';
 import type { Field } from '../../../types/fields/field.types.ts';
 import { satelliteTiles } from '../../maps/constants/maps.constants.ts';
+import { useCropPatterns } from '../hooks/useCropPatterns.ts';
+import { cropPatternAt, summarizeCropPattern } from '../utils/cropPatterns.ts';
 import './FieldCropHistory.css';
 
 const pinIcon = divIcon({
@@ -38,7 +51,9 @@ const pinIcon = divIcon({
   </svg>`,
 });
 
-export function FieldCropHistory({ field }: { field: Field }) {
+type FieldCropHistoryProps = { field: Field };
+
+export function FieldCropHistory({ field }: FieldCropHistoryProps) {
   const { t } = useTranslation();
   const [part, setPart] = useState(0);
   const count = field.boundary?.coordinates.length ?? 0;
@@ -86,14 +101,34 @@ function CropHistoryExplorer({ fieldId, part, geometryKey, rings }: ExplorerProp
   const { token } = theme.useToken();
   const scope = `${part}:${geometryKey}`;
   const [pin, setPin] = useState<{ scope: string; point: CropHistoryPoint } | null>(null);
+  const [mode, setMode] = useState<'patterns' | 'annual'>('patterns');
+  const [period, setPeriod] = useState(6);
   const [year, setYear] = useState<number>();
   const [previewIndex, setPreviewIndex] = useState<number | null>(null);
   const point = pin?.scope === scope ? pin.point : null;
-  const history = useQuery(cropHistoryQueries.point(fieldId, part, geometryKey, point));
-  const selectedYear = year ?? history.data?.years[0]?.year;
-  const layer = useQuery(cropHistoryQueries.layer(fieldId, part, geometryKey, selectedYear));
+  const historical = mode === 'patterns';
+  const history = useQuery(
+    cropHistoryQueries.point(fieldId, part, geometryKey, historical ? null : point),
+  );
   const chronologicalYears = history.data?.years.map(({ year }) => year).reverse() ?? [];
+  const latestYear = chronologicalYears.at(-1);
+  const selectedYear = year ?? latestYear;
+  const patternYears = historical ? chronologicalYears.slice(-period) : [];
+  const patterns = useCropPatterns(fieldId, part, geometryKey, patternYears);
+  const layer = useQuery(
+    cropHistoryQueries.layer(fieldId, part, geometryKey, historical ? undefined : selectedYear),
+  );
+  const mapLayer = historical ? patterns.data : layer.data;
+  const mapQuery = historical ? patterns : layer;
+  const loadingMap = mapQuery.isFetching || (latestYear === undefined && history.isFetching);
+  const staleMap = !historical && layer.isPlaceholderData;
   const marker = point ?? (history.isPlaceholderData ? undefined : history.data?.coordinates);
+  const pattern = patterns.data?.patterns;
+  const pointYears =
+    pattern && marker
+      ? cropPatternAt(pattern, marker)
+      : patternYears.map((year) => ({ year, crop: null }));
+  const activeClasses = historical ? pattern?.classes : layer.data?.classes;
   const lastIndex = chronologicalYears.length - 1;
   const sliderIndex = previewIndex ?? chronologicalYears.findIndex((year) => year === selectedYear);
   const yearMarks = Object.fromEntries(
@@ -103,15 +138,34 @@ function CropHistoryExplorer({ fieldId, part, geometryKey, rings }: ExplorerProp
   return (
     <>
       <div className="crop-history-main">
-        <Spin spinning={layer.isFetching || (selectedYear === undefined && history.isFetching)}>
-          {layer.data ? (
-            <div
-              className={layer.isPlaceholderData ? 'crop-history-placeholder' : undefined}
-              inert={layer.isPlaceholderData}
-            >
+        <div className="crop-history-controls">
+          <Segmented
+            aria-label={t('Crop map view')}
+            value={mode}
+            onChange={setMode}
+            options={[
+              { value: 'patterns', label: t('Historical patterns') },
+              { value: 'annual', label: t('Single year') },
+            ]}
+          />
+          {historical && (
+            <Select
+              aria-label={t('Years of crop history')}
+              value={period}
+              onChange={setPeriod}
+              options={[3, 6, 10].map((value) => ({
+                value,
+                label: t('Last {{years}} years', { years: value }),
+              }))}
+            />
+          )}
+        </div>
+        <Spin spinning={loadingMap}>
+          {mapLayer ? (
+            <div className={staleMap ? 'crop-history-placeholder' : undefined} inert={staleMap}>
               <CropHistoryMap
-                layer={layer.data}
-                showLayer={!layer.isPlaceholderData && !layer.isError}
+                layer={mapLayer}
+                showLayer={!staleMap && !mapQuery.isError}
                 marker={marker}
                 rings={rings}
                 onPick={(point) => setPin({ scope, point })}
@@ -121,7 +175,7 @@ function CropHistoryExplorer({ fieldId, part, geometryKey, rings }: ExplorerProp
             <div className="crop-history-map" />
           )}
         </Spin>
-        {chronologicalYears.length > 0 && (
+        {!historical && chronologicalYears.length > 0 && (
           <div className="crop-history-years">
             <div className="crop-history-year-label">
               <span>{t('Crop map year')}</span>
@@ -163,19 +217,28 @@ function CropHistoryExplorer({ fieldId, part, geometryKey, rings }: ExplorerProp
             </ConfigProvider>
           </div>
         )}
-        {layer.isError && <CropHistoryError retry={() => void layer.refetch()} />}
-        {selectedYear !== undefined && layer.data && layer.data.classes.length > 0 && (
-          <div className={layer.isPlaceholderData ? 'crop-history-placeholder' : undefined}>
-            <CropShareChart year={selectedYear} classes={layer.data.classes} />
-          </div>
+        {mapQuery.isError && <CropHistoryError retry={() => void mapQuery.refetch()} />}
+        {mapLayer?.image && !staleMap && !mapQuery.isError && activeClasses && (
+          <>
+            <CropMapLegend classes={activeClasses} mixed={historical && !!pattern?.hasMixed} />
+            {historical && (
+              <p className="crop-history-map-description">
+                {t(
+                  'Map colors show the class present in more than half of the years with data at each spot.',
+                )}
+              </p>
+            )}
+          </>
         )}
-        {layer.data && !layer.data.image && (
-          <div className={layer.isPlaceholderData ? 'crop-history-placeholder' : undefined}>
-            <Empty
-              image={Empty.PRESENTED_IMAGE_SIMPLE}
-              description={t('No mapped crop data for this year.')}
-            />
-          </div>
+        {mapLayer && !mapLayer.image && !staleMap && (
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={t(
+              historical
+                ? 'No mapped crop data for these years.'
+                : 'No mapped crop data for this year.',
+            )}
+          />
         )}
         <p>{t('Tap the map to see the crop history at that spot.')}</p>
         <small>{t('Source')} · USDA Cropland Data Layer</small>
@@ -183,100 +246,103 @@ function CropHistoryExplorer({ fieldId, part, geometryKey, rings }: ExplorerProp
       <div className="crop-history-list">
         <h3>{t('History at map pin')}</h3>
         {history.isError && <CropHistoryError retry={() => void history.refetch()} />}
-        <Spin spinning={history.isFetching}>
-          {history.data && (
-            <ul
-              className={history.isPlaceholderData ? 'crop-history-placeholder' : undefined}
-              inert={history.isPlaceholderData}
-            >
-              {history.data.years.map(({ year, crop }) => (
-                <li key={year}>
-                  <Button
-                    block
-                    type={selectedYear === year ? 'primary' : 'text'}
-                    aria-pressed={selectedYear === year}
-                    onClick={() => {
-                      setPreviewIndex(null);
-                      setYear(year);
-                    }}
-                  >
-                    <strong>{year}</strong>
-                    {crop && (
-                      <span className="crop-history-swatch" style={{ background: crop.color }} />
-                    )}
-                    {crop?.label ?? t('No data')}
-                  </Button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </Spin>
+        {historical && (
+          <Spin spinning={loadingMap}>
+            {patterns.data && <PointCropPatterns years={pointYears} />}
+          </Spin>
+        )}
+        {!historical && (
+          <Spin spinning={history.isFetching}>
+            {history.data && (
+              <ul
+                className={history.isPlaceholderData ? 'crop-history-placeholder' : undefined}
+                inert={history.isPlaceholderData}
+              >
+                {history.data.years.map(({ year, crop }) => (
+                  <li key={year}>
+                    <Button
+                      block
+                      type={selectedYear === year ? 'primary' : 'text'}
+                      aria-pressed={selectedYear === year}
+                      onClick={() => {
+                        setPreviewIndex(null);
+                        setYear(year);
+                      }}
+                    >
+                      <strong>{year}</strong>
+                      {crop && (
+                        <span className="crop-history-swatch" style={{ background: crop.color }} />
+                      )}
+                      {crop?.label ?? t('No data')}
+                    </Button>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </Spin>
+        )}
       </div>
     </>
   );
 }
 
-function CropShareChart({ year, classes }: { year: number; classes: CropLayerClass[] }) {
-  const { t, i18n } = useTranslation();
-  const { token } = theme.useToken();
-  const percent = new Intl.NumberFormat(i18n.language, {
-    style: 'percent',
-    maximumFractionDigits: 1,
-  });
-  const ranked = [...classes].sort((a, b) => b.share - a.share);
-  const maxEntries = 6;
-  const data =
-    ranked.length <= maxEntries
-      ? ranked
-      : [
-          ...ranked.slice(0, maxEntries - 1),
-          {
-            code: 'other',
-            label: t('Other'),
-            color: token.colorTextTertiary,
-            share: ranked.slice(maxEntries - 1).reduce((sum, crop) => sum + crop.share, 0),
-          },
-        ];
+type CropMapLegendProps = { classes: HistoricalCropClass[]; mixed: boolean };
+
+function CropMapLegend({ classes, mixed }: CropMapLegendProps) {
+  const { t } = useTranslation();
 
   return (
-    <section className="crop-history-share">
-      <h3>{t('Crop share in {{year}}', { year })}</h3>
-      <p>{t('Share of classified pixels in the displayed area')}</p>
-      <div className="crop-history-share-content">
-        <div className="crop-history-pie">
-          <ResponsiveContainer width="100%" height="100%">
-            <PieChart accessibilityLayer>
-              <Pie
-                data={data}
-                dataKey="share"
-                nameKey="label"
-                outerRadius="94%"
-                isAnimationActive={false}
-              >
-                {data.map((crop) => (
-                  <Cell key={crop.code} fill={crop.color} />
-                ))}
-              </Pie>
-              <Tooltip formatter={(value) => percent.format(Number(value))} />
-            </PieChart>
-          </ResponsiveContainer>
-        </div>
-        <ul>
-          {data.map((crop) => (
-            <li key={crop.code}>
-              <span className="crop-history-swatch" style={{ background: crop.color }} />
-              <span>{crop.label}</span>
-              <strong>{percent.format(crop.share)}</strong>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </section>
+    <ul className="crop-history-legend" aria-label={t('Crop map legend')}>
+      {classes.map(({ code, color, label }) => (
+        <li key={code}>
+          <span className="crop-history-swatch" style={{ background: color }} />
+          {label}
+        </li>
+      ))}
+      {mixed && (
+        <li>
+          <span className="crop-history-swatch crop-history-mixed" />
+          {t('No dominant class')}
+        </li>
+      )}
+    </ul>
+  );
+}
+
+type PointCropPatternsProps = { years: CropHistoryYear[] };
+
+function PointCropPatterns({ years }: PointCropPatternsProps) {
+  const { t } = useTranslation();
+  const { dominant, observed, occurrences } = summarizeCropPattern(years);
+  let summary = t('No mapped crop data at this point.');
+  if (dominant) {
+    summary = t('{{crop}} mapped in {{occurrences}} of {{observed}} observed years.', {
+      crop: dominant.label,
+      occurrences,
+      observed,
+    });
+  } else if (observed > 0) {
+    summary = t('No class dominated the {{observed}} observed years.', { observed });
+  }
+
+  return (
+    <div aria-live="polite">
+      <p className="crop-history-point-summary">{summary}</p>
+      <ul className="crop-history-sequence">
+        {years.map(({ year, crop }) => (
+          <li key={year}>
+            <strong>{year}</strong>
+            <span className="crop-history-swatch" style={{ background: crop?.color }} />
+            {crop?.label ?? t('No data')}
+          </li>
+        ))}
+      </ul>
+    </div>
   );
 }
 
 type MapProps = {
-  layer: CropHistoryLayer;
+  layer: Pick<CropHistoryLayer, 'bounds' | 'image'>;
   showLayer: boolean;
   marker?: CropHistoryPoint;
   rings?: number[][][];

@@ -2,14 +2,14 @@
 
 ## Public app details
 
-- App name: **FrogFarmers**. Keep this spelling and the frog branding consistent in Google Auth Platform and the website.
+- App name: **FieldSense**. Keep this spelling and the frog branding consistent in Google Auth Platform and the website.
 - Production origin: `https://nasa-fields-demo-app.vercel.app`
 - App homepage: `https://nasa-fields-demo-app.vercel.app/about`
 - Privacy policy: `https://nasa-fields-demo-app.vercel.app/privacy`
 - Terms of service: `https://nasa-fields-demo-app.vercel.app/terms`
 - Support and data requests: `https://nasa-fields-demo-app.vercel.app/support`
 - Support/privacy email: `olehzpr@gmail.com`. Google requires the selected support email to be a permitted account or managed group in the project; choose the corresponding account in the console.
-- Public identity: FrogFarmers project team. The app does not claim to be a registered company or use the fictional farm profile as its operator.
+- Public identity: FieldSense project team. The app does not claim to be a registered company or use the fictional farm profile as its operator.
 - Branding image: `public/frog-farmer.png`; use a square PNG that meets Google's current upload limits.
 
 These pages are outside the farm layout, need no login or query-backed farm data,
@@ -40,7 +40,7 @@ tokens, fake synchronization, or simulated Google authorization have been added.
 The intended integration is:
 
 - Sign-in: `openid`, `email`, and `profile`, to identify the user. This may return a Google subject identifier, email address, display name, and profile image.
-- Optional Calendar connection: `https://www.googleapis.com/auth/calendar.app.created`, to create a dedicated FrogFarmers calendar and manage events in app-created calendars. Ask for this separately when the user chooses to connect Calendar.
+- Optional Calendar connection: `https://www.googleapis.com/auth/calendar.app.created`, to create a dedicated FieldSense calendar and manage events in app-created calendars. Ask for this separately when the user chooses to connect Calendar.
 - No Gmail, Drive, Contacts, broad `calendar`, or read/write access to events in pre-existing personal/work calendars is needed for this design.
 
 The Calendar scope permits reading and modifying events in calendars created by

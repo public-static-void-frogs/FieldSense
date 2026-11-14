@@ -76,11 +76,11 @@ export function AppLayout() {
         collapsedWidth={76}
       >
         <div className="sidebar-brand-row">
-          <Link to="/" className="brand" aria-label={t('FrogFarmers overview')}>
+          <Link to="/" className="brand" aria-label={t('FieldSense overview')}>
             <span className="brand-symbol">
               <img src="/frog-farmer.png" width={40} height={40} alt="" />
             </span>
-            <span className="brand-word">FrogFarmers</span>
+            <span className="brand-word">FieldSense</span>
           </Link>
           <Tooltip title={collapsed ? t('Expand sidebar') : t('Collapse sidebar')}>
             <Button

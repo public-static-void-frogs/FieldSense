@@ -18,7 +18,7 @@ export function ProjectSection() {
         </Typography.Title>
         <Typography.Paragraph>
           {t(
-            'FrogFarmers is a decision-support prototype for exploring crop rotations at field level. It brings field locations, soil and crop information, environmental history, and rotation recommendations into one place, so farmers can compare strategies and review the actions each one proposes.',
+            'FieldSense is a decision-support prototype for exploring crop rotations at field level. It brings field locations, soil and crop information, environmental history, and rotation recommendations into one place, so farmers can compare strategies and review the actions each one proposes.',
           )}
         </Typography.Paragraph>
       </header>

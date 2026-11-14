@@ -5,7 +5,7 @@ export const privacySections: PolicySection[] = [
     id: 'operator',
     title: 'Who is responsible',
     paragraphs: [
-      'FrogFarmers is operated as a project prototype by the FrogFarmers team. Contact olehzpr@gmail.com for support or privacy requests.',
+      'FieldSense is operated as a project prototype by the FieldSense team. Contact olehzpr@gmail.com for support or privacy requests.',
     ],
   },
   {
@@ -28,7 +28,7 @@ export const privacySections: PolicySection[] = [
     id: 'google-use',
     title: 'Purpose of the planned Google connection',
     paragraphs: [
-      'Google sign-in is intended only to identify you and associate you with your FrogFarmers account. Calendar access is optional and intended only to export field-plan actions you select to a dedicated FrogFarmers calendar.',
+      'Google sign-in is intended only to identify you and associate you with your FieldSense account. Calendar access is optional and intended only to export field-plan actions you select to a dedicated FieldSense calendar.',
       'We will not use Google user data for advertising, sell it to data brokers, or use it to train general-purpose AI or machine-learning models. Google account and Calendar data will not be used to generate agronomic predictions.',
       'Any future access to or transfer of Google user data must follow the Google API Services User Data Policy, including its Limited Use restrictions.',
     ],
@@ -57,7 +57,7 @@ export const termsSections: PolicySection[] = [
     id: 'service',
     title: 'About this service',
     paragraphs: [
-      'FrogFarmers combines live weather model data with illustrative field management and crop-rotation planning. Google sign-in and Calendar export are not available in the current prototype.',
+      'FieldSense combines live weather model data with illustrative field management and crop-rotation planning. Google sign-in and Calendar export are not available in the current prototype.',
     ],
   },
   {

@@ -18,7 +18,7 @@ export function PublicPageLayout({ title, description, children }: PublicPageLay
   return (
     <div className="public-page">
       <header className="public-header">
-        <Link to="/about" className="public-brand" aria-label={t('FrogFarmers home')}>
+        <Link to="/about" className="public-brand" aria-label={t('FieldSense home')}>
           <img src="/frog-farmer.png" width={40} height={40} alt="" />
           {publicApp.name}
         </Link>
