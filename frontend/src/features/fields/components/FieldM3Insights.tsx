@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Button, Card, Empty, Skeleton, Tabs, Timeline, Tooltip } from 'antd';
-import { CircleHelp, Droplets } from 'lucide-react';
+import { Alert, Button, Card, Empty, Skeleton, Tabs, Timeline } from 'antd';
+import { Droplets } from 'lucide-react';
 import type { CSSProperties, ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import {
@@ -26,6 +26,7 @@ import type {
 import { CropIcon } from '../../../components/common/CropIcon';
 import type { Field } from '../../../types/fields/field.types.ts';
 import { insightDate, insightNumber } from '../utils/fieldInsightFormats.ts';
+import { InsightHelpLabel } from './InsightHelpLabel';
 import './FieldInsights.css';
 
 const crops = { corn: 'Corn', soybeans: 'Soybeans' } as const;
@@ -85,7 +86,7 @@ export function FieldM3Insights({ field }: FieldM3InsightsProps) {
         : t('Uses a regional weather cell');
   }
 
-  return <Card title={<M3HelpLabel label={title} help={locationHelp} />}>{content}</Card>;
+  return <Card title={<InsightHelpLabel label={title} help={locationHelp} />}>{content}</Card>;
 }
 
 type M3ResultsProps = { insights: M3Insights };
@@ -130,29 +131,6 @@ function M3Results({ insights }: M3ResultsProps) {
   );
 }
 
-type M3HelpLabelProps = { label: string; help?: ReactNode };
-
-function M3HelpLabel({ label, help }: M3HelpLabelProps) {
-  const { t } = useTranslation();
-
-  return (
-    <span className="field-insights-help-label">
-      <span>{label}</span>
-      {help && (
-        <Tooltip title={help} trigger={['hover', 'focus', 'click']}>
-          <button
-            type="button"
-            className="field-insights-help-button"
-            aria-label={t('About {{label}}', { label })}
-          >
-            <CircleHelp size={16} aria-hidden="true" />
-          </button>
-        </Tooltip>
-      )}
-    </span>
-  );
-}
-
 type M3WaterCapacityProps = { value: number; median: number | null | undefined };
 
 function M3WaterCapacity({ value, median }: M3WaterCapacityProps) {
@@ -172,7 +150,7 @@ function M3WaterCapacity({ value, median }: M3WaterCapacityProps) {
     <div className="field-insights-water-capacity">
       <h3>
         <Droplets size={18} aria-hidden="true" />
-        <M3HelpLabel
+        <InsightHelpLabel
           label={t('Available soil water storage')}
           help={t('This is how much water the soil can store for plants. Current moisture varies.')}
         />
@@ -207,7 +185,7 @@ function M3CropPanel({ crop, insights }: M3CropPanelProps) {
   return (
     <div className="field-insights-panel">
       <h3>
-        <M3HelpLabel
+        <InsightHelpLabel
           label={t('Typical season')}
           help={
             <div className="field-insights-help-copy">
@@ -362,7 +340,7 @@ function M3TypicalRiskRow({
     <div className="field-insights-season-stage">
       <div className="field-insights-outlook-label">
         <strong>
-          <M3HelpLabel label={label} help={help} />
+          <InsightHelpLabel label={label} help={help} />
         </strong>
         {value == null ? (
           <span>{t('No data')}</span>
@@ -695,7 +673,7 @@ function M3Outlook({ crop, insights }: M3CropPanelProps) {
   return (
     <section className="field-insights-panel">
       <h3>
-        <M3HelpLabel
+        <InsightHelpLabel
           label={t('2040 climate outlook')}
           help={t('Ranges show how climate models differ under each emissions scenario.')}
         />
@@ -729,7 +707,7 @@ function M3Outlook({ crop, insights }: M3CropPanelProps) {
         {heat.length > 0 && (
           <div className="field-insights-season-stage">
             <strong>
-              <M3HelpLabel
+              <InsightHelpLabel
                 label={t('Heat during flowering')}
                 help={t(
                   'Share of years with at least two days at 35°C or higher during flowering.',

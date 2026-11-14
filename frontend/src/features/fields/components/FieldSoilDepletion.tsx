@@ -1,11 +1,14 @@
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Button, Card, Collapse, Progress, Spin, Tag, Typography } from 'antd';
+import { Alert, Button, Collapse, Progress, Spin, Tabs, Tag, Typography } from 'antd';
+import type { ReactNode } from 'react';
 import { Layers3 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { fieldInsightsQueries } from '../../../api/fields/field-insights.queries.ts';
 import { CropIcon } from '../../../components/common/CropIcon';
 import type { SoilAssessment, SoilSignal } from '../../../types/fields/field-insights.types.ts';
 import { insightNumber } from '../utils/fieldInsightFormats.ts';
+import { InsightHelpLabel } from './InsightHelpLabel';
+import { SoilDataView } from './SoilDataView';
 import './FieldInsights.css';
 
 const signalTitles = {
@@ -31,7 +34,6 @@ const demandLabels = {
 } as const;
 const repeatLabels = { repeat: 'Repeat', heavy_repeat: 'Heavy repeat' } as const;
 const adviceLabels = {
-  low: 'Keep rotating crops and monitor the field.',
   moderate: 'Review the contributing signals and keep rotating crops.',
   high: 'Consider breaking repeated cropping and confirm the result with a soil test.',
   very_high: 'Review the next crop and test the soil before planting.',
@@ -110,11 +112,16 @@ function SoilAssessmentResults({ assessment }: SoilAssessmentResultsProps) {
   const { t, i18n } = useTranslation();
   const { score, level, coverage, components, drivers, metrics, notes } = assessment;
   const locale = i18n.language;
-  const peaks = Object.entries(metrics.peak_ndvi ?? {}).reverse();
 
   return (
     <div className="field-insights-panel">
       <div className="field-insights-heading">
+        <InsightHelpLabel
+          label={t('Depletion score')}
+          help={t(
+            'This screening index uses the parcel’s reference point. Higher scores indicate more signs of depletion. A soil test is needed to measure fertility.',
+          )}
+        />
         {score !== null && (
           <strong>{t('{{score}} / 100', { score: insightNumber(score, locale) })}</strong>
         )}
@@ -125,69 +132,49 @@ function SoilAssessmentResults({ assessment }: SoilAssessmentResultsProps) {
           })}
         </span>
       </div>
-      <Typography.Text type="secondary">
-        {t(
-          'This screening index uses the parcel’s reference point. Higher scores indicate more signs of depletion. A soil test is needed to measure fertility.',
-        )}
-      </Typography.Text>
       {score === null && (
         <Alert
           type="info"
           title={t('At least half of the index weights need data to calculate an overall score.')}
         />
       )}
-      {level !== 'unknown' && <p>{t(adviceLabels[level])}</p>}
-      <div className="field-insights-grid field-insights-signals">
-        {Object.entries(signalTitles).map(([key, title]) => {
-          const signal = key as SoilSignal;
+      {level !== 'low' && level !== 'unknown' && <p>{t(adviceLabels[level])}</p>}
+      <Tabs
+        items={(Object.keys(signalTitles) as SoilSignal[]).map((signal) => {
+          const title = t(signalTitles[signal]);
           const value = components[signal];
 
-          return (
-            <Card size="small" className="field-insights-metric" key={key}>
-              <div className="field-insights-heading">
-                <strong className="field-insights-signal-label">{t(title)}</strong>
-                {drivers.includes(signal) && <Tag color="gold">{t('Driver')}</Tag>}
+          return {
+            key: signal,
+            label: title,
+            children: (
+              <div className="field-insights-panel">
+                <div className="field-insights-heading">
+                  {value == null && (
+                    <Typography.Text type="secondary">
+                      {t('No score for this signal')}
+                    </Typography.Text>
+                  )}
+                  {value != null && (
+                    <Progress
+                      percent={Math.round(value * 100)}
+                      format={(percent) =>
+                        t('{{score}} / 100', { score: insightNumber(percent, locale) })
+                      }
+                      aria-label={title}
+                      className="field-soil-signal-score"
+                    />
+                  )}
+                  {drivers.includes(signal) && <Tag color="gold">{t('Driver')}</Tag>}
+                </div>
+                <SoilSignalDetails signal={signal} metrics={metrics} />
+                {signal === 'rotation' && <RotationHistory metrics={metrics} />}
+                {signal === 'greenness' && <GreennessHistory metrics={metrics} />}
               </div>
-              {value != null && (
-                <Progress
-                  percent={Math.round(value * 100)}
-                  showInfo={false}
-                  aria-label={t(title)}
-                />
-              )}
-              <SoilSignalDetails signal={signal} metrics={metrics} available={value != null} />
-            </Card>
-          );
+            ),
+          };
         })}
-      </div>
-      <RotationHistory metrics={metrics} />
-      {peaks.length > 0 && (
-        <details>
-          <summary>{t('Yearly satellite greenness')}</summary>
-          <div className="field-insights-peaks">
-            <table className="field-insights-table">
-              <thead>
-                <tr>
-                  <th scope="col">{t('Year')}</th>
-                  <th scope="col">NDVI</th>
-                  <th scope="col">EVI</th>
-                  <th scope="col">{t('Clear scenes')}</th>
-                </tr>
-              </thead>
-              <tbody>
-                {peaks.map(([year, ndvi]) => (
-                  <tr key={year}>
-                    <th scope="row">{year}</th>
-                    <td>{insightNumber(ndvi, locale)}</td>
-                    <td>{insightNumber(metrics.peak_evi?.[year], locale)}</td>
-                    <td>{insightNumber(metrics.peak_scene_count?.[year], locale)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </details>
-      )}
+      />
       {notes.length > 0 && (
         <ul className="field-insights-notes field-insights-muted">
           {notes.map((note) => (
@@ -195,6 +182,63 @@ function SoilAssessmentResults({ assessment }: SoilAssessmentResultsProps) {
           ))}
         </ul>
       )}
+    </div>
+  );
+}
+
+function GreennessHistory({ metrics }: { metrics: SoilAssessment['metrics'] }) {
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language;
+  const peaks = Object.entries(metrics.peak_ndvi ?? {}).reverse();
+  if (!peaks.length) {
+    return null;
+  }
+
+  return (
+    <div>
+      <SoilDataView
+        title={t('Yearly satellite greenness')}
+        kind="line"
+        rows={peaks
+          .slice()
+          .reverse()
+          .map(([year, ndvi]) => ({
+            label: year,
+            values: {
+              ndvi,
+              evi: metrics.peak_evi?.[year],
+              scenes: metrics.peak_scene_count?.[year],
+            },
+          }))}
+        series={[
+          { key: 'ndvi', label: 'NDVI' },
+          { key: 'evi', label: 'EVI' },
+          { key: 'scenes', label: t('Clear scenes'), count: true },
+        ]}
+      >
+        <div className="field-insights-peaks">
+          <table className="field-insights-table">
+            <thead>
+              <tr>
+                <th scope="col">{t('Year')}</th>
+                <th scope="col">NDVI</th>
+                <th scope="col">EVI</th>
+                <th scope="col">{t('Clear scenes')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {peaks.map(([year, ndvi]) => (
+                <tr key={year}>
+                  <th scope="row">{year}</th>
+                  <td>{insightNumber(ndvi, locale)}</td>
+                  <td>{insightNumber(metrics.peak_evi?.[year], locale)}</td>
+                  <td>{insightNumber(metrics.peak_scene_count?.[year], locale)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </SoilDataView>
     </div>
   );
 }
@@ -210,41 +254,54 @@ function RotationHistory({ metrics }: { metrics: SoilAssessment['metrics'] }) {
   return (
     <details>
       <summary>{t('Crop demand and repetition by year')}</summary>
-      <div className="field-insights-peaks">
-        <table className="field-insights-table">
-          <thead>
-            <tr>
-              <th scope="col">{t('Year')}</th>
-              <th scope="col">{t('Crop')}</th>
-              <th scope="col">{t('Crop demand')}</th>
-              <th scope="col">{t('Consecutive years')}</th>
-              <th scope="col">{t('Repetition')}</th>
-            </tr>
-          </thead>
-          <tbody>
-            {marks
-              .slice()
-              .reverse()
-              .map(({ year, crop, demand, demand_class, run, mark }) => (
-                <tr key={year}>
-                  <th scope="row">{year}</th>
-                  <td>
-                    <span className="field-insights-heading">
-                      <CropIcon crop={crop} size={20} />
-                      {crop}
-                    </span>
-                  </td>
-                  <td>
-                    {t(demandLabels[demand_class])} ·{' '}
-                    {insightNumber(demand, i18n.language, 'percent')}
-                  </td>
-                  <td>{run}</td>
-                  <td>{mark ? t(repeatLabels[mark]) : '—'}</td>
-                </tr>
-              ))}
-          </tbody>
-        </table>
-      </div>
+      <SoilDataView
+        title={t('Crop demand and repetition by year')}
+        rows={marks.map(({ year, crop, demand, run, mark }) => ({
+          label: String(year),
+          detail: mark ? `${crop} · ${t(repeatLabels[mark])}` : crop,
+          values: { demand: Math.round(demand * 100), run },
+        }))}
+        series={[
+          { key: 'demand', label: `${t('Crop demand')} (%)` },
+          { key: 'run', label: t('Consecutive years'), count: true },
+        ]}
+      >
+        <div className="field-insights-peaks">
+          <table className="field-insights-table">
+            <thead>
+              <tr>
+                <th scope="col">{t('Year')}</th>
+                <th scope="col">{t('Crop')}</th>
+                <th scope="col">{t('Crop demand')}</th>
+                <th scope="col">{t('Consecutive years')}</th>
+                <th scope="col">{t('Repetition')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {marks
+                .slice()
+                .reverse()
+                .map(({ year, crop, demand, demand_class, run, mark }) => (
+                  <tr key={year}>
+                    <th scope="row">{year}</th>
+                    <td>
+                      <span className="field-insights-heading">
+                        <CropIcon crop={crop} size={20} />
+                        {crop}
+                      </span>
+                    </td>
+                    <td>
+                      {t(demandLabels[demand_class])} ·{' '}
+                      {insightNumber(demand, i18n.language, 'percent')}
+                    </td>
+                    <td>{run}</td>
+                    <td>{mark ? t(repeatLabels[mark]) : '—'}</td>
+                  </tr>
+                ))}
+            </tbody>
+          </table>
+        </div>
+      </SoilDataView>
       {unrated.length > 0 && (
         <p>{t('A default demand rating was used for {{crops}}.', { crops: unrated.join(', ') })}</p>
       )}
@@ -255,130 +312,207 @@ function RotationHistory({ metrics }: { metrics: SoilAssessment['metrics'] }) {
 type SoilSignalDetailsProps = {
   signal: SoilSignal;
   metrics: SoilAssessment['metrics'];
-  available: boolean;
 };
 
-function SoilSignalDetails({ signal, metrics, available }: SoilSignalDetailsProps) {
+type SoilMetric = {
+  label: string;
+  value: ReactNode;
+  help?: ReactNode;
+};
+
+function SoilSignalDetails({ signal, metrics }: SoilSignalDetailsProps) {
   const { t, i18n } = useTranslation();
   const number = (value: number | null) => insightNumber(value, i18n.language);
   const percent = (value: number | null) => insightNumber(value, i18n.language, 'percent');
+  const percentFromWhole = (value: number | null) => {
+    if (value == null) {
+      return null;
+    }
+    return percent(value / 100);
+  };
+  const ratioHelp = t(
+    'Compares the county yield for the crop grown that year with the state yield for the same crop and year.',
+  );
+  const cards: Record<SoilSignal, SoilMetric[]> = {
+    rotation: [
+      {
+        label: t('Consecutive years'),
+        value:
+          metrics.years_same_crop == null ? null : (
+            <>
+              {number(metrics.years_same_crop)} <small>{metrics.latest_crop}</small>
+            </>
+          ),
+        help: t(
+          'The number of years in a row with the same mapped crop. A missing year breaks the streak.',
+        ),
+      },
+      {
+        label: t('Most common crop'),
+        value:
+          metrics.share_top_crop_5y == null ? null : (
+            <>
+              {percent(metrics.share_top_crop_5y)} <small>{metrics.top_crop_5y}</small>
+            </>
+          ),
+        help: t(
+          'Share of observed crop years occupied by this crop in the latest five-year window.',
+        ),
+      },
+      {
+        label: t('Average crop demand'),
+        value: metrics.demand_mean_5y == null ? null : percent(metrics.demand_mean_5y),
+        help: t(
+          'Average of the model’s crop demand ratings over the latest five-year window. Higher ratings add more pressure to the rotation score.',
+        ),
+      },
+      {
+        label: t('Repetition'),
+        value: metrics.rotation_repeat == null ? null : percent(metrics.rotation_repeat),
+        help: t(
+          'The rotation score’s repetition factor increases with the current streak and the crop’s demand.',
+        ),
+      },
+      {
+        label: t('Rotation load'),
+        value: metrics.rotation_load == null ? null : percent(metrics.rotation_load),
+        help: t(
+          'The rotation score’s load factor rises when average crop demand exceeds the model’s threshold.',
+        ),
+      },
+      {
+        label: t('Crop concentration'),
+        value:
+          metrics.rotation_concentration == null ? null : percent(metrics.rotation_concentration),
+        help: t(
+          'The rotation score’s concentration factor rises when a demanding crop dominates the recent history.',
+        ),
+      },
+    ],
+    greenness: [
+      {
+        label: t('Annual peak NDVI change'),
+        value: percentFromWhole(metrics.ndvi_trend_pct_per_yr),
+        help: t(
+          'Estimated yearly change in peak satellite greenness, calculated within the same crop type. Weather can also affect the trend.',
+        ),
+      },
+      {
+        label: t('Latest NDVI'),
+        value: metrics.latest_ndvi == null ? null : number(metrics.latest_ndvi),
+        help: (
+          <span className="field-insights-help-copy">
+            <span>{t('NDVI is a satellite measure of vegetation greenness.')}</span>
+            {metrics.latest_vs_peak_mean != null && (
+              <span>
+                {t('{{value}} of the historical peak mean', {
+                  value: percent(metrics.latest_vs_peak_mean),
+                })}
+              </span>
+            )}
+            <span>{t('Weather can also affect satellite greenness.')}</span>
+          </span>
+        ),
+      },
+      {
+        label: t('Latest EVI'),
+        value: metrics.latest_evi == null ? null : number(metrics.latest_evi),
+        help: t(
+          'EVI is a satellite vegetation index designed to reduce the influence of soil background and atmosphere.',
+        ),
+      },
+      { label: t('Satellite observation date'), value: metrics.latest_greenness_date },
+    ],
+    soil: [
+      {
+        label: t('Mapped soil component'),
+        value: metrics.soil_component,
+        help: t('The main soil type listed for the survey map unit at this point.'),
+      },
+      {
+        label: 'SSURGO',
+        value: metrics.mukey,
+        help: t('The map unit identifier in the USDA Soil Survey Geographic Database.'),
+      },
+      {
+        label: t('Drainage class'),
+        value: metrics.drainage_class,
+        help: t('Describes how often and for how long the soil is naturally wet.'),
+      },
+      {
+        label: t('Hydrologic group'),
+        value: metrics.hydrologic_group,
+        help: t(
+          'Groups A to D describe runoff potential when the soil is wet. A has the lowest potential and D the highest. For C/D, C applies when drained and D when undrained.',
+        ),
+      },
+      {
+        label: t('Soil erodibility (K factor)'),
+        value: metrics.kffact == null ? null : number(metrics.kffact),
+        help: t(
+          'Estimates how readily water can detach and carry soil particles. A higher K factor means the soil is more susceptible to water erosion under similar conditions.',
+        ),
+      },
+      {
+        label: t('Organic matter (top 30 cm)'),
+        value: percentFromWhole(metrics.om_pct_0_30cm),
+        help: t('The estimated share of organic material in the upper 30 cm of the mapped soil.'),
+      },
+      {
+        label: t('Available water storage'),
+        value:
+          metrics.aws0150_cm == null
+            ? null
+            : t('{{value}} cm', { value: number(metrics.aws0150_cm) }),
+        help: t(
+          'Estimated water the soil can hold for plants in the upper 150 cm, expressed as an equivalent depth of water.',
+        ),
+      },
+      {
+        label: t('Slope'),
+        value: percentFromWhole(metrics.slope_pct),
+        help: t('The rise in elevation per 100 units of horizontal distance.'),
+      },
+    ],
+    county: [
+      {
+        label: t('County FIPS'),
+        value: metrics.county_fips,
+        help: t('The five-digit identifier for a U.S. county.'),
+      },
+      {
+        label: t('Years with yield data'),
+        value: metrics.county_yield_years,
+        help: t('Years with both a county and a state yield for the crop grown.'),
+      },
+      {
+        label: t('County yield relative to state'),
+        value:
+          metrics.county_yield_ratio_mean == null ? null : percent(metrics.county_yield_ratio_mean),
+        help: ratioHelp,
+      },
+      {
+        label: t('Annual change in relative yield'),
+        value: percentFromWhole(metrics.county_yield_ratio_slope_pct_yr),
+        help: ratioHelp,
+      },
+    ],
+  };
+  const available = cards[signal].filter(({ value }) => value != null);
+  if (!available.length) {
+    return null;
+  }
 
   return (
-    <>
-      {!available && (
-        <Typography.Text type="secondary">{t('No score for this signal')}</Typography.Text>
-      )}
-      {signal === 'rotation' && metrics.years_same_crop !== null && (
-        <span>
-          {t('Latest streak: {{crop}} (years: {{count}})', {
-            crop: metrics.latest_crop,
-            count: metrics.years_same_crop,
-          })}
-        </span>
-      )}
-      {signal === 'rotation' && metrics.share_top_crop_5y !== null && (
-        <span>
-          {t('{{crop}} in {{share}} of the last five years with data', {
-            crop: metrics.top_crop_5y,
-            share: percent(metrics.share_top_crop_5y),
-          })}
-        </span>
-      )}
-      {signal === 'greenness' && metrics.ndvi_trend_pct_per_yr !== null && (
-        <span>
-          {t('Peak NDVI change of {{change}} per year', {
-            change: percent(metrics.ndvi_trend_pct_per_yr / 100),
-          })}
-        </span>
-      )}
-      {signal === 'rotation' && metrics.demand_mean_5y != null && (
-        <span>{t('Mean crop demand: {{value}}', { value: percent(metrics.demand_mean_5y) })}</span>
-      )}
-      {signal === 'rotation' && metrics.rotation_repeat != null && (
-        <span>
-          {t('Repetition {{repeat}}, load {{load}}, concentration {{concentration}}', {
-            repeat: percent(metrics.rotation_repeat),
-            load: percent(metrics.rotation_load),
-            concentration: percent(metrics.rotation_concentration),
-          })}
-        </span>
-      )}
-      {signal === 'greenness' && metrics.latest_ndvi != null && (
-        <span>
-          {metrics.latest_greenness_date} · NDVI {number(metrics.latest_ndvi)} · EVI{' '}
-          {number(metrics.latest_evi)}
-          {metrics.latest_vs_peak_mean != null && (
-            <small>
-              {t('{{value}} of the historical peak mean', {
-                value: percent(metrics.latest_vs_peak_mean),
-              })}
-            </small>
-          )}
-        </span>
-      )}
-      {signal === 'soil' && metrics.soil_component && (
-        <span>
-          {metrics.soil_component}
-          {metrics.mukey != null && ` · SSURGO ${metrics.mukey}`}
-        </span>
-      )}
-      {signal === 'soil' && metrics.drainage_class && (
-        <span>
-          {t('Drainage class')} · {metrics.drainage_class}
-        </span>
-      )}
-      {signal === 'soil' && metrics.hydrologic_group && (
-        <span>
-          {t('Hydrologic group')} · {metrics.hydrologic_group}
-        </span>
-      )}
-      {signal === 'soil' && metrics.kffact != null && (
-        <span>
-          {t('Soil erodibility (K factor)')} · {number(metrics.kffact)}
-        </span>
-      )}
-      {signal === 'county' && metrics.county_fips && (
-        <span>
-          {t('County FIPS')} · {metrics.county_fips}
-        </span>
-      )}
-      {signal === 'county' && metrics.county_yield_years != null && (
-        <span>
-          {t('Years with yield data')} · {metrics.county_yield_years}
-        </span>
-      )}
-      {signal === 'greenness' && available && (
-        <small>{t('Weather can also affect satellite greenness.')}</small>
-      )}
-      {signal === 'soil' && metrics.om_pct_0_30cm !== null && (
-        <span>
-          {t('{{value}} organic matter in the top 30 cm', {
-            value: percent(metrics.om_pct_0_30cm / 100),
-          })}
-        </span>
-      )}
-      {signal === 'soil' && metrics.aws0150_cm !== null && (
-        <span>
-          {t('{{value}} cm of available water storage', { value: number(metrics.aws0150_cm) })}
-        </span>
-      )}
-      {signal === 'soil' && metrics.slope_pct !== null && (
-        <span>{t('{{value}} slope', { value: percent(metrics.slope_pct / 100) })}</span>
-      )}
-      {signal === 'county' && metrics.county_yield_ratio_mean !== null && (
-        <span>
-          {t('County yields averaged {{value}} of state yields', {
-            value: percent(metrics.county_yield_ratio_mean),
-          })}
-        </span>
-      )}
-      {signal === 'county' && metrics.county_yield_ratio_slope_pct_yr !== null && (
-        <span>
-          {t('County-to-state yield ratio changed {{value}} per year', {
-            value: percent(metrics.county_yield_ratio_slope_pct_yr / 100),
-          })}
-        </span>
-      )}
-    </>
+    <dl className="field-insights-grid field-soil-depletion-metrics">
+      {available.map(({ label, value, help }) => (
+        <div key={label}>
+          <dt>
+            <InsightHelpLabel label={label} help={help} />
+          </dt>
+          <dd>{value}</dd>
+        </div>
+      ))}
+    </dl>
   );
 }

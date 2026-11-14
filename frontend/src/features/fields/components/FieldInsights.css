@@ -120,8 +120,34 @@
   gap: 12px;
 }
 
-.field-insights-signals {
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+.field-soil-signal-score {
+  max-width: 280px;
+}
+
+.field-soil-depletion-metrics > div {
+  padding: 10px 14px;
+  border-radius: 8px;
+  background: #f3f6ef;
+  overflow-wrap: anywhere;
+}
+
+.field-soil-depletion-metrics dt {
+  color: #52624a;
+  font-size: 13px;
+}
+
+.field-soil-depletion-metrics dd {
+  margin: 2px 0 0;
+  color: var(--field-insights-green);
+  font-size: 20px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.field-soil-depletion-metrics dd small {
+  color: #52624a;
+  font-size: 13px;
+  font-weight: 400;
 }
 
 .field-insights-crop-tab {
@@ -349,4 +375,16 @@
   margin: 4px 0 0;
   font-size: 20px;
   font-weight: 600;
+}
+
+.field-insights-data-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px 16px;
+}
+
+.field-insights-data-chart {
+  min-width: 0;
 }

@@ -15,6 +15,7 @@ import type {
   MoistureSource,
   CurrentSoilMoisture,
 } from '../../../types/fields/soil-moisture.types.ts';
+import { SoilDataView } from './SoilDataView';
 import './FieldInsights.css';
 
 const sourceNames = { openmeteo: 'Open-Meteo · ERA5-Land', power: 'NASA POWER' };
@@ -74,9 +75,6 @@ export function FieldSoilMoisture(location: SoilMoistureLocation) {
           extra: <Droplets size={17} aria-hidden />,
           children: (
             <div className="field-insights-panel">
-              <p className="field-insights-muted">
-                {t('These are modeled readings for the grid cell at the parcel reference point.')}
-              </p>
               <Tabs
                 destroyOnHidden
                 items={[
@@ -144,13 +142,13 @@ function CurrentReadings({ data }: { data: CurrentSoilMoisture }) {
   const rows = Object.entries({ ...data.layers, profile_mean: data.profile_mean });
 
   return (
-    <div className="field-insights-panel">
-      <small>Open-Meteo · {time} UTC · m³/m³</small>
-      {data.grid_point && (
-        <small>
-          {t('Model grid point')} · {data.grid_point[1]}, {data.grid_point[0]}
-        </small>
-      )}
+    <SoilDataView
+      title={t('Current readings')}
+      help={`Open-Meteo · ${time} UTC · m³/m³`}
+      unit="m³/m³"
+      rows={rows.map(([key, value]) => ({ label: label(key, true), values: { moisture: value } }))}
+      series={[{ key: 'moisture', label: t('Soil moisture') }]}
+    >
       <Table
         size="small"
         pagination={false}
@@ -165,7 +163,7 @@ function CurrentReadings({ data }: { data: CurrentSoilMoisture }) {
           },
         ]}
       />
-    </div>
+    </SoilDataView>
   );
 }
 
@@ -187,6 +185,7 @@ function MoistureHistory(location: SoilMoistureLocation) {
   const query = useQuery(soilMoistureQueries.history(location, period));
   const rows = query.data?.series ?? [];
   const keys = Object.keys(rows[0]?.values ?? {});
+  const stats = Object.entries(query.data?.stats ?? {});
   const format = (value: number | null | undefined) => moistureNumber(value, i18n.language);
   const endLimit = dayjs().subtract(7, 'day').endOf('day');
   const earliest = dayjs(period.source === 'power' ? '1981-01-01' : '1950-01-01');
@@ -262,41 +261,61 @@ function MoistureHistory(location: SoilMoistureLocation) {
       )}
       {rows.length > 0 && (
         <>
-          <strong>{t('Layer statistics')}</strong>
-          <Table
-            size="small"
-            pagination={false}
-            scroll={{ x: true }}
-            rowKey={([key]) => key}
-            dataSource={Object.entries(query.data?.stats ?? {})}
-            columns={[
-              { title: t('Soil layer'), render: (_, [key]) => label(key) },
-              ...statisticKeys.map((key) => ({
-                title: t(statisticLabels[key]),
-                align: 'right' as const,
-                render: (_: unknown, [, stats]: [string, MoistureStats]) => format(stats[key]),
-              })),
-            ]}
-          />
-          <strong>{t('Historical readings')}</strong>
-          <Table
-            size="small"
-            scroll={{ x: true }}
-            rowKey={(row) => row.time_utc ?? row.date}
-            pagination={{ defaultPageSize: 10, hideOnSinglePage: true }}
-            dataSource={rows}
-            columns={[
-              {
-                title: t('Date'),
-                render: (_, row) => row.time_utc?.slice(0, 16).replace('T', ' ') ?? row.date,
-              },
-              ...keys.map((key) => ({
-                title: label(key),
-                align: 'right' as const,
-                render: (_: unknown, row: (typeof rows)[number]) => format(row.values[key]),
-              })),
-            ]}
-          />
+          <SoilDataView
+            title={t('Layer statistics')}
+            unit={unit}
+            rows={stats.map(([key, values]) => ({ label: label(key), values }))}
+            series={statisticKeys.map((key) => ({
+              key,
+              label: t(statisticLabels[key]),
+              count: key === 'n',
+            }))}
+          >
+            <Table
+              size="small"
+              pagination={false}
+              scroll={{ x: true }}
+              rowKey={([key]) => key}
+              dataSource={stats}
+              columns={[
+                { title: t('Soil layer'), render: (_, [key]) => label(key) },
+                ...statisticKeys.map((key) => ({
+                  title: t(statisticLabels[key]),
+                  align: 'right' as const,
+                  render: (_: unknown, [, stats]: [string, MoistureStats]) => format(stats[key]),
+                })),
+              ]}
+            />
+          </SoilDataView>
+          <SoilDataView
+            title={t('Historical readings')}
+            kind="line"
+            unit={unit}
+            rows={rows.map((row) => ({
+              label: row.time_utc?.slice(0, 16).replace('T', ' ') ?? row.date,
+              values: row.values,
+            }))}
+            series={keys.map((key) => ({ key, label: label(key) }))}
+          >
+            <Table
+              size="small"
+              scroll={{ x: true }}
+              rowKey={(row) => row.time_utc ?? row.date}
+              pagination={{ defaultPageSize: 10, hideOnSinglePage: true }}
+              dataSource={rows}
+              columns={[
+                {
+                  title: t('Date'),
+                  render: (_, row) => row.time_utc?.slice(0, 16).replace('T', ' ') ?? row.date,
+                },
+                ...keys.map((key) => ({
+                  title: label(key),
+                  align: 'right' as const,
+                  render: (_: unknown, row: (typeof rows)[number]) => format(row.values[key]),
+                })),
+              ]}
+            />
+          </SoilDataView>
         </>
       )}
     </div>
@@ -324,46 +343,56 @@ function MoistureComparison(location: SoilMoistureLocation) {
 
   return (
     <div className="field-insights-panel">
-      <p className="field-insights-muted">
-        {t(
+      <div className="field-insights-panel">
+        {current.profile_mean == null && (
+          <Alert type="info" title={t('No complete current profile is available.')} />
+        )}
+        {current.profile_mean != null && past_mean == null && (
+          <Alert
+            type="info"
+            title={t('At least three historical years are needed for comparison.')}
+          />
+        )}
+        <dl className="field-soil-moisture-comparison">
+          {metrics.map(({ label, value }) => (
+            <div key={label}>
+              <dt>{label}</dt>
+              <dd>{value}</dd>
+            </div>
+          ))}
+        </dl>
+        <small>Open-Meteo · ERA5-Land · m³/m³</small>
+      </div>
+      <SoilDataView
+        title={t('Seasonal comparison')}
+        help={t(
           'The current 0–81 cm profile is compared with the archive’s 0–100 cm profile for the same time of year (the date and preceding {{days}} days).',
           { days: window_days },
         )}
-      </p>
-      {current.profile_mean == null && (
-        <Alert type="info" title={t('No complete current profile is available.')} />
-      )}
-      {current.profile_mean != null && past_mean == null && (
-        <Alert
-          type="info"
-          title={t('At least three historical years are needed for comparison.')}
-        />
-      )}
-      <dl className="field-soil-moisture-comparison">
-        {metrics.map(({ label, value }) => (
-          <div key={label}>
-            <dt>{label}</dt>
-            <dd>{value}</dd>
-          </div>
-        ))}
-      </dl>
-      <small>Open-Meteo · ERA5-Land · m³/m³</small>
-      {Object.keys(years).length > 0 && (
-        <Table
-          size="small"
-          pagination={false}
-          rowKey={([year]) => year}
-          dataSource={Object.entries(years).reverse()}
-          columns={[
-            { title: t('Year'), render: (_, [year]) => year },
-            {
-              title: t('Profile mean (0–100 cm)'),
-              align: 'right',
-              render: (_, [, value]) => format(value),
-            },
-          ]}
-        />
-      )}
+        unit="m³/m³"
+        rows={Object.entries(years).map(([year, value]) => ({
+          label: year,
+          values: { moisture: value },
+        }))}
+        series={[{ key: 'moisture', label: t('Profile mean (0–100 cm)') }]}
+      >
+        {Object.keys(years).length > 0 && (
+          <Table
+            size="small"
+            pagination={false}
+            rowKey={([year]) => year}
+            dataSource={Object.entries(years).reverse()}
+            columns={[
+              { title: t('Year'), render: (_, [year]) => year },
+              {
+                title: t('Profile mean (0–100 cm)'),
+                align: 'right',
+                render: (_, [, value]) => format(value),
+              },
+            ]}
+          />
+        )}
+      </SoilDataView>
       {unavailable_years.length > 0 && (
         <small>
           {t('Years without usable readings')} · {unavailable_years.join(', ')}
