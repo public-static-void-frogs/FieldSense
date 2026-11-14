@@ -1,0 +1,275 @@
+region,crop,level,low,mid,high,unit,source,as_of,verified
+AL,corn,state,112.0,143.0,164.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; AL, 2021-2026 (min, mean, max)",2026-11-14,true
+AR,corn,state,173.0,183.17,190.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; AR, 2021-2026 (min, mean, max)",2026-11-14,true
+AZ,corn,state,181.0,205.17,225.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; AZ, 2021-2026 (min, mean, max)",2026-11-14,true
+CA,corn,state,173.0,179.6,188.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; CA, 2021-2025 (min, mean, max)",2026-11-14,true
+CO,corn,state,93.0,119.0,133.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; CO, 2021-2026 (min, mean, max)",2026-11-14,true
+DE,corn,state,170.0,181.83,191.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; DE, 2021-2026 (min, mean, max)",2026-11-14,true
+FL,corn,state,141.0,158.8,176.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; FL, 2021-2025 (min, mean, max)",2026-11-14,true
+GA,corn,state,163.0,174.83,187.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; GA, 2021-2026 (min, mean, max)",2026-11-14,true
+IA,corn,state,200.0,207.5,219.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; IA, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,corn,state,202.0,207.67,216.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; ID, 2021-2026 (min, mean, max)",2026-11-14,true
+IL,corn,state,200.0,208.83,217.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; IL, 2021-2026 (min, mean, max)",2026-11-14,true
+IN,corn,state,190.0,197.5,204.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; IN, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,corn,state,115.0,128.5,145.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+KY,corn,state,156.0,178.17,192.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; KY, 2021-2026 (min, mean, max)",2026-11-14,true
+LA,corn,state,170.0,179.5,193.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; LA, 2021-2026 (min, mean, max)",2026-11-14,true
+MD,corn,state,143.0,164.0,175.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; MD, 2021-2026 (min, mean, max)",2026-11-14,true
+MI,corn,state,168.0,173.17,181.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; MI, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,corn,state,174.0,189.33,204.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MO,corn,state,153.0,169.5,185.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; MO, 2021-2026 (min, mean, max)",2026-11-14,true
+MS,corn,state,165.0,181.5,196.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; MS, 2021-2026 (min, mean, max)",2026-11-14,true
+MT,corn,state,85.0,111.6,132.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; MT, 2021-2025 (min, mean, max)",2026-11-14,true
+NC,corn,state,87.0,128.33,149.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; NC, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,corn,state,105.0,135.67,158.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+NE,corn,state,165.0,184.5,194.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; NE, 2021-2026 (min, mean, max)",2026-11-14,true
+NJ,corn,state,114.0,152.6,168.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; NJ, 2021-2025 (min, mean, max)",2026-11-14,true
+NM,corn,state,149.0,163.6,184.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; NM, 2021-2025 (min, mean, max)",2026-11-14,true
+NY,corn,state,140.0,156.5,169.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; NY, 2021-2026 (min, mean, max)",2026-11-14,true
+OH,corn,state,177.0,189.83,200.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; OH, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,corn,state,93.0,122.33,150.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+OR,corn,state,208.0,227.0,240.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; OR, 2021-2025 (min, mean, max)",2026-11-14,true
+OT,corn,state,0.0,27.02,162.1,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; OT, 2021-2026 (min, mean, max)",2026-11-14,true
+PA,corn,state,138.0,153.67,169.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+SC,corn,state,97.0,124.5,150.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; SC, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,corn,state,132.0,151.0,171.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+TN,corn,state,130.0,162.5,188.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; TN, 2021-2026 (min, mean, max)",2026-11-14,true
+TX,corn,state,95.0,118.67,135.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; TX, 2021-2026 (min, mean, max)",2026-11-14,true
+UT,corn,state,165.0,173.6,185.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; UT, 2021-2025 (min, mean, max)",2026-11-14,true
+VA,corn,state,114.0,155.83,169.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; VA, 2021-2026 (min, mean, max)",2026-11-14,true
+WA,corn,state,220.0,239.17,251.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; WA, 2021-2026 (min, mean, max)",2026-11-14,true
+WI,corn,state,174.0,180.33,188.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+WV,corn,state,110.0,144.0,168.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; WV, 2021-2025 (min, mean, max)",2026-11-14,true
+WY,corn,state,132.0,147.6,155.0,bu/acre,"USDA NASS Quick Stats: CORN, GRAIN - YIELD, MEASURED IN BU / ACRE; WY, 2021-2025 (min, mean, max)",2026-11-14,true
+AL,soybeans,state,31.0,39.67,46.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; AL, 2021-2026 (min, mean, max)",2026-11-14,true
+AR,soybeans,state,52.0,54.0,56.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; AR, 2021-2026 (min, mean, max)",2026-11-14,true
+DE,soybeans,state,43.0,48.0,54.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; DE, 2021-2026 (min, mean, max)",2026-11-14,true
+GA,soybeans,state,41.0,45.17,49.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; GA, 2021-2026 (min, mean, max)",2026-11-14,true
+IA,soybeans,state,58.0,61.33,65.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; IA, 2021-2026 (min, mean, max)",2026-11-14,true
+IL,soybeans,state,62.5,63.58,65.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; IL, 2021-2026 (min, mean, max)",2026-11-14,true
+IN,soybeans,state,57.5,60.0,63.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; IN, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,soybeans,state,26.0,34.5,48.5,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+KY,soybeans,state,42.0,51.0,56.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; KY, 2021-2026 (min, mean, max)",2026-11-14,true
+LA,soybeans,state,40.0,50.08,56.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; LA, 2021-2026 (min, mean, max)",2026-11-14,true
+MD,soybeans,state,43.0,47.0,53.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; MD, 2021-2026 (min, mean, max)",2026-11-14,true
+MI,soybeans,state,46.0,48.58,51.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; MI, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,soybeans,state,45.0,49.42,54.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MO,soybeans,state,45.5,47.92,50.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; MO, 2021-2026 (min, mean, max)",2026-11-14,true
+MS,soybeans,state,54.0,55.83,59.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; MS, 2021-2026 (min, mean, max)",2026-11-14,true
+NC,soybeans,state,36.0,38.5,40.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; NC, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,soybeans,state,25.5,33.5,37.5,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+NE,soybeans,state,49.0,58.08,65.5,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; NE, 2021-2026 (min, mean, max)",2026-11-14,true
+NJ,soybeans,state,28.0,40.5,46.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; NJ, 2021-2026 (min, mean, max)",2026-11-14,true
+NY,soybeans,state,40.0,47.83,53.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; NY, 2021-2026 (min, mean, max)",2026-11-14,true
+OH,soybeans,state,50.0,55.92,62.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; OH, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,soybeans,state,17.0,22.5,29.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+PA,soybeans,state,43.0,48.17,57.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+SC,soybeans,state,31.0,35.0,39.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; SC, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,soybeans,state,38.0,42.83,47.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+TN,soybeans,state,42.0,47.5,52.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; TN, 2021-2026 (min, mean, max)",2026-11-14,true
+TX,soybeans,state,20.0,29.67,38.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; TX, 2021-2026 (min, mean, max)",2026-11-14,true
+VA,soybeans,state,38.0,41.83,46.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; VA, 2021-2026 (min, mean, max)",2026-11-14,true
+WI,soybeans,state,48.0,53.0,56.0,bu/acre,"USDA NASS Quick Stats: SOYBEANS - YIELD, MEASURED IN BU / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+CO,sorghum,state,20.0,33.83,52.0,bu/acre,"USDA NASS Quick Stats: SORGHUM, GRAIN - YIELD, MEASURED IN BU / ACRE; CO, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,sorghum,state,39.0,63.83,90.0,bu/acre,"USDA NASS Quick Stats: SORGHUM, GRAIN - YIELD, MEASURED IN BU / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+NE,sorghum,state,55.0,77.67,87.0,bu/acre,"USDA NASS Quick Stats: SORGHUM, GRAIN - YIELD, MEASURED IN BU / ACRE; NE, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,sorghum,state,24.0,44.5,58.0,bu/acre,"USDA NASS Quick Stats: SORGHUM, GRAIN - YIELD, MEASURED IN BU / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,sorghum,state,64.0,74.5,90.0,bu/acre,"USDA NASS Quick Stats: SORGHUM, GRAIN - YIELD, MEASURED IN BU / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+TX,sorghum,state,45.0,53.83,62.0,bu/acre,"USDA NASS Quick Stats: SORGHUM, GRAIN - YIELD, MEASURED IN BU / ACRE; TX, 2021-2026 (min, mean, max)",2026-11-14,true
+AR,oats,state,61.0,71.0,90.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; AR, 2021-2023 (min, mean, max)",2026-11-14,true
+CA,oats,state,65.0,68.33,75.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; CA, 2021-2023 (min, mean, max)",2026-11-14,true
+GA,oats,state,51.0,59.67,70.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; GA, 2021-2026 (min, mean, max)",2026-11-14,true
+IA,oats,state,77.0,85.5,100.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; IA, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,oats,state,54.0,72.17,92.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; ID, 2021-2026 (min, mean, max)",2026-11-14,true
+IL,oats,state,83.0,92.17,105.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; IL, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,oats,state,41.0,54.33,66.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+ME,oats,state,62.0,77.83,86.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; ME, 2021-2026 (min, mean, max)",2026-11-14,true
+MI,oats,state,61.0,67.17,75.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; MI, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,oats,state,57.0,77.0,92.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MO,oats,state,52.0,60.0,68.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; MO, 2021-2023 (min, mean, max)",2026-11-14,true
+MT,oats,state,33.0,41.0,59.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; MT, 2021-2026 (min, mean, max)",2026-11-14,true
+NC,oats,state,54.0,70.33,77.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; NC, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,oats,state,48.0,74.17,98.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+NE,oats,state,50.0,55.17,69.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; NE, 2021-2026 (min, mean, max)",2026-11-14,true
+NY,oats,state,54.0,60.0,68.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; NY, 2021-2026 (min, mean, max)",2026-11-14,true
+OH,oats,state,67.0,72.67,81.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; OH, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,oats,state,20.0,41.67,60.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; OK, 2021-2023 (min, mean, max)",2026-11-14,true
+OR,oats,state,62.0,86.0,105.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; OR, 2021-2026 (min, mean, max)",2026-11-14,true
+OT,oats,state,0.0,0.0,0.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; OT, 2021-2024 (min, mean, max)",2026-11-14,true
+PA,oats,state,52.0,58.83,65.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,oats,state,67.0,81.83,96.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+TX,oats,state,45.0,50.83,55.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; TX, 2021-2026 (min, mean, max)",2026-11-14,true
+WI,oats,state,61.0,67.0,74.0,bu/acre,"USDA NASS Quick Stats: OATS - YIELD, MEASURED IN BU / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+AK,barley,state,38.0,45.67,51.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; AK, 2021-2026 (min, mean, max)",2026-11-14,true
+AZ,barley,state,81.0,113.33,133.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; AZ, 2021-2026 (min, mean, max)",2026-11-14,true
+CA,barley,state,56.0,64.17,75.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; CA, 2021-2026 (min, mean, max)",2026-11-14,true
+CO,barley,state,111.0,123.0,145.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; CO, 2021-2026 (min, mean, max)",2026-11-14,true
+DE,barley,state,75.0,86.83,95.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; DE, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,barley,state,89.0,105.5,112.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; ID, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,barley,state,29.0,51.0,75.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+MD,barley,state,80.0,88.5,96.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; MD, 2021-2026 (min, mean, max)",2026-11-14,true
+ME,barley,state,45.0,71.83,91.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; ME, 2021-2026 (min, mean, max)",2026-11-14,true
+MI,barley,state,45.0,53.67,60.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; MI, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,barley,state,55.0,70.33,76.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MT,barley,state,38.0,48.17,56.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; MT, 2021-2026 (min, mean, max)",2026-11-14,true
+NC,barley,state,65.0,71.33,76.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; NC, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,barley,state,51.0,69.0,78.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+NY,barley,state,54.0,60.83,65.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; NY, 2021-2026 (min, mean, max)",2026-11-14,true
+OR,barley,state,32.0,46.0,66.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; OR, 2021-2026 (min, mean, max)",2026-11-14,true
+OT,barley,state,0.0,12.25,73.5,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; OT, 2021-2026 (min, mean, max)",2026-11-14,true
+PA,barley,state,67.0,78.33,81.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,barley,state,20.0,45.17,57.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+UT,barley,state,73.0,79.5,90.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; UT, 2021-2026 (min, mean, max)",2026-11-14,true
+VA,barley,state,75.0,82.67,87.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; VA, 2021-2026 (min, mean, max)",2026-11-14,true
+WA,barley,state,38.0,58.0,84.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; WA, 2021-2026 (min, mean, max)",2026-11-14,true
+WI,barley,state,45.0,54.17,63.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+WY,barley,state,91.0,103.0,112.0,bu/acre,"USDA NASS Quick Stats: BARLEY - YIELD, MEASURED IN BU / ACRE; WY, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,rye,state,44.0,48.67,56.0,bu/acre,"USDA NASS Quick Stats: RYE - YIELD, MEASURED IN BU / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,rye,state,32.0,42.33,48.0,bu/acre,"USDA NASS Quick Stats: RYE - YIELD, MEASURED IN BU / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,rye,state,17.0,22.0,27.0,bu/acre,"USDA NASS Quick Stats: RYE - YIELD, MEASURED IN BU / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+OT,rye,state,30.4,32.7,34.7,bu/acre,"USDA NASS Quick Stats: RYE - YIELD, MEASURED IN BU / ACRE; OT, 2021-2026 (min, mean, max)",2026-11-14,true
+PA,rye,state,34.0,39.83,53.0,bu/acre,"USDA NASS Quick Stats: RYE - YIELD, MEASURED IN BU / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,rye,state,52.0,54.33,56.0,bu/acre,"USDA NASS Quick Stats: RYE - YIELD, MEASURED IN BU / ACRE; SD, 2024-2026 (min, mean, max)",2026-11-14,true
+WI,rye,state,39.0,44.17,58.0,bu/acre,"USDA NASS Quick Stats: RYE - YIELD, MEASURED IN BU / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+AL,winter_wheat,state,71.0,75.17,83.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; AL, 2021-2026 (min, mean, max)",2026-11-14,true
+AR,winter_wheat,state,53.0,56.17,58.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; AR, 2021-2026 (min, mean, max)",2026-11-14,true
+CA,winter_wheat,state,73.0,79.67,86.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; CA, 2021-2026 (min, mean, max)",2026-11-14,true
+CO,winter_wheat,state,17.0,32.17,41.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; CO, 2021-2026 (min, mean, max)",2026-11-14,true
+DE,winter_wheat,state,70.0,78.5,92.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; DE, 2021-2026 (min, mean, max)",2026-11-14,true
+GA,winter_wheat,state,55.0,59.33,66.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; GA, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,winter_wheat,state,71.0,86.5,99.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; ID, 2021-2026 (min, mean, max)",2026-11-14,true
+IL,winter_wheat,state,79.0,84.33,88.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; IL, 2021-2026 (min, mean, max)",2026-11-14,true
+IN,winter_wheat,state,81.0,86.83,92.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; IN, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,winter_wheat,state,34.0,42.0,52.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+KY,winter_wheat,state,75.0,82.17,88.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; KY, 2021-2026 (min, mean, max)",2026-11-14,true
+MD,winter_wheat,state,75.0,79.17,85.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; MD, 2021-2026 (min, mean, max)",2026-11-14,true
+MI,winter_wheat,state,81.0,85.17,90.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; MI, 2021-2026 (min, mean, max)",2026-11-14,true
+MO,winter_wheat,state,60.0,70.5,80.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; MO, 2021-2026 (min, mean, max)",2026-11-14,true
+MS,winter_wheat,state,50.0,54.67,60.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; MS, 2021-2026 (min, mean, max)",2026-11-14,true
+MT,winter_wheat,state,31.0,42.5,51.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; MT, 2021-2026 (min, mean, max)",2026-11-14,true
+NC,winter_wheat,state,53.0,60.0,70.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; NC, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,winter_wheat,state,33.0,50.17,60.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+NE,winter_wheat,state,32.0,42.5,52.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; NE, 2021-2026 (min, mean, max)",2026-11-14,true
+NJ,winter_wheat,state,67.0,73.0,82.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; NJ, 2021-2023 (min, mean, max)",2026-11-14,true
+NM,winter_wheat,state,11.0,21.17,36.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; NM, 2021-2026 (min, mean, max)",2026-11-14,true
+NY,winter_wheat,state,69.0,74.17,81.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; NY, 2021-2026 (min, mean, max)",2026-11-14,true
+OH,winter_wheat,state,79.0,84.67,90.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; OH, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,winter_wheat,state,28.0,33.17,39.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+OR,winter_wheat,state,45.0,64.33,76.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; OR, 2021-2026 (min, mean, max)",2026-11-14,true
+OT,winter_wheat,state,0.0,0.0,0.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; OT, 2021-2026 (min, mean, max)",2026-11-14,true
+PA,winter_wheat,state,72.0,74.5,77.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+SC,winter_wheat,state,53.0,56.5,60.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; SC, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,winter_wheat,state,38.0,50.5,63.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+TN,winter_wheat,state,71.0,75.0,80.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; TN, 2021-2026 (min, mean, max)",2026-11-14,true
+TX,winter_wheat,state,30.0,33.83,37.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; TX, 2021-2026 (min, mean, max)",2026-11-14,true
+UT,winter_wheat,state,36.0,45.83,53.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; UT, 2021-2026 (min, mean, max)",2026-11-14,true
+VA,winter_wheat,state,55.0,66.67,78.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; VA, 2021-2026 (min, mean, max)",2026-11-14,true
+WA,winter_wheat,state,42.0,63.5,79.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; WA, 2021-2026 (min, mean, max)",2026-11-14,true
+WI,winter_wheat,state,75.0,78.33,83.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+WY,winter_wheat,state,15.0,25.83,32.0,bu/acre,"USDA NASS Quick Stats: WHEAT, WINTER - YIELD, MEASURED IN BU / ACRE; WY, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,spring_wheat,state,63.0,78.17,89.0,bu/acre,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - YIELD, MEASURED IN BU / ACRE; ID, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,spring_wheat,state,48.0,61.92,69.0,bu/acre,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - YIELD, MEASURED IN BU / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MT,spring_wheat,state,17.0,26.83,34.0,bu/acre,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - YIELD, MEASURED IN BU / ACRE; MT, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,spring_wheat,state,33.5,49.5,59.0,bu/acre,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - YIELD, MEASURED IN BU / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+SD,spring_wheat,state,29.0,44.17,51.0,bu/acre,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - YIELD, MEASURED IN BU / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+WA,spring_wheat,state,30.0,40.83,46.0,bu/acre,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - YIELD, MEASURED IN BU / ACRE; WA, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,canola,state,32.0,35.33,38.0,bu/acre,"USDA NASS Quick Stats: CANOLA - YIELD, MEASURED IN LB / ACRE; ID, 2024-2026 (min, mean, max)",2026-11-14,true
+KS,canola,state,12.0,20.5,35.2,bu/acre,"USDA NASS Quick Stats: CANOLA - YIELD, MEASURED IN LB / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,canola,state,34.0,43.8,49.4,bu/acre,"USDA NASS Quick Stats: CANOLA - YIELD, MEASURED IN LB / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MT,canola,state,18.0,23.17,28.4,bu/acre,"USDA NASS Quick Stats: CANOLA - YIELD, MEASURED IN LB / ACRE; MT, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,canola,state,26.8,35.93,42.4,bu/acre,"USDA NASS Quick Stats: CANOLA - YIELD, MEASURED IN LB / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,canola,state,14.0,23.0,36.0,bu/acre,"USDA NASS Quick Stats: CANOLA - YIELD, MEASURED IN LB / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+WA,canola,state,22.0,31.8,36.4,bu/acre,"USDA NASS Quick Stats: CANOLA - YIELD, MEASURED IN LB / ACRE; WA, 2021-2026 (min, mean, max)",2026-11-14,true
+AR,alfalfa,state,2.8,3.03,3.3,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; AR, 2021-2023 (min, mean, max)",2026-11-14,true
+AZ,alfalfa,state,7.3,7.83,8.3,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; AZ, 2021-2026 (min, mean, max)",2026-11-14,true
+CA,alfalfa,state,6.5,6.95,7.4,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; CA, 2021-2026 (min, mean, max)",2026-11-14,true
+CO,alfalfa,state,2.9,3.65,4.1,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; CO, 2021-2026 (min, mean, max)",2026-11-14,true
+CT,alfalfa,state,2.0,2.08,2.1,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; CT, 2021-2025 (min, mean, max)",2026-11-14,true
+DE,alfalfa,state,2.2,2.85,3.5,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; DE, 2021-2025 (min, mean, max)",2026-11-14,true
+IA,alfalfa,state,3.2,3.78,4.3,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; IA, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,alfalfa,state,4.1,4.23,4.5,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; ID, 2021-2026 (min, mean, max)",2026-11-14,true
+IL,alfalfa,state,3.65,3.8,4.2,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; IL, 2021-2026 (min, mean, max)",2026-11-14,true
+IN,alfalfa,state,2.5,3.27,3.7,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; IN, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,alfalfa,state,2.65,3.28,3.7,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+KY,alfalfa,state,3.0,3.2,3.6,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; KY, 2021-2026 (min, mean, max)",2026-11-14,true
+MA,alfalfa,state,1.5,1.76,2.1,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; MA, 2021-2025 (min, mean, max)",2026-11-14,true
+MD,alfalfa,state,3.0,3.76,4.4,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; MD, 2021-2025 (min, mean, max)",2026-11-14,true
+ME,alfalfa,state,2.0,2.26,2.5,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; ME, 2021-2025 (min, mean, max)",2026-11-14,true
+MI,alfalfa,state,2.5,2.85,3.2,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; MI, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,alfalfa,state,2.55,3.18,3.75,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MO,alfalfa,state,2.2,2.62,3.05,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; MO, 2021-2026 (min, mean, max)",2026-11-14,true
+MT,alfalfa,state,1.7,2.1,2.4,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; MT, 2021-2026 (min, mean, max)",2026-11-14,true
+NC,alfalfa,state,2.45,2.74,3.0,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; NC, 2021-2025 (min, mean, max)",2026-11-14,true
+ND,alfalfa,state,0.9,1.68,1.95,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+NE,alfalfa,state,3.1,3.68,4.3,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; NE, 2021-2026 (min, mean, max)",2026-11-14,true
+NH,alfalfa,state,1.2,1.64,2.0,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; NH, 2021-2025 (min, mean, max)",2026-11-14,true
+NJ,alfalfa,state,2.6,2.92,3.4,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; NJ, 2021-2025 (min, mean, max)",2026-11-14,true
+NM,alfalfa,state,4.0,4.63,5.0,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; NM, 2021-2026 (min, mean, max)",2026-11-14,true
+NV,alfalfa,state,4.4,4.7,5.1,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; NV, 2021-2026 (min, mean, max)",2026-11-14,true
+NY,alfalfa,state,2.0,2.33,2.6,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; NY, 2021-2026 (min, mean, max)",2026-11-14,true
+OH,alfalfa,state,3.1,3.43,3.9,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; OH, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,alfalfa,state,2.0,2.73,3.9,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+OR,alfalfa,state,3.4,4.32,4.7,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; OR, 2021-2026 (min, mean, max)",2026-11-14,true
+OT,alfalfa,state,0.0,0.49,2.91,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; OT, 2021-2026 (min, mean, max)",2026-11-14,true
+PA,alfalfa,state,2.9,3.2,3.6,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+RI,alfalfa,state,1.5,1.98,2.2,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; RI, 2021-2025 (min, mean, max)",2026-11-14,true
+SD,alfalfa,state,1.5,2.07,2.4,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+TN,alfalfa,state,3.0,3.28,3.8,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; TN, 2021-2025 (min, mean, max)",2026-11-14,true
+TX,alfalfa,state,3.0,4.25,5.5,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; TX, 2021-2026 (min, mean, max)",2026-11-14,true
+UT,alfalfa,state,3.7,4.08,4.4,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; UT, 2021-2026 (min, mean, max)",2026-11-14,true
+VA,alfalfa,state,2.9,3.13,3.3,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; VA, 2021-2026 (min, mean, max)",2026-11-14,true
+VT,alfalfa,state,1.4,2.31,3.4,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; VT, 2021-2025 (min, mean, max)",2026-11-14,true
+WA,alfalfa,state,4.6,4.92,5.2,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; WA, 2021-2026 (min, mean, max)",2026-11-14,true
+WI,alfalfa,state,2.7,3.41,3.9,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+WV,alfalfa,state,2.2,2.57,3.1,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; WV, 2021-2025 (min, mean, max)",2026-11-14,true
+WY,alfalfa,state,2.5,2.83,3.0,ton/acre,"USDA NASS Quick Stats: HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE; WY, 2021-2026 (min, mean, max)",2026-11-14,true
+AK,other_hay,state,1.0,1.27,1.4,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; AK, 2021-2025 (min, mean, max)",2026-11-14,true
+AL,other_hay,state,2.6,2.77,3.1,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; AL, 2021-2026 (min, mean, max)",2026-11-14,true
+AR,other_hay,state,1.9,2.08,2.3,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; AR, 2021-2026 (min, mean, max)",2026-11-14,true
+AZ,other_hay,state,4.3,4.54,4.8,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; AZ, 2021-2025 (min, mean, max)",2026-11-14,true
+CA,other_hay,state,3.1,3.52,4.4,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; CA, 2021-2026 (min, mean, max)",2026-11-14,true
+CO,other_hay,state,1.5,1.72,1.95,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; CO, 2021-2026 (min, mean, max)",2026-11-14,true
+CT,other_hay,state,1.7,1.9,2.3,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; CT, 2021-2025 (min, mean, max)",2026-11-14,true
+DE,other_hay,state,2.4,2.5,2.6,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; DE, 2021-2025 (min, mean, max)",2026-11-14,true
+FL,other_hay,state,2.3,2.6,3.1,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; FL, 2021-2025 (min, mean, max)",2026-11-14,true
+GA,other_hay,state,2.8,3.02,3.2,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; GA, 2021-2026 (min, mean, max)",2026-11-14,true
+IA,other_hay,state,2.0,2.37,2.7,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; IA, 2021-2026 (min, mean, max)",2026-11-14,true
+ID,other_hay,state,2.2,2.3,2.5,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; ID, 2021-2026 (min, mean, max)",2026-11-14,true
+IL,other_hay,state,2.1,2.33,2.7,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; IL, 2021-2026 (min, mean, max)",2026-11-14,true
+IN,other_hay,state,2.3,2.48,2.8,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; IN, 2021-2026 (min, mean, max)",2026-11-14,true
+KS,other_hay,state,1.35,1.68,2.25,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; KS, 2021-2026 (min, mean, max)",2026-11-14,true
+KY,other_hay,state,2.1,2.31,2.6,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; KY, 2021-2026 (min, mean, max)",2026-11-14,true
+LA,other_hay,state,2.1,2.37,2.8,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; LA, 2021-2026 (min, mean, max)",2026-11-14,true
+MA,other_hay,state,1.4,1.75,2.0,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; MA, 2021-2025 (min, mean, max)",2026-11-14,true
+MD,other_hay,state,1.4,2.1,2.6,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; MD, 2021-2025 (min, mean, max)",2026-11-14,true
+ME,other_hay,state,1.8,1.86,2.0,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; ME, 2021-2025 (min, mean, max)",2026-11-14,true
+MI,other_hay,state,1.3,1.77,2.1,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; MI, 2021-2026 (min, mean, max)",2026-11-14,true
+MN,other_hay,state,1.4,1.98,2.75,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; MN, 2021-2026 (min, mean, max)",2026-11-14,true
+MO,other_hay,state,1.2,1.82,2.1,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; MO, 2021-2026 (min, mean, max)",2026-11-14,true
+MS,other_hay,state,1.9,2.22,2.5,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; MS, 2021-2026 (min, mean, max)",2026-11-14,true
+MT,other_hay,state,1.3,1.49,1.75,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; MT, 2021-2026 (min, mean, max)",2026-11-14,true
+NC,other_hay,state,2.0,2.17,2.4,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; NC, 2021-2026 (min, mean, max)",2026-11-14,true
+ND,other_hay,state,1.15,1.49,1.85,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; ND, 2021-2026 (min, mean, max)",2026-11-14,true
+NE,other_hay,state,1.4,1.62,1.7,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; NE, 2021-2026 (min, mean, max)",2026-11-14,true
+NH,other_hay,state,1.5,1.66,1.8,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; NH, 2021-2025 (min, mean, max)",2026-11-14,true
+NJ,other_hay,state,1.8,1.9,2.0,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; NJ, 2021-2025 (min, mean, max)",2026-11-14,true
+NM,other_hay,state,1.4,1.86,2.2,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; NM, 2021-2025 (min, mean, max)",2026-11-14,true
+NV,other_hay,state,2.0,2.12,2.2,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; NV, 2021-2025 (min, mean, max)",2026-11-14,true
+NY,other_hay,state,1.35,1.9,2.3,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; NY, 2021-2026 (min, mean, max)",2026-11-14,true
+OH,other_hay,state,1.85,2.38,2.6,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; OH, 2021-2026 (min, mean, max)",2026-11-14,true
+OK,other_hay,state,1.25,1.64,1.95,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; OK, 2021-2026 (min, mean, max)",2026-11-14,true
+OR,other_hay,state,2.2,2.35,2.8,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; OR, 2021-2026 (min, mean, max)",2026-11-14,true
+OT,other_hay,state,0.0,0.42,2.51,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; OT, 2021-2026 (min, mean, max)",2026-11-14,true
+PA,other_hay,state,2.1,2.43,2.6,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; PA, 2021-2026 (min, mean, max)",2026-11-14,true
+RI,other_hay,state,1.4,1.72,2.1,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; RI, 2021-2025 (min, mean, max)",2026-11-14,true
+SC,other_hay,state,2.2,2.44,2.7,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; SC, 2021-2025 (min, mean, max)",2026-11-14,true
+SD,other_hay,state,1.05,1.48,1.85,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; SD, 2021-2026 (min, mean, max)",2026-11-14,true
+TN,other_hay,state,2.1,2.21,2.35,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; TN, 2021-2026 (min, mean, max)",2026-11-14,true
+TX,other_hay,state,1.5,1.9,2.4,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; TX, 2021-2026 (min, mean, max)",2026-11-14,true
+UT,other_hay,state,2.2,2.88,3.3,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; UT, 2021-2025 (min, mean, max)",2026-11-14,true
+VA,other_hay,state,1.9,2.1,2.3,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; VA, 2021-2026 (min, mean, max)",2026-11-14,true
+VT,other_hay,state,1.6,1.88,2.1,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; VT, 2021-2025 (min, mean, max)",2026-11-14,true
+WA,other_hay,state,2.4,2.82,3.3,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; WA, 2021-2026 (min, mean, max)",2026-11-14,true
+WI,other_hay,state,1.3,1.7,1.9,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; WI, 2021-2026 (min, mean, max)",2026-11-14,true
+WV,other_hay,state,1.5,1.68,1.9,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; WV, 2021-2026 (min, mean, max)",2026-11-14,true
+WY,other_hay,state,1.4,1.47,1.55,ton/acre,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE; WY, 2021-2026 (min, mean, max)",2026-11-14,true

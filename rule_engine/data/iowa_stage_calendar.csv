@@ -1,0 +1,19 @@
+region,crop,stage,doy_p50,source,as_of
+IA,corn,planted,124,"USDA NASS Crop Progress, Iowa 2025, 50% planted (data/additional_sources/data/nass_progress_dates.parquet)",2025-11-01
+IA,corn,emerged,136,"USDA NASS Crop Progress, Iowa 2025, 50% emerged",2025-11-01
+IA,corn,flowering,198,"USDA NASS Crop Progress, Iowa 2025, 50% silking",2025-11-01
+IA,corn,grain_fill,214,"USDA NASS Crop Progress, Iowa 2025, 50% dough",2025-11-01
+IA,corn,mature,258,"USDA NASS Crop Progress, Iowa 2025, 50% mature",2025-11-01
+IA,corn,harvested,292,"USDA NASS Crop Progress, Iowa 2025, 50% harvested",2025-11-01
+IA,soybeans,planted,127,"USDA NASS Crop Progress, Iowa 2025, 50% planted",2025-11-01
+IA,soybeans,emerged,141,"USDA NASS Crop Progress, Iowa 2025, 50% emerged",2025-11-01
+IA,soybeans,flowering,192,"USDA NASS Crop Progress, Iowa 2025, 50% blooming",2025-11-01
+IA,soybeans,grain_fill,207,"USDA NASS Crop Progress, Iowa 2025, 50% setting pods",2025-11-01
+IA,soybeans,mature,261,"USDA NASS Crop Progress, Iowa 2025, 50% dropping leaves",2025-11-01
+IA,soybeans,harvested,291,"USDA NASS Crop Progress, Iowa 2025, 50% harvested",2025-11-01
+IA,oats,planted,104,"USDA NASS Crop Progress, Iowa 2025, 50% planted",2025-11-01
+IA,oats,emerged,121,"USDA NASS Crop Progress, Iowa 2025, 50% emerged",2025-11-01
+IA,oats,flowering,157,"USDA NASS Crop Progress, Iowa 2025, 50% headed",2025-11-01
+IA,oats,grain_fill,185,"USDA NASS Crop Progress, Iowa 2025, 50% coloring",2025-11-01
+IA,oats,mature,196,"Midpoint of coloring and harvested (NASS reports no 'mature' for oats)",2025-11-01
+IA,oats,harvested,208,"USDA NASS Crop Progress, Iowa 2025, 50% harvested",2025-11-01

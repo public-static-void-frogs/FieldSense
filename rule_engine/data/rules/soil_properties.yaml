@@ -1,0 +1,180 @@
+# Rules over field.soil.* (SSURGO map-unit estimates or a farmer's soil test; see ssurgo.py).
+# Slope and water-storage cut-offs are design thresholds, not published ones: evidence is weak
+# and every rule needs local review. SSURGO describes the natural, undrained soil.
+version: "2026-11-14"
+rules:
+  - id: erosion_steep_slope_row_crop
+    title: Row crop or small grain on a steep slope
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.3"]}
+    when:
+      - {fact: field.soil.slope_pct, op: ge, value: 9}
+    effect: {kind: risk, level: high}
+    evidence_strength: weak
+    sources:
+      - "RUSLE slope-steepness factor; 7 CFR 12.21 highly erodible land (RKLS/T >= 8). The 9 % cut-off is the SSURGO C/D slope-class break, not a published erosion threshold"
+    uses_traits: [rusle_c]
+    needs_local_review: true
+
+  - id: erosion_sloping_row_crop
+    title: Row crop or small grain on sloping land
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.3"]}
+    when:
+      - {fact: field.soil.slope_pct, op: ge, value: 5}
+      - {fact: field.soil.slope_pct, op: lt, value: 9}
+    effect: {kind: risk, level: medium}
+    evidence_strength: weak
+    sources:
+      - "RUSLE slope-steepness factor; 7 CFR 12.21 highly erodible land (RKLS/T >= 8). The 5 % cut-off is the SSURGO B/C slope-class break, not a published erosion threshold"
+    uses_traits: [rusle_c]
+    needs_local_review: true
+
+  - id: perennial_cover_on_slope
+    title: Year-round cover protects sloping land
+    category: erosion
+    applies_to: {traits: ["rusle_c<0.1"]}
+    when:
+      - {fact: field.soil.slope_pct, op: ge, value: 5}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "RUSLE C-factor and slope-steepness factors"
+    uses_traits: [rusle_c]
+    needs_local_review: true
+
+  - id: highly_erodible_land_compliance
+    title: Highly erodible land (conservation compliance)
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.3"]}
+    when:
+      - {fact: field.soil.hel, op: eq, value: true}
+    effect: {kind: advisory}
+    evidence_strength: strong
+    sources:
+      - "7 CFR 12.21, identification of highly erodible lands"
+    needs_local_review: true
+
+  - id: land_capability_not_for_cultivation
+    title: Land capability class 5 or higher
+    category: erosion
+    applies_to: {traits: ["rusle_c>=0.3"]}
+    when:
+      - {fact: field.soil.nirr_class, op: ge, value: 5}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "USDA SCS 1961, Land-Capability Classification, Agriculture Handbook 210 (classes 5-8 generally not suited to cultivation)"
+    needs_local_review: true
+
+  - id: droughty_soil_high_water_demand
+    title: High water demand on a soil that stores little water
+    category: water
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: candidate.water_demand, op: eq, value: high}
+      - {fact: field.soil.aws_100cm_mm, op: lt, value: 100}
+    effect: {kind: risk, level: medium}
+    evidence_strength: weak
+    sources:
+      - "SSURGO available water storage 0-100 cm (muaggatt.aws0100wta). The 100 mm cut-off is a design threshold, not a published one"
+    needs_local_review: true
+
+  - id: sandy_soil_high_water_demand
+    title: High water demand on a sandy soil
+    category: water
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: candidate.water_demand, op: eq, value: high}
+      - {fact: field.soil.aws_100cm_mm, op: is_null}
+      - {fact: field.soil.sand_pct, op: ge, value: 70}
+    effect: {kind: risk, level: medium}
+    evidence_strength: weak
+    sources:
+      - "SSURGO surface texture (chorizon.sandtotal_r). The 70 % sand cut-off is a design threshold, not a published one"
+    needs_local_review: true
+
+  - id: wet_soil_spring_fieldwork
+    title: Poorly drained soil delays spring planting
+    category: water
+    applies_to: {crops: [corn, sorghum, soybeans, oats, spring_wheat]}
+    when:
+      - {fact: field.soil.wetness, op: eq, value: wet}
+    effect: {kind: risk, level: low}
+    evidence_strength: weak
+    sources:
+      - "SSURGO natural drainage class; ISU Extension planting-date guidance (not retrieved in full)"
+    needs_local_review: true
+
+  - id: alfalfa_wet_soil
+    title: Alfalfa on a poorly drained soil
+    category: water
+    applies_to: {crops: [alfalfa]}
+    when:
+      - {fact: field.soil.wetness, op: eq, value: wet}
+    effect: {kind: risk, level: high}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension alfalfa establishment: field site should be well drained; ponding and wet soils can be detrimental"
+    needs_local_review: true
+
+  - id: alfalfa_somewhat_wet_soil
+    title: Alfalfa on a somewhat poorly drained soil
+    category: water
+    applies_to: {crops: [alfalfa]}
+    when:
+      - {fact: field.soil.wetness, op: eq, value: somewhat_wet}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension alfalfa establishment: field site should be well drained; ponding and wet soils can be detrimental"
+    needs_local_review: true
+
+  - id: alfalfa_low_ph
+    title: Soil pH below the alfalfa target
+    category: soil_nutrient
+    applies_to: {crops: [alfalfa]}
+    when:
+      - {fact: field.soil.ph, op: lt, value: 6.5}
+    effect: {kind: risk, level: medium}
+    evidence_strength: strong
+    sources:
+      - "ISU Extension alfalfa establishment: soil pH greater than 6.5, ideally 6.8-7.0"
+    needs_local_review: false
+
+  - id: soybean_iron_chlorosis_calcareous
+    title: Iron deficiency chlorosis on calcareous soil
+    category: soil_nutrient
+    applies_to: {crops: [soybeans, double_crop_winter_wheat_soybeans]}
+    when:
+      - {fact: field.soil.caco3_pct, op: gt, value: 0}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension, soybean iron deficiency chlorosis on calcareous, high-pH soils of central and north-central Iowa"
+    needs_local_review: true
+
+  - id: soybean_iron_chlorosis_high_ph
+    title: Iron deficiency chlorosis on high-pH soil (carbonate not reported)
+    category: soil_nutrient
+    applies_to: {crops: [soybeans, double_crop_winter_wheat_soybeans]}
+    when:
+      - {fact: field.soil.caco3_pct, op: is_null}
+      - {fact: field.soil.ph, op: ge, value: 7.3}
+    effect: {kind: risk, level: low}
+    evidence_strength: weak
+    sources:
+      - "ISU Extension, soybean iron deficiency chlorosis on calcareous, high-pH soils (the pH 7.3 figure was not read in the primary source)"
+    needs_local_review: true
+
+  - id: scn_sampling_high_ph
+    title: Sample for soybean cyst nematode on high-pH soil
+    category: pest_disease
+    applies_to: {crops: [soybeans, double_crop_winter_wheat_soybeans]}
+    when:
+      - {fact: field.soil.ph, op: gt, value: 7.2}
+    effect: {kind: advisory}
+    evidence_strength: moderate
+    sources:
+      - "ISU Extension 2008, soybean cyst nematode and soil pH (sample areas with pH above 7.2)"
+    needs_local_review: false

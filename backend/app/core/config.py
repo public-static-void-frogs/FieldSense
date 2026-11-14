@@ -55,6 +55,18 @@ class Settings:
     )
     nass_api_key: str = field(default_factory=lambda: os.getenv("NASS_API_KEY", ""), repr=False)
       
+    # Rotation advice inputs (season summaries, weather record, CDL history); may be absent.
+    rotation_data_root: str = field(
+        default_factory=lambda: os.getenv(
+            "ROTATION_DATA_ROOT",
+            str(Path(__file__).resolve().parents[3] / "data" / "local" / "usa_sample"),
+        )
+    )
+    # Ask USDA Soil Data Access for the soil at a field point that has no stored soil block.
+    rotation_soil_lookup: bool = field(
+        default_factory=lambda: os.getenv("ROTATION_SOIL_LOOKUP", "true").lower() == "true"
+    )
+
     weather_timeout_seconds: float = 5
     weather_forecast_ttl_seconds: int = 600
     weather_history_ttl_seconds: int = 21600

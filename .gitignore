@@ -24,5 +24,9 @@ ml/field-cv-model/weights/*.pt
 
 # macOS metadata
 .DS_Store
+
+# Large local datasets (not committed)
+/data/local/
+
 .idea/
 tmp/

@@ -1,0 +1,10 @@
+crop,price_usd,unit,source,as_of,verified,level
+corn,4.62,bu,"USDA RMA 2026 projected price (PM-26-010), February average of Dec-2026 futures; farmdoc daily 2026-03",2026-03-01,true,national
+soybeans,11.09,bu,"USDA RMA 2026 projected price (PM-26-010), February average of Nov-2026 futures; farmdoc daily 2026-03",2026-03-01,true,national
+oats,3.55,bu,"USDA NASS Quick Stats: OATS - PRICE RECEIVED, MEASURED IN $ / BU; Iowa, marketing year 2025",2026-11-11,true,state
+alfalfa,108.0,ton,"USDA NASS Quick Stats: HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON; Iowa, marketing year 2025",2026-11-11,true,state
+other_hay,95.0,ton,"USDA NASS Quick Stats: HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON; Iowa, marketing year 2025",2026-11-11,true,state
+winter_wheat,4.85,bu,"USDA NASS Quick Stats: WHEAT, WINTER - PRICE RECEIVED, MEASURED IN $ / BU; United States, marketing year 2025",2026-11-11,true,national
+spring_wheat,5.39,bu,"USDA NASS Quick Stats: WHEAT, SPRING, (EXCL DURUM) - PRICE RECEIVED, MEASURED IN $ / BU; United States, marketing year 2025",2026-11-11,true,national
+rye,4.63,bu,"USDA NASS Quick Stats: RYE - PRICE RECEIVED, MEASURED IN $ / BU; United States, marketing year 2025",2026-11-11,true,national
+sorghum,3.67,bu,"USDA NASS Quick Stats: SORGHUM, GRAIN - PRICE RECEIVED, MEASURED IN $ / CWT; United States, marketing year 2025",2026-11-11,true,national

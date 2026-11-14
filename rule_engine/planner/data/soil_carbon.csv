@@ -1,0 +1,6 @@
+group,dry_matter,shoot_residue_per_harvest_c,root_per_harvest_c,verified,source
+warm_season_grain,0.845,1.00,0.59,false,"Relative carbon allocation after Bolinder et al. 2007 (Agric. Ecosyst. Environ. 118:29-42), corn; recalled, not fetched in this work"
+grain_legume,0.87,1.50,0.79,false,"Relative carbon allocation after Bolinder et al. 2007, soybean; recalled, not fetched in this work"
+small_grain,0.865,1.50,0.61,false,"Relative carbon allocation after Bolinder et al. 2007, small-grain cereals with straw left on the field; recalled, not fetched in this work"
+perennial_forage_legume,0.85,0.0,1.0,false,"Harvested forage removed; root and extra-root input taken equal to harvested carbon (rough, after Bolinder et al. 2007 perennial forages); recalled, not fetched"
+grass_hay_pasture,0.85,0.0,1.0,false,"Harvested forage removed; root and extra-root input taken equal to harvested carbon (rough, after Bolinder et al. 2007 perennial forages); recalled, not fetched"

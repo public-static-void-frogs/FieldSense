@@ -1,0 +1,823 @@
+region,crop,stage,doy_p50,source,as_of
+AL,corn,planted,106,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+AL,corn,emerged,117,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+AL,corn,flowering,172,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+AL,corn,mature,212,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+AL,corn,harvested,254,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+AL,corn,grain_fill,187,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+AR,corn,planted,107,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+AR,corn,emerged,116,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+AR,corn,flowering,170,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+AR,corn,grain_fill,192,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+AR,corn,mature,224,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+AR,corn,harvested,245,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+CO,corn,planted,136,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+CO,corn,emerged,150,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+CO,corn,flowering,210,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+CO,corn,grain_fill,231,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+CO,corn,mature,272,"USDA NASS Crop Progress, CO 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+CO,corn,harvested,263,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+DE,corn,planted,131,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+DE,corn,emerged,139,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+DE,corn,flowering,199,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+DE,corn,grain_fill,222,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+DE,corn,mature,255,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+DE,corn,harvested,279,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+GA,corn,planted,96,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+GA,corn,emerged,103,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+GA,corn,flowering,159,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+GA,corn,mature,208,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+GA,corn,harvested,238,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+GA,corn,grain_fill,174,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+IA,corn,planted,125,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+IA,corn,emerged,138,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+IA,corn,flowering,197,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+IA,corn,grain_fill,215,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+IA,corn,mature,261,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+IA,corn,harvested,292,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ID,corn,planted,131,"USDA NASS Crop Progress, ID 2021-2025 (5 seasons), median day 50% planted",2026-11-14
+ID,corn,emerged,145,"USDA NASS Crop Progress, ID 2021-2025 (5 seasons), median day 50% emerged",2026-11-14
+ID,corn,flowering,205,"USDA NASS Crop Progress, ID 2021-2021 (1 seasons), median day 50% silking",2026-11-14
+ID,corn,grain_fill,223,"USDA NASS Crop Progress, ID 2021-2021 (1 seasons), median day 50% dough",2026-11-14
+ID,corn,mature,254,"USDA NASS Crop Progress, ID 2021-2021 (1 seasons), median day 50% mature",2026-11-14
+ID,corn,harvested,276,"USDA NASS Crop Progress, ID 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+IL,corn,planted,129,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+IL,corn,emerged,138,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+IL,corn,flowering,194,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+IL,corn,grain_fill,215,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+IL,corn,mature,256,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+IL,corn,harvested,287,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+IN,corn,planted,132,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+IN,corn,emerged,142,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+IN,corn,flowering,199,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+IN,corn,grain_fill,221,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+IN,corn,mature,263,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+IN,corn,harvested,260,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+KS,corn,planted,128,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+KS,corn,emerged,140,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+KS,corn,flowering,194,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+KS,corn,grain_fill,215,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+KS,corn,mature,252,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+KS,corn,harvested,274,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+KY,corn,planted,124,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+KY,corn,emerged,138,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+KY,corn,flowering,191,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+KY,corn,grain_fill,217,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+KY,corn,mature,248,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+KY,corn,harvested,270,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+LA,corn,planted,82,"USDA NASS Crop Progress, LA 2021-2026 (5 seasons), median day 50% planted",2026-11-14
+LA,corn,emerged,93,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+LA,corn,flowering,154,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+LA,corn,grain_fill,175,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+LA,corn,mature,211,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+LA,corn,harvested,227,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MD,corn,planted,127,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MD,corn,emerged,138,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MD,corn,flowering,198,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+MD,corn,grain_fill,226,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+MD,corn,mature,258,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+MD,corn,harvested,281,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MI,corn,planted,138,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MI,corn,emerged,149,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MI,corn,flowering,204,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+MI,corn,grain_fill,224,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+MI,corn,mature,273,"USDA NASS Crop Progress, MI 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+MI,corn,harvested,267,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MN,corn,planted,128,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MN,corn,emerged,141,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MN,corn,flowering,200,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+MN,corn,grain_fill,223,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+MN,corn,mature,263,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+MN,corn,harvested,260,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MO,corn,planted,121,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MO,corn,emerged,133,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MO,corn,flowering,189,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+MO,corn,grain_fill,209,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+MO,corn,mature,252,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+MO,corn,harvested,278,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MS,corn,planted,101,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MS,corn,emerged,110,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MS,corn,flowering,166,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+MS,corn,grain_fill,189,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+MS,corn,mature,222,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+MS,corn,harvested,240,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NC,corn,planted,112,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NC,corn,emerged,120,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NC,corn,flowering,177,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+NC,corn,grain_fill,201,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+NC,corn,mature,234,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+NC,corn,harvested,241,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ND,corn,planted,138,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+ND,corn,emerged,153,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+ND,corn,flowering,206,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+ND,corn,grain_fill,229,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+ND,corn,mature,267,"USDA NASS Crop Progress, ND 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+ND,corn,harvested,297,"USDA NASS Crop Progress, ND 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+NE,corn,planted,125,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NE,corn,emerged,140,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NE,corn,flowering,198,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+NE,corn,grain_fill,219,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+NE,corn,mature,261,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+NE,corn,harvested,292,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NH,corn,planted,145,"USDA NASS Crop Progress, NH 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NH,corn,emerged,159,"USDA NASS Crop Progress, NH 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NH,corn,flowering,222,"USDA NASS Crop Progress, NH 2022-2022 (1 seasons), median day 50% silking",2026-11-14
+NH,corn,grain_fill,225,"USDA NASS Crop Progress, NH 2022-2022 (1 seasons), median day 50% dough",2026-11-14
+NH,corn,harvested,269,"USDA NASS Crop Progress, NH 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NH,corn,mature,259,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NJ,corn,planted,136,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NJ,corn,emerged,143,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NJ,corn,flowering,201,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+NJ,corn,grain_fill,244,"USDA NASS Crop Progress, NJ 2023-2026 (4 seasons), median day 50% dough",2026-11-14
+NJ,corn,mature,270,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+NJ,corn,harvested,297,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NM,corn,planted,139,"USDA NASS Crop Progress, NM 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NM,corn,emerged,157,"USDA NASS Crop Progress, NM 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NM,corn,flowering,216,"USDA NASS Crop Progress, NM 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+NM,corn,grain_fill,242,"USDA NASS Crop Progress, NM 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+NM,corn,mature,273,"USDA NASS Crop Progress, NM 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+NM,corn,harvested,271,"USDA NASS Crop Progress, NM 2022-2026 (5 seasons), median day 50% harvested",2026-11-14
+NY,corn,planted,145,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NY,corn,emerged,158,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NY,corn,flowering,214,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+NY,corn,grain_fill,242,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+NY,corn,mature,287,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+NY,corn,harvested,282,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OH,corn,planted,140,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+OH,corn,emerged,147,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+OH,corn,flowering,203,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+OH,corn,grain_fill,219,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+OH,corn,mature,267,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+OH,corn,harvested,256,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OK,corn,planted,129,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+OK,corn,emerged,141,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+OK,corn,flowering,195,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+OK,corn,grain_fill,222,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+OK,corn,mature,257,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+OK,corn,harvested,274,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+PA,corn,planted,144,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+PA,corn,emerged,156,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+PA,corn,flowering,211,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+PA,corn,grain_fill,234,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+PA,corn,mature,275,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+PA,corn,harvested,272,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SC,corn,planted,103,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+SC,corn,emerged,110,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+SC,corn,flowering,166,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+SC,corn,mature,206,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+SC,corn,harvested,244,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SC,corn,grain_fill,181,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+SD,corn,planted,132,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+SD,corn,emerged,144,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+SD,corn,flowering,204,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+SD,corn,grain_fill,222,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+SD,corn,mature,265,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+SD,corn,harvested,294,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TN,corn,planted,118,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+TN,corn,emerged,130,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+TN,corn,flowering,182,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+TN,corn,grain_fill,204,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+TN,corn,mature,245,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+TN,corn,harvested,265,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TX,corn,planted,86,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+TX,corn,emerged,104,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+TX,corn,flowering,155,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+TX,corn,grain_fill,184,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+TX,corn,mature,219,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+TX,corn,harvested,234,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+UT,corn,planted,139,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+UT,corn,emerged,155,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+UT,corn,flowering,215,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+UT,corn,grain_fill,243,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+UT,corn,mature,280,"USDA NASS Crop Progress, UT 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+UT,corn,harvested,280,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+VA,corn,planted,118,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+VA,corn,emerged,130,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+VA,corn,flowering,187,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+VA,corn,grain_fill,204,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+VA,corn,mature,243,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+VA,corn,harvested,242,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+VT,corn,planted,141,"USDA NASS Crop Progress, VT 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+VT,corn,emerged,153,"USDA NASS Crop Progress, VT 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+VT,corn,flowering,223,"USDA NASS Crop Progress, VT 2022-2022 (1 seasons), median day 50% silking",2026-11-14
+VT,corn,harvested,276,"USDA NASS Crop Progress, VT 2021-2026 (5 seasons), median day 50% harvested",2026-11-14
+VT,corn,grain_fill,238,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+VT,corn,mature,266,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WA,corn,planted,128,"USDA NASS Crop Progress, WA 2021-2025 (5 seasons), median day 50% planted",2026-11-14
+WA,corn,emerged,144,"USDA NASS Crop Progress, WA 2021-2025 (5 seasons), median day 50% emerged",2026-11-14
+WA,corn,flowering,199,"USDA NASS Crop Progress, WA 2021-2021 (1 seasons), median day 50% silking",2026-11-14
+WA,corn,grain_fill,237,"USDA NASS Crop Progress, WA 2021-2021 (1 seasons), median day 50% dough",2026-11-14
+WA,corn,mature,275,"USDA NASS Crop Progress, WA 2021-2021 (1 seasons), median day 50% mature",2026-11-14
+WA,corn,harvested,274,"USDA NASS Crop Progress, WA 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+WI,corn,planted,135,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WI,corn,emerged,147,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WI,corn,flowering,207,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+WI,corn,grain_fill,228,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+WI,corn,mature,269,"USDA NASS Crop Progress, WI 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+WI,corn,harvested,269,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WV,corn,planted,145,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WV,corn,emerged,161,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WV,corn,flowering,212,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+WV,corn,grain_fill,236,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+WV,corn,mature,278,"USDA NASS Crop Progress, WV 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+WV,corn,harvested,310,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WY,corn,planted,136,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WY,corn,emerged,155,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WY,corn,flowering,217,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% silking",2026-11-14
+WY,corn,grain_fill,232,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% dough",2026-11-14
+WY,corn,mature,274,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+WY,corn,harvested,268,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+AL,soybeans,planted,143,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+AL,soybeans,emerged,154,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+AL,soybeans,flowering,191,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+AL,soybeans,grain_fill,209,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+AL,soybeans,mature,262,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+AL,soybeans,harvested,291,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+AR,soybeans,planted,121,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+AR,soybeans,emerged,132,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+AR,soybeans,flowering,170,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+AR,soybeans,grain_fill,189,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+AR,soybeans,mature,254,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+AR,soybeans,harvested,276,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+DE,soybeans,planted,146,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+DE,soybeans,emerged,155,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+DE,soybeans,flowering,210,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+DE,soybeans,grain_fill,230,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+DE,soybeans,mature,278,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+DE,soybeans,harvested,305,"USDA NASS Crop Progress, DE 2021-2026 (5 seasons), median day 50% harvested",2026-11-14
+GA,soybeans,planted,144,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+GA,soybeans,emerged,153,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+GA,soybeans,flowering,194,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+GA,soybeans,grain_fill,210,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+GA,soybeans,mature,264,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+GA,soybeans,harvested,300,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+IA,soybeans,planted,128,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+IA,soybeans,emerged,143,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+IA,soybeans,flowering,192,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+IA,soybeans,grain_fill,208,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+IA,soybeans,mature,262,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+IA,soybeans,harvested,281,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+IL,soybeans,planted,128,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+IL,soybeans,emerged,140,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+IL,soybeans,flowering,193,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+IL,soybeans,grain_fill,208,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+IL,soybeans,mature,257,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+IL,soybeans,harvested,286,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+IN,soybeans,planted,135,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+IN,soybeans,emerged,146,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+IN,soybeans,flowering,198,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+IN,soybeans,grain_fill,212,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+IN,soybeans,mature,259,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+IN,soybeans,harvested,287,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+KS,soybeans,planted,140,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+KS,soybeans,emerged,154,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+KS,soybeans,flowering,200,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+KS,soybeans,grain_fill,221,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+KS,soybeans,mature,265,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+KS,soybeans,harvested,292,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+KY,soybeans,planted,141,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+KY,soybeans,emerged,153,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+KY,soybeans,flowering,201,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+KY,soybeans,grain_fill,214,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+KY,soybeans,mature,268,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+KY,soybeans,harvested,292,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+LA,soybeans,planted,117,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+LA,soybeans,emerged,125,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+LA,soybeans,flowering,163,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+LA,soybeans,grain_fill,186,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+LA,soybeans,mature,238,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+LA,soybeans,harvested,258,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MD,soybeans,planted,139,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MD,soybeans,emerged,146,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MD,soybeans,flowering,204,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+MD,soybeans,grain_fill,223,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+MD,soybeans,mature,276,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+MD,soybeans,harvested,304,"USDA NASS Crop Progress, MD 2021-2026 (5 seasons), median day 50% harvested",2026-11-14
+MI,soybeans,planted,140,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MI,soybeans,emerged,152,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MI,soybeans,flowering,198,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+MI,soybeans,grain_fill,215,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+MI,soybeans,mature,260,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+MI,soybeans,harvested,293,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MN,soybeans,planted,135,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MN,soybeans,emerged,147,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MN,soybeans,flowering,193,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+MN,soybeans,grain_fill,210,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+MN,soybeans,mature,261,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+MN,soybeans,harvested,279,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MO,soybeans,planted,139,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MO,soybeans,emerged,150,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MO,soybeans,flowering,198,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+MO,soybeans,grain_fill,216,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+MO,soybeans,mature,264,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+MO,soybeans,harvested,292,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MS,soybeans,planted,119,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MS,soybeans,emerged,128,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MS,soybeans,flowering,171,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+MS,soybeans,grain_fill,188,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+MS,soybeans,mature,244,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+MS,soybeans,harvested,263,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NC,soybeans,planted,140,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NC,soybeans,emerged,147,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NC,soybeans,flowering,197,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+NC,soybeans,grain_fill,213,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+NC,soybeans,mature,266,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+NC,soybeans,harvested,307,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ND,soybeans,planted,143,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+ND,soybeans,emerged,159,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+ND,soybeans,flowering,198,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+ND,soybeans,grain_fill,212,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+ND,soybeans,mature,256,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+ND,soybeans,harvested,281,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NE,soybeans,planted,130,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NE,soybeans,emerged,144,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NE,soybeans,flowering,191,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+NE,soybeans,grain_fill,211,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+NE,soybeans,mature,258,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+NE,soybeans,harvested,281,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NJ,soybeans,planted,145,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NJ,soybeans,emerged,162,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NJ,soybeans,flowering,204,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+NJ,soybeans,grain_fill,234,"USDA NASS Crop Progress, NJ 2021-2026 (5 seasons), median day 50% setting pods",2026-11-14
+NJ,soybeans,mature,282,"USDA NASS Crop Progress, NJ 2021-2026 (5 seasons), median day 50% dropping leaves",2026-11-14
+NJ,soybeans,harvested,306,"USDA NASS Crop Progress, NJ 2021-2024 (4 seasons), median day 50% harvested",2026-11-14
+NY,soybeans,planted,150,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NY,soybeans,emerged,163,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NY,soybeans,flowering,211,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+NY,soybeans,grain_fill,229,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+NY,soybeans,mature,271,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+NY,soybeans,harvested,295,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OH,soybeans,planted,141,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+OH,soybeans,emerged,150,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+OH,soybeans,flowering,199,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+OH,soybeans,grain_fill,212,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+OH,soybeans,mature,263,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+OH,soybeans,harvested,289,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OK,soybeans,planted,160,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+OK,soybeans,emerged,176,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+OK,soybeans,flowering,216,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+OK,soybeans,grain_fill,237,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+OK,soybeans,mature,283,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+OK,soybeans,harvested,305,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+PA,soybeans,planted,148,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+PA,soybeans,emerged,158,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+PA,soybeans,flowering,207,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+PA,soybeans,grain_fill,219,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+PA,soybeans,mature,270,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+PA,soybeans,harvested,302,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SC,soybeans,planted,148,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+SC,soybeans,emerged,160,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+SC,soybeans,flowering,209,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+SC,soybeans,grain_fill,228,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+SC,soybeans,mature,285,"USDA NASS Crop Progress, SC 2021-2026 (5 seasons), median day 50% dropping leaves",2026-11-14
+SC,soybeans,harvested,314,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SD,soybeans,planted,137,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+SD,soybeans,emerged,151,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+SD,soybeans,flowering,202,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+SD,soybeans,grain_fill,215,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+SD,soybeans,mature,259,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+SD,soybeans,harvested,281,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TN,soybeans,planted,136,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+TN,soybeans,emerged,150,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+TN,soybeans,flowering,191,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+TN,soybeans,grain_fill,210,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+TN,soybeans,mature,258,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+TN,soybeans,harvested,288,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TX,soybeans,planted,133,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+TX,soybeans,emerged,144,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+TX,soybeans,flowering,190,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+TX,soybeans,grain_fill,209,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+TX,soybeans,mature,241,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+TX,soybeans,harvested,278,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+VA,soybeans,planted,137,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+VA,soybeans,emerged,155,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+VA,soybeans,flowering,201,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+VA,soybeans,grain_fill,221,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+VA,soybeans,mature,273,"USDA NASS Crop Progress, VA 2021-2026 (5 seasons), median day 50% dropping leaves",2026-11-14
+VA,soybeans,harvested,305,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WI,soybeans,planted,137,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WI,soybeans,emerged,149,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WI,soybeans,flowering,198,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+WI,soybeans,grain_fill,215,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+WI,soybeans,mature,264,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% dropping leaves",2026-11-14
+WI,soybeans,harvested,286,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WV,soybeans,planted,151,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WV,soybeans,emerged,171,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WV,soybeans,flowering,226,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% blooming",2026-11-14
+WV,soybeans,grain_fill,247,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% setting pods",2026-11-14
+WV,soybeans,mature,279,"USDA NASS Crop Progress, WV 2021-2026 (5 seasons), median day 50% dropping leaves",2026-11-14
+WV,soybeans,harvested,314,"USDA NASS Crop Progress, WV 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+CO,sorghum,planted,161,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+CO,sorghum,flowering,220,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+CO,sorghum,grain_fill,246,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+CO,sorghum,mature,273,"USDA NASS Crop Progress, CO 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+CO,sorghum,harvested,298,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+KS,sorghum,planted,162,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+KS,sorghum,flowering,220,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+KS,sorghum,grain_fill,245,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+KS,sorghum,mature,268,"USDA NASS Crop Progress, KS 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+KS,sorghum,harvested,294,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NE,sorghum,planted,153,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NE,sorghum,flowering,214,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NE,sorghum,grain_fill,243,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+NE,sorghum,mature,269,"USDA NASS Crop Progress, NE 2021-2026 (5 seasons), median day 50% mature",2026-11-14
+NE,sorghum,harvested,294,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OK,sorghum,planted,166,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+OK,sorghum,flowering,220,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+OK,sorghum,grain_fill,244,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+OK,sorghum,mature,267,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+OK,sorghum,harvested,293,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SD,sorghum,planted,149,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+SD,sorghum,flowering,215,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+SD,sorghum,grain_fill,242,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+SD,sorghum,mature,263,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+SD,sorghum,harvested,287,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TX,sorghum,planted,102,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+TX,sorghum,flowering,170,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+TX,sorghum,grain_fill,190,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+TX,sorghum,mature,216,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% mature",2026-11-14
+TX,sorghum,harvested,229,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+GA,oats,planted,312,"USDA NASS Crop Progress, GA 2021-2027 (6 seasons), median day 50% planted",2026-11-14
+GA,oats,flowering,97,"USDA NASS Crop Progress, GA 2024-2026 (3 seasons), median day 50% headed",2026-11-14
+GA,oats,harvested,149,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+GA,oats,grain_fill,112,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+GA,oats,mature,139,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+IA,oats,planted,105,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+IA,oats,emerged,121,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+IA,oats,flowering,158,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+IA,oats,grain_fill,185,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+IA,oats,harvested,207,"USDA NASS Crop Progress, IA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+IA,oats,mature,197,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ID,oats,planted,119,"USDA NASS Crop Progress, ID 2021-2025 (5 seasons), median day 50% planted",2026-11-14
+ID,oats,emerged,134,"USDA NASS Crop Progress, ID 2021-2025 (5 seasons), median day 50% emerged",2026-11-14
+ID,oats,flowering,182,"USDA NASS Crop Progress, ID 2021-2025 (5 seasons), median day 50% headed",2026-11-14
+ID,oats,harvested,240,"USDA NASS Crop Progress, ID 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+ID,oats,grain_fill,197,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+ID,oats,mature,230,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MI,oats,planted,127,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MI,oats,emerged,143,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MI,oats,flowering,180,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MI,oats,harvested,219,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MI,oats,grain_fill,195,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MI,oats,mature,209,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MN,oats,planted,125,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MN,oats,emerged,138,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MN,oats,flowering,177,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MN,oats,grain_fill,197,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+MN,oats,harvested,224,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MN,oats,mature,214,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MT,oats,planted,136,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MT,oats,emerged,148,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MT,oats,flowering,194,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MT,oats,grain_fill,211,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+MT,oats,harvested,230,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MT,oats,mature,220,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ND,oats,planted,135,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+ND,oats,emerged,149,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+ND,oats,flowering,186,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+ND,oats,grain_fill,209,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+ND,oats,harvested,239,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ND,oats,mature,229,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NE,oats,planted,104,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NE,oats,emerged,120,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NE,oats,flowering,164,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NE,oats,harvested,202,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NE,oats,grain_fill,179,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NE,oats,mature,192,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NY,oats,planted,133,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NY,oats,emerged,149,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NY,oats,flowering,180,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NY,oats,harvested,225,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NY,oats,grain_fill,195,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NY,oats,mature,215,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OH,oats,planted,116,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+OH,oats,emerged,131,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+OH,oats,flowering,167,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+OH,oats,harvested,209,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OH,oats,grain_fill,182,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OH,oats,mature,199,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OK,oats,planted,308,"USDA NASS Crop Progress, OK 2021-2023 (2 seasons), median day 50% planted",2026-11-14
+OK,oats,emerged,330,"USDA NASS Crop Progress, OK 2021-2023 (2 seasons), median day 50% emerged",2026-11-14
+OK,oats,flowering,145,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+OK,oats,harvested,186,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OK,oats,grain_fill,160,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OK,oats,mature,176,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OR,oats,planted,107,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% planted",2026-11-14
+OR,oats,emerged,122,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% emerged",2026-11-14
+OR,oats,flowering,166,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% headed",2026-11-14
+OR,oats,harvested,221,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+OR,oats,grain_fill,181,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OR,oats,mature,211,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+PA,oats,planted,117,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+PA,oats,emerged,134,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+PA,oats,flowering,176,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+PA,oats,grain_fill,201,"USDA NASS Crop Progress, PA 2021-2022 (2 seasons), median day 50% coloring",2026-11-14
+PA,oats,harvested,220,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+PA,oats,mature,210,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+SD,oats,planted,113,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+SD,oats,emerged,130,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+SD,oats,flowering,166,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+SD,oats,harvested,212,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SD,oats,grain_fill,181,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+SD,oats,mature,202,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+TX,oats,flowering,104,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+TX,oats,harvested,160,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TX,oats,grain_fill,119,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+TX,oats,mature,150,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WA,oats,planted,122,"USDA NASS Crop Progress, WA 2021-2021 (1 seasons), median day 50% planted",2026-11-14
+WA,oats,emerged,143,"USDA NASS Crop Progress, WA 2021-2021 (1 seasons), median day 50% emerged",2026-11-14
+WA,oats,flowering,172,"USDA NASS Crop Progress, WA 2021-2021 (1 seasons), median day 50% headed",2026-11-14
+WA,oats,harvested,219,"USDA NASS Crop Progress, WA 2021-2021 (1 seasons), median day 50% harvested",2026-11-14
+WA,oats,grain_fill,187,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WA,oats,mature,209,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WI,oats,planted,129,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WI,oats,emerged,140,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WI,oats,flowering,172,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WI,oats,grain_fill,193,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% coloring",2026-11-14
+WI,oats,harvested,221,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WI,oats,mature,211,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+AZ,barley,planted,34,"USDA NASS Crop Progress, AZ 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+AZ,barley,emerged,39,"USDA NASS Crop Progress, AZ 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+AZ,barley,flowering,83,"USDA NASS Crop Progress, AZ 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+AZ,barley,harvested,148,"USDA NASS Crop Progress, AZ 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+AZ,barley,grain_fill,98,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+AZ,barley,mature,138,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+CO,barley,planted,114,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+CO,barley,emerged,128,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+CO,barley,flowering,180,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+CO,barley,harvested,235,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+CO,barley,grain_fill,195,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+CO,barley,mature,225,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+DE,barley,planted,295,"USDA NASS Crop Progress, DE 2025-2027 (3 seasons), median day 50% planted",2026-11-14
+DE,barley,emerged,134,"USDA NASS Crop Progress, DE 2021-2027 (6 seasons), median day 50% emerged",2026-11-14
+DE,barley,flowering,119,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+DE,barley,harvested,176,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+DE,barley,grain_fill,134,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+DE,barley,mature,166,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ID,barley,planted,111,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+ID,barley,emerged,128,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+ID,barley,flowering,178,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+ID,barley,harvested,233,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ID,barley,grain_fill,193,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+ID,barley,mature,223,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MD,barley,planted,287,"USDA NASS Crop Progress, MD 2025-2027 (3 seasons), median day 50% planted",2026-11-14
+MD,barley,emerged,134,"USDA NASS Crop Progress, MD 2021-2027 (5 seasons), median day 50% emerged",2026-11-14
+MD,barley,flowering,120,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MD,barley,harvested,179,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MD,barley,grain_fill,135,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MD,barley,mature,169,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MI,barley,planted,143,"USDA NASS Crop Progress, MI 2021-2023 (3 seasons), median day 50% planted",2026-11-14
+MI,barley,emerged,150,"USDA NASS Crop Progress, MI 2021-2023 (3 seasons), median day 50% emerged",2026-11-14
+MI,barley,flowering,188,"USDA NASS Crop Progress, MI 2021-2023 (3 seasons), median day 50% headed",2026-11-14
+MI,barley,harvested,238,"USDA NASS Crop Progress, MI 2021-2023 (3 seasons), median day 50% harvested",2026-11-14
+MI,barley,grain_fill,203,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MI,barley,mature,228,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MN,barley,planted,132,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MN,barley,emerged,142,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MN,barley,flowering,182,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MN,barley,harvested,231,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MN,barley,grain_fill,197,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MN,barley,mature,221,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MT,barley,planted,126,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MT,barley,emerged,141,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MT,barley,flowering,189,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MT,barley,harvested,232,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MT,barley,grain_fill,204,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MT,barley,mature,222,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NC,barley,planted,302,"USDA NASS Crop Progress, NC 2021-2027 (6 seasons), median day 50% planted",2026-11-14
+NC,barley,flowering,110,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NC,barley,harvested,162,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NC,barley,grain_fill,125,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NC,barley,mature,152,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ND,barley,planted,135,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+ND,barley,emerged,149,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+ND,barley,flowering,185,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+ND,barley,harvested,236,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ND,barley,grain_fill,200,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+ND,barley,mature,226,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NY,barley,planted,138,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+NY,barley,emerged,149,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+NY,barley,flowering,184,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NY,barley,harvested,217,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NY,barley,grain_fill,199,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NY,barley,mature,207,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OR,barley,planted,98,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% planted",2026-11-14
+OR,barley,emerged,119,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% emerged",2026-11-14
+OR,barley,flowering,160,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% headed",2026-11-14
+OR,barley,harvested,217,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+OR,barley,grain_fill,175,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OR,barley,mature,207,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+PA,barley,planted,293,"USDA NASS Crop Progress, PA 2021-2027 (7 seasons), median day 50% planted",2026-11-14
+PA,barley,emerged,299,"USDA NASS Crop Progress, PA 2021-2027 (7 seasons), median day 50% emerged",2026-11-14
+PA,barley,flowering,129,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+PA,barley,harvested,182,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+PA,barley,grain_fill,144,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+PA,barley,mature,172,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+UT,barley,planted,109,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+UT,barley,emerged,135,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+UT,barley,flowering,168,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+UT,barley,harvested,218,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+UT,barley,grain_fill,183,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+UT,barley,mature,208,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WA,barley,planted,111,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WA,barley,emerged,126,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WA,barley,flowering,171,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WA,barley,harvested,228,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WA,barley,grain_fill,186,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WA,barley,mature,218,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WY,barley,planted,101,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WY,barley,emerged,118,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WY,barley,flowering,179,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WY,barley,harvested,223,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WY,barley,grain_fill,194,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WY,barley,mature,213,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ID,spring_wheat,planted,110,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+ID,spring_wheat,emerged,126,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+ID,spring_wheat,flowering,181,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+ID,spring_wheat,harvested,235,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ID,spring_wheat,grain_fill,196,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+ID,spring_wheat,mature,225,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MN,spring_wheat,planted,129,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MN,spring_wheat,emerged,140,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MN,spring_wheat,flowering,181,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MN,spring_wheat,harvested,233,"USDA NASS Crop Progress, MN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MN,spring_wheat,grain_fill,196,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MN,spring_wheat,mature,223,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MT,spring_wheat,planted,128,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+MT,spring_wheat,emerged,142,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+MT,spring_wheat,flowering,189,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MT,spring_wheat,harvested,232,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MT,spring_wheat,grain_fill,204,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MT,spring_wheat,mature,222,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ND,spring_wheat,planted,133,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+ND,spring_wheat,emerged,147,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+ND,spring_wheat,flowering,185,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+ND,spring_wheat,harvested,240,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ND,spring_wheat,grain_fill,200,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+ND,spring_wheat,mature,230,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OR,spring_wheat,planted,96,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% planted",2026-11-14
+OR,spring_wheat,emerged,114,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% emerged",2026-11-14
+OR,spring_wheat,flowering,160,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% headed",2026-11-14
+OR,spring_wheat,harvested,217,"USDA NASS Crop Progress, OR 2021-2025 (5 seasons), median day 50% harvested",2026-11-14
+OR,spring_wheat,grain_fill,175,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OR,spring_wheat,mature,207,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+SD,spring_wheat,planted,116,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+SD,spring_wheat,emerged,131,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+SD,spring_wheat,flowering,172,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+SD,spring_wheat,harvested,220,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SD,spring_wheat,grain_fill,187,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+SD,spring_wheat,mature,210,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WA,spring_wheat,planted,108,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% planted",2026-11-14
+WA,spring_wheat,emerged,123,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% emerged",2026-11-14
+WA,spring_wheat,flowering,171,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WA,spring_wheat,harvested,230,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WA,spring_wheat,grain_fill,186,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WA,spring_wheat,mature,220,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+AL,winter_wheat,flowering,108,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+AL,winter_wheat,harvested,164,"USDA NASS Crop Progress, AL 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+AL,winter_wheat,grain_fill,123,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+AL,winter_wheat,mature,154,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+AR,winter_wheat,flowering,115,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+AR,winter_wheat,harvested,167,"USDA NASS Crop Progress, AR 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+AR,winter_wheat,grain_fill,130,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+AR,winter_wheat,mature,157,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+CA,winter_wheat,flowering,102,"USDA NASS Crop Progress, CA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+CA,winter_wheat,harvested,177,"USDA NASS Crop Progress, CA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+CA,winter_wheat,grain_fill,117,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+CA,winter_wheat,mature,167,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+CO,winter_wheat,flowering,149,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+CO,winter_wheat,harvested,195,"USDA NASS Crop Progress, CO 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+CO,winter_wheat,grain_fill,164,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+CO,winter_wheat,mature,185,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+DE,winter_wheat,flowering,126,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+DE,winter_wheat,harvested,182,"USDA NASS Crop Progress, DE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+DE,winter_wheat,grain_fill,141,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+DE,winter_wheat,mature,172,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+GA,winter_wheat,flowering,97,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+GA,winter_wheat,harvested,149,"USDA NASS Crop Progress, GA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+GA,winter_wheat,grain_fill,112,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+GA,winter_wheat,mature,139,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ID,winter_wheat,flowering,162,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+ID,winter_wheat,harvested,223,"USDA NASS Crop Progress, ID 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ID,winter_wheat,grain_fill,177,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+ID,winter_wheat,mature,213,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+IL,winter_wheat,flowering,128,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+IL,winter_wheat,harvested,175,"USDA NASS Crop Progress, IL 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+IL,winter_wheat,grain_fill,143,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+IL,winter_wheat,mature,165,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+IN,winter_wheat,flowering,139,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+IN,winter_wheat,harvested,185,"USDA NASS Crop Progress, IN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+IN,winter_wheat,grain_fill,154,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+IN,winter_wheat,mature,175,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+KS,winter_wheat,flowering,129,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+KS,winter_wheat,harvested,177,"USDA NASS Crop Progress, KS 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+KS,winter_wheat,grain_fill,144,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+KS,winter_wheat,mature,167,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+KY,winter_wheat,flowering,123,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+KY,winter_wheat,harvested,173,"USDA NASS Crop Progress, KY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+KY,winter_wheat,grain_fill,138,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+KY,winter_wheat,mature,163,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+LA,winter_wheat,flowering,97,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+LA,winter_wheat,harvested,152,"USDA NASS Crop Progress, LA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+LA,winter_wheat,grain_fill,112,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+LA,winter_wheat,mature,142,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MD,winter_wheat,flowering,128,"USDA NASS Crop Progress, MD 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MD,winter_wheat,harvested,182,"USDA NASS Crop Progress, MD 2021-2026 (5 seasons), median day 50% harvested",2026-11-14
+MD,winter_wheat,grain_fill,143,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MD,winter_wheat,mature,172,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MI,winter_wheat,flowering,150,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MI,winter_wheat,harvested,199,"USDA NASS Crop Progress, MI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MI,winter_wheat,grain_fill,165,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MI,winter_wheat,mature,189,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MO,winter_wheat,flowering,126,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MO,winter_wheat,harvested,172,"USDA NASS Crop Progress, MO 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MO,winter_wheat,grain_fill,141,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MO,winter_wheat,mature,162,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MS,winter_wheat,flowering,111,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MS,winter_wheat,harvested,163,"USDA NASS Crop Progress, MS 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MS,winter_wheat,grain_fill,126,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MS,winter_wheat,mature,153,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+MT,winter_wheat,flowering,170,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+MT,winter_wheat,harvested,219,"USDA NASS Crop Progress, MT 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+MT,winter_wheat,grain_fill,185,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+MT,winter_wheat,mature,209,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NC,winter_wheat,flowering,114,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NC,winter_wheat,harvested,169,"USDA NASS Crop Progress, NC 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NC,winter_wheat,grain_fill,129,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NC,winter_wheat,mature,159,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+ND,winter_wheat,flowering,171,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+ND,winter_wheat,harvested,222,"USDA NASS Crop Progress, ND 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+ND,winter_wheat,grain_fill,186,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+ND,winter_wheat,mature,212,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NE,winter_wheat,flowering,148,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NE,winter_wheat,harvested,197,"USDA NASS Crop Progress, NE 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NE,winter_wheat,grain_fill,163,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NE,winter_wheat,mature,187,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NJ,winter_wheat,flowering,128,"USDA NASS Crop Progress, NJ 2021-2026 (5 seasons), median day 50% headed",2026-11-14
+NJ,winter_wheat,harvested,187,"USDA NASS Crop Progress, NJ 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NJ,winter_wheat,grain_fill,143,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NJ,winter_wheat,mature,177,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NM,winter_wheat,flowering,129,"USDA NASS Crop Progress, NM 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NM,winter_wheat,harvested,191,"USDA NASS Crop Progress, NM 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NM,winter_wheat,grain_fill,144,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NM,winter_wheat,mature,181,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+NY,winter_wheat,flowering,155,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+NY,winter_wheat,harvested,205,"USDA NASS Crop Progress, NY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+NY,winter_wheat,grain_fill,170,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+NY,winter_wheat,mature,195,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OH,winter_wheat,flowering,142,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+OH,winter_wheat,harvested,187,"USDA NASS Crop Progress, OH 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OH,winter_wheat,grain_fill,157,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OH,winter_wheat,mature,177,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OK,winter_wheat,flowering,120,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+OK,winter_wheat,harvested,169,"USDA NASS Crop Progress, OK 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OK,winter_wheat,grain_fill,135,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OK,winter_wheat,mature,159,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+OR,winter_wheat,flowering,142,"USDA NASS Crop Progress, OR 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+OR,winter_wheat,harvested,208,"USDA NASS Crop Progress, OR 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+OR,winter_wheat,grain_fill,157,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+OR,winter_wheat,mature,198,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+PA,winter_wheat,flowering,142,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+PA,winter_wheat,harvested,198,"USDA NASS Crop Progress, PA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+PA,winter_wheat,grain_fill,157,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+PA,winter_wheat,mature,188,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+SC,winter_wheat,flowering,108,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+SC,winter_wheat,harvested,162,"USDA NASS Crop Progress, SC 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SC,winter_wheat,grain_fill,123,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+SC,winter_wheat,mature,152,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+SD,winter_wheat,flowering,157,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+SD,winter_wheat,harvested,204,"USDA NASS Crop Progress, SD 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+SD,winter_wheat,grain_fill,172,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+SD,winter_wheat,mature,194,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+TN,winter_wheat,flowering,117,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+TN,winter_wheat,harvested,170,"USDA NASS Crop Progress, TN 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TN,winter_wheat,grain_fill,132,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+TN,winter_wheat,mature,160,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+TX,winter_wheat,flowering,112,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+TX,winter_wheat,harvested,163,"USDA NASS Crop Progress, TX 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+TX,winter_wheat,grain_fill,127,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+TX,winter_wheat,mature,153,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+UT,winter_wheat,flowering,160,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+UT,winter_wheat,harvested,220,"USDA NASS Crop Progress, UT 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+UT,winter_wheat,grain_fill,175,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+UT,winter_wheat,mature,210,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+VA,winter_wheat,flowering,118,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+VA,winter_wheat,harvested,172,"USDA NASS Crop Progress, VA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+VA,winter_wheat,grain_fill,133,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+VA,winter_wheat,mature,162,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WA,winter_wheat,flowering,149,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WA,winter_wheat,harvested,215,"USDA NASS Crop Progress, WA 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WA,winter_wheat,grain_fill,164,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WA,winter_wheat,mature,205,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WI,winter_wheat,flowering,157,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WI,winter_wheat,harvested,209,"USDA NASS Crop Progress, WI 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WI,winter_wheat,grain_fill,172,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WI,winter_wheat,mature,199,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WV,winter_wheat,flowering,131,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WV,winter_wheat,harvested,198,"USDA NASS Crop Progress, WV 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WV,winter_wheat,grain_fill,146,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WV,winter_wheat,mature,188,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14
+WY,winter_wheat,flowering,171,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% headed",2026-11-14
+WY,winter_wheat,harvested,212,"USDA NASS Crop Progress, WY 2021-2026 (6 seasons), median day 50% harvested",2026-11-14
+WY,winter_wheat,grain_fill,186,Derived: 15 days after 50% headed (NASS reports no grain-fill stage),2026-11-14
+WY,winter_wheat,mature,202,Derived: 10 days before 50% harvested (NASS reports no maturity stage),2026-11-14

@@ -1,5 +1,10 @@
 import type { RouteObject } from 'react-router-dom';
-import { calendarLoader, fieldLoader, strategyOptionLoader } from './route-loaders.ts';
+import {
+  calendarLoader,
+  fieldLoader,
+  recommendationCropLoader,
+  strategyOptionLoader,
+} from './route-loaders.ts';
 
 export type AppRouteHandle = {
   navigationKey?: string;
@@ -71,6 +76,25 @@ export const appRoutes: RouteObject[] = [
             handle: { navigationKey: '/fields' },
             lazy: async () => ({
               Component: (await import('../pages/FieldDetailsPage')).FieldDetailsPage,
+            }),
+          },
+          {
+            id: 'recommendation',
+            path: 'fields/:fieldId/recommendation',
+            loader: fieldLoader,
+            handle: { navigationKey: '/fields' },
+            lazy: async () => ({
+              Component: (await import('../pages/FieldRecommendationPage')).FieldRecommendationPage,
+            }),
+          },
+          {
+            id: 'recommendation-crop',
+            path: 'fields/:fieldId/recommendation/:cropId',
+            loader: recommendationCropLoader,
+            handle: { navigationKey: '/fields' },
+            lazy: async () => ({
+              Component: (await import('../pages/FieldRecommendationCropPage'))
+                .FieldRecommendationCropPage,
             }),
           },
           {

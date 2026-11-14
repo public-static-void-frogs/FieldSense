@@ -1,0 +1,133 @@
+version: "2026-11-10"
+rules:
+  - id: corn_rootworm_continuous
+    title: Corn rootworm pressure (corn after corn)
+    category: pest_disease
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: history.consecutive_same_crop, op: ge, value: 1}
+    effect: {kind: risk, level: high}
+    evidence_strength: strong
+    sources:
+      - "ISU ICM News 2015, Corn rootworm management update"
+      - "Gassmann (ISU), Bt resistance in western corn rootworm; Seed World 2018"
+    needs_local_review: true
+
+  - id: corn_rootworm_alternation
+    title: Rotation-resistant rootworm variants (long corn-soy alternation)
+    category: pest_disease
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: history.consecutive_same_crop, op: eq, value: 0}
+      - {fact: history.corn_soy_alternation_years, op: ge, value: 4}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "ISU ICM News 2015, Corn rootworm management update"
+      - "ESA 2009 abstract, rotation-resistant WCR distribution in Iowa"
+    needs_local_review: true
+
+  - id: corn_leaf_blight_residue
+    title: Residue-borne corn leaf diseases
+    category: pest_disease
+    applies_to: {crops: [corn]}
+    when:
+      - {fact: history.consecutive_same_crop, op: ge, value: 1}
+    effect: {kind: risk, level: medium}
+    evidence_strength: strong
+    sources:
+      - "University of Kentucky PPFS-AG-C-10"
+      - "Corteva, Northern corn leaf blight"
+    needs_local_review: false
+
+  - id: scn_soy_after_soy
+    title: Soybean cyst nematode build-up
+    category: pest_disease
+    applies_to: {traits: ["hosts~soybean_cyst_nematode"]}
+    when:
+      - {fact: history.shared_hosts_prev1, op: contains, value: soybean_cyst_nematode}
+    effect: {kind: risk, level: high}
+    evidence_strength: strong
+    sources:
+      - "UNL CropWatch 2021, Managing soybean cyst nematode"
+      - "MSU Extension pub 1293"
+    needs_local_review: true
+
+  - id: scn_soy_share_5y
+    title: Soybean-heavy history (SCN)
+    category: pest_disease
+    applies_to: {crops: [soybeans]}
+    when:
+      - {fact: history.share_same_crop_5y, op: gt, value: 0.6}
+    effect: {kind: risk, level: medium}
+    evidence_strength: strong
+    sources:
+      - "MSU Extension pub 1293"
+      - "Purdue CCA 2008, Tylka"
+    needs_local_review: true
+
+  - id: white_mold_host_sequence
+    title: White mold host sequence
+    category: pest_disease
+    applies_to: {traits: ["hosts~white_mold"]}
+    when:
+      - {fact: history.shared_hosts_prev1, op: contains, value: white_mold}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "NDSU Extension, White mold of soybean"
+      - "SDSU Extension soybean management"
+    needs_local_review: true
+
+  - id: take_all_second_cereal
+    title: Take-all (cereal after cereal)
+    category: pest_disease
+    applies_to: {traits: ["hosts~take_all"]}
+    when:
+      - {fact: history.shared_hosts_prev1, op: contains, value: take_all}
+    effect: {kind: risk, level: medium, yield_factor: [0.80, 0.95]}
+    evidence_strength: strong
+    sources:
+      - "AHDB six-year rotation experiment, take-all control"
+    needs_local_review: false
+
+  - id: fusarium_after_corn
+    title: Fusarium head blight after corn
+    category: pest_disease
+    applies_to: {traits: ["hosts~fusarium_head_blight"]}
+    when:
+      - {fact: history.prev1.crop, op: in, value: [corn, sorghum]}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "MSU Extension, Fusarium head blight risk assessment models"
+    needs_local_review: true
+
+  - id: return_interval_violated
+    title: Minimum return interval not met
+    category: pest_disease
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume]}
+    when:
+      - {fact: history.years_since_same_family, op: not_null}
+      - {fact: history.years_since_same_family, op: lt, value: "@candidate.min_return_years"}
+      - {fact: candidate.min_return_years, op: gt, value: 1}
+    effect: {kind: risk, level: medium}
+    evidence_strength: moderate
+    sources:
+      - "research/crop_coefficients.csv, min_return_interval_yr"
+    uses_traits: [min_return_years]
+    needs_local_review: true
+
+  - id: pest_break_benefit
+    title: Rotation breaks pest and disease cycles
+    category: pest_disease
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    when:
+      - {fact: history.prev1.crop, op: not_null}
+      - {fact: history.shared_hosts_prev1, op: eq, value: []}
+      - {fact: history.consecutive_same_family, op: eq, value: 0}
+    effect: {kind: benefit}
+    evidence_strength: moderate
+    sources:
+      - "ISU ICM News 2015; UNL CropWatch 2021; UKY PPFS-AG-C-10"
+    needs_local_review: false
