@@ -53,5 +53,14 @@ and `series` (the cached forecast with crop assessment for the field or the acco
 
 Rules: return `None` for "nothing to add" (the section is omitted); an exception is logged and the
 section skipped, so one broken model does not break chat. Registering a duplicate name raises
-`ValueError`. Built-in providers are `field` and `weather_forecast`
-(`app/services/assistant_context.py`).
+`ValueError`. Built-in providers live in `app/services/assistant_context.py`; all of them need
+`field_id` except `weather_forecast`, which falls back to the account location:
+
+| Name | Source | Notes |
+| --- | --- | --- |
+| `field` | the selected field | name and crop |
+| `weather_forecast` | forecast + crop-risk rule alerts | next 3 days |
+| `m3_insights` | `services/m3_lookup.py` | planting/frost timing windows and heat/frost risk, same data as `GET /fields/{id}/m3-insights` minus the delay scan. `status: unavailable` when the field is outside model coverage. Reads local model output files (`M3_OUT`). |
+| `soil_depletion` | `services/soil_depletion.py` via `SoilAssessments` | the screening index, same cache as `GET /fields/{id}/soil-depletion`. Chat never waits for it: the first request starts the background calculation and the section says `status: pending` (or `busy`); once it is ready (up to ~100 s) later turns include the full assessment. |
+
+To skip the heavier ones, send `contexts` (for example `["field", "weather_forecast"]`).

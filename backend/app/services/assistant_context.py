@@ -85,8 +85,43 @@ def weather_forecast_context(ctx: ChatContext) -> dict | None:
     return forecast_insight_input(ctx.series, records[0]["date"], ctx.locale)
 
 
+def m3_insights_context(ctx: ChatContext) -> dict | None:
+    """Precomputed M3 crop-timing windows and climate risks at the field's coordinates."""
+    if not ctx.field:
+        return None
+    lon, lat = ctx.field["geometry"]["coordinates"]
+    result = ctx.state.m3_advice.lookup(lat, lon)  # delay scan omitted: large, rarely needed
+    if not result.get("ok"):
+        return {"status": "unavailable", "error": result.get("error")}
+    # Drop the echoed query and file bookkeeping; keep what answers agronomic questions.
+    keep = ("match", "windows", "risk", "fallow_zero", "warnings")
+    return {"status": "ready", **{key: result[key] for key in keep if result.get(key)}}
+
+
+def soil_depletion_context(ctx: ChatContext) -> dict | None:
+    """Soil depletion screening index. Never waits: the index is computed in the background."""
+    if not ctx.field:
+        return None
+    from app.services.crop_history import analysis_point  # heavy import, as in the fields API
+
+    coordinates = analysis_point(ctx.field, 0)
+    result = ctx.state.soil_assessments.get(coordinates)
+    if result.status != "ready":
+        # get() has started (or is already running) the calculation, so a later turn can use it.
+        return {
+            "status": result.status,
+            "note": "Calculation not finished; no result yet. Do not estimate it.",
+        }
+    return {
+        "status": "ready",
+        "assessment": result.assessment.model_dump(mode="json", exclude_none=True),
+    }
+
+
 def default_registry() -> ContextRegistry:
     registry = ContextRegistry()
     registry.register("field", field_context)
     registry.register("weather_forecast", weather_forecast_context)
+    registry.register("m3_insights", m3_insights_context)
+    registry.register("soil_depletion", soil_depletion_context)
     return registry

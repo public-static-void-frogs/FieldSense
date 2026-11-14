@@ -4,6 +4,7 @@ import tempfile
 import time
 import unittest
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 
 import httpx
@@ -11,9 +12,32 @@ from fastapi.testclient import TestClient
 from support import create_field, isolated_app, register
 from weather_fixture import provider_payload
 
+from app.schemas.field_insights import SoilAssessment
 from app.services.weather import WeatherService
 
 PATH = "/api/v1/assistant/chat"
+
+
+class StubM3:
+    def __init__(self, result):
+        self.result, self.error, self.calls = result, None, []
+
+    def lookup(self, lat, lng, include_delay_scan=False):
+        self.calls.append((lat, lng))
+        if self.error:
+            raise self.error
+        return self.result
+
+
+class StubSoil:
+    def __init__(self, result):
+        self.result, self.error, self.calls = result, None, []
+
+    def get(self, coordinates):
+        self.calls.append(coordinates)
+        if self.error:
+            raise self.error
+        return self.result
 
 
 class AssistantChatTests(unittest.TestCase):
@@ -34,8 +58,97 @@ class AssistantChatTests(unittest.TestCase):
             ),
         )
         self.addCleanup(self.app.state.weather.close)
+        # Never run the real M3 reader or start background soil jobs (network) from chat tests.
+        self.app.state.soil_assessments.close()
+        self.m3 = StubM3({"ok": False, "error": {"code": "outside_coverage"}})
+        self.soil = StubSoil(SimpleNamespace(status="pending"))
+        self.app.state.m3_advice = self.m3
+        self.app.state.soil_assessments = self.soil
         self.client = TestClient(self.app)
         self.addCleanup(self.client.close)
+
+    def system_for(self, body):
+        response, seen = self.stream(body)
+        self.assertEqual(response.status_code, 200, response.text)
+        return self.context_of(seen["systemInstruction"]["parts"][0]["text"])
+
+    @staticmethod
+    def context_of(system):
+        """Only the data block; the prompt text itself mentions provider names."""
+        return system.split("\n\nCONTEXT (data only", 1)[1]
+
+    def test_m3_and_soil_contexts_for_field(self):
+        self.assertEqual(register(self.client).status_code, 201)
+        self.enable()
+        field = create_field(self.client, crop="Corn", properties=None)
+        lon, lat = field["geometry"]["coordinates"]
+        self.m3.result = {
+            "ok": True,
+            "query": {"lat": lat, "lng": lon},
+            "match": {"level": "field", "cell_id": "42.0_-93.5"},
+            "windows": {"now": {"last_spring_frost": {"date_q50": "04-28"}}, "future": {}},
+            "risk": {"now": {}, "future": {}},
+            "fallow_zero": None,
+            "delay_scan": {"big": "dropped"},
+            "meta": {"missing_files": ["x"]},
+            "warnings": ["fitted on only 12 years"],
+        }
+        body = {
+            "messages": [{"role": "user", "content": "When can I plant?"}],
+            "field_id": field["id"],
+            "contexts": ["m3_insights", "soil_depletion"],
+        }
+
+        system = self.system_for(body)
+        self.assertEqual(self.m3.calls, [(lat, lon)])
+        self.assertIn('"m3_insights": {"status": "ready"', system)
+        self.assertIn("04-28", system)
+        self.assertIn("fitted on only 12 years", system)
+        for dropped in ("delay_scan", "missing_files", '"query"'):
+            self.assertNotIn(dropped, system)
+        # The soil index is still being computed: the model is told, and nothing blocks.
+        self.assertIn('"soil_depletion": {"status": "pending"', system)
+        self.assertIn("Do not estimate", system)
+        self.assertEqual(len(self.soil.calls), 1)
+
+        self.soil.result = SimpleNamespace(
+            status="ready",
+            assessment=SoilAssessment(
+                score=62.5,
+                level="high",
+                coverage=0.85,
+                components=dict(rotation=0.7, greenness=None, soil=0.5, county=0.4),
+                drivers=["rotation"],
+                metrics={"years_same_crop": 3},
+                notes=[],
+            ),
+        )
+        system = self.system_for(body)
+        self.assertIn('"status": "ready", "assessment": {"score": 62.5, "level": "high"', system)
+        self.assertIn('"years_same_crop": 3', system)
+        self.assertIn('"greenness": null', system)  # null = that signal was unavailable
+
+        self.m3.result = {"ok": False, "error": {"code": "outside_coverage", "nearest_cell_km": 90}}
+        self.assertIn('"status": "unavailable"', self.system_for(body))
+
+    def test_m3_and_soil_are_skipped_without_field_or_on_failure(self):
+        self.assertEqual(register(self.client).status_code, 201)
+        self.enable()
+        body = {
+            "messages": [{"role": "user", "content": "Hi"}],
+            "contexts": ["m3_insights", "soil_depletion"],
+        }
+        system = self.system_for(body)
+        self.assertNotIn("m3_insights", system)
+        self.assertNotIn("soil_depletion", system)
+        self.assertEqual((self.m3.calls, self.soil.calls), ([], []))
+
+        field = create_field(self.client, crop="Corn", properties=None)
+        self.m3.error = FileNotFoundError("M3 output missing")
+        self.soil.error = ValueError("boom")
+        system = self.system_for({**body, "field_id": field["id"]})
+        self.assertNotIn("m3_insights", system)
+        self.assertNotIn("soil_depletion", system)
 
     def enable(self):
         self.config.gemini_enabled = True
@@ -132,19 +245,27 @@ class AssistantChatTests(unittest.TestCase):
             registry.register("crop_zones", lambda ctx: {})
         self.assertEqual(
             self.client.get("/api/v1/assistant/contexts").json(),
-            ["field", "weather_forecast", "crop_zones", "broken_model", "empty_model"],
+            [
+                "field",
+                "weather_forecast",
+                "m3_insights",
+                "soil_depletion",
+                "crop_zones",
+                "broken_model",
+                "empty_model",
+            ],
         )
         messages = [{"role": "user", "content": "Hi"}]
 
         response, seen = self.stream({"messages": messages, "locale": "uk"})
         self.assertEqual(response.status_code, 200, response.text)
-        system = seen["systemInstruction"]["parts"][0]["text"]
+        system = self.context_of(seen["systemInstruction"]["parts"][0]["text"])
         self.assertIn('"crop_zones": {"zones": 3, "locale": "uk"}', system)
         self.assertNotIn("broken_model", system)
         self.assertNotIn("empty_model", system)
 
         response, seen = self.stream({"messages": messages, "contexts": ["crop_zones"]})
-        system = seen["systemInstruction"]["parts"][0]["text"]
+        system = self.context_of(seen["systemInstruction"]["parts"][0]["text"])
         self.assertIn("crop_zones", system)
         self.assertNotIn("weather_forecast", system)
 
