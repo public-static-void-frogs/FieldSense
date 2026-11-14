@@ -26,6 +26,7 @@ from functools import cached_property
 from fastapi import HTTPException
 
 from app.services.crop_conditions import assessment_context, field_location
+from app.services.rotation_advice import InvalidAdviceRequest
 from app.services.weather_insight import forecast_insight_input
 
 logger = logging.getLogger(__name__)
@@ -204,6 +205,75 @@ def soil_moisture_tool(ctx: ChatContext, args: dict) -> dict | None:
     return result
 
 
+PRIORITIES = ("water", "soil", "erosion", "income", "pest_break")
+DETAILED_CANDIDATES = 3  # the intended crop and the best-ranked crops get full detail
+
+
+def _finding(finding: dict) -> dict:
+    keep = ("ruleId", "title", "category", "level", "points", "yieldFactor", "evidenceStrength")
+    return {key: finding[key] for key in keep if finding.get(key) is not None}
+
+
+def _candidate(candidate: dict, detailed: bool) -> dict:
+    result = {
+        key: candidate[key]
+        for key in ("crop", "label", "group", "rank", "isIntended", "score", "scoreBreakdown")
+    }
+    for kind in ("risks", "benefits", "advisories"):
+        result[kind] = [_finding(item) for item in candidate[kind]]
+    if detailed:
+        for key in ("yield", "revenue", "calendar", "soil", "dataGaps", "needsLocalReview"):
+            if candidate.get(key):
+                result[key] = candidate[key]
+    return result
+
+
+def rotation_advice_tool(ctx: ChatContext, args: dict) -> dict | None:
+    """The data behind the crop recommendation page for one crop (``/recommendation/<crop>``)."""
+    if not ctx.field:
+        return NO_FIELD
+    crop = args.get("crop") if isinstance(args.get("crop"), str) else None
+    priorities = [p for p in args.get("priorities") or [] if p in PRIORITIES]
+    advise = ctx.state.rotation.advise
+    try:
+        advice = advise(ctx.field, crop, priorities, ctx.location.units)
+    except InvalidAdviceRequest as error:
+        if crop is None:
+            return {"status": "unavailable", "error": str(error)}
+        # Let the model correct itself: list the crops it may ask for.
+        options = advise(ctx.field, None, [], ctx.location.units)["cropOptions"]
+        return {
+            "status": "unavailable",
+            "error": str(error),
+            "cropOptions": [option["id"] for option in options],
+        }
+    candidates = [
+        _candidate(item, item["isIntended"] or item["rank"] <= DETAILED_CANDIDATES)
+        for item in advice["candidates"]
+    ]
+    keep = (
+        "intendedCrop",
+        "intendedCropSource",
+        "region",
+        "asOf",
+        "areaHa",
+        "units",
+        "priorities",
+        "historySource",
+        "history",
+        "weatherRecord",
+        "offSeason",
+        "scoring",
+        "dataGaps",
+    )
+    return {
+        "status": "ready",
+        **{key: advice[key] for key in keep if advice.get(key) is not None},
+        "cropOptions": [option["id"] for option in advice["cropOptions"]],
+        "candidates": candidates,
+    }
+
+
 def default_registry() -> ToolRegistry:
     registry = ToolRegistry()
     registry.register(
@@ -297,6 +367,37 @@ def default_registry() -> ToolRegistry:
                         "description": "Also compare with past years. Slower; set true only "
                         "when the user asks whether it is wetter or drier than usual.",
                     }
+                },
+            },
+        )
+    )
+    registry.register(
+        Tool(
+            "get_rotation_advice",
+            "Ranked next-crop advice for the selected field from the rotation rule engine: "
+            "score per candidate crop (lower means less risk) with its breakdown, risks, "
+            "benefits and advisories (rotation, disease, weather, soil), yield and gross revenue "
+            "estimates, sowing calendar, soil indicators, off-season cover-crop options, the "
+            "crop history it used (satellite-estimated, not farmer records) and the data gaps. "
+            "This is what the crop recommendation page shows for a crop. Use it to explain why a "
+            "crop ranks where it does, to compare crops, or to suggest what to grow next. "
+            "Explain rankings from the returned findings only. Needs a selected field.",
+            rotation_advice_tool,
+            {
+                "type": "object",
+                "properties": {
+                    "crop": {
+                        "type": "string",
+                        "description": "Crop id to assess as the intended crop (the page's "
+                        "crop). Defaults to the field's crop. If rejected, the "
+                        "error returns the valid crop ids in cropOptions.",
+                    },
+                    "priorities": {
+                        "type": "array",
+                        "items": {"type": "string", "enum": list(PRIORITIES)},
+                        "description": "What the user cares about most; it reweights the "
+                        "scores. Set only when the user states priorities.",
+                    },
                 },
             },
         )

@@ -15,6 +15,7 @@ from weather_fixture import provider_payload
 from app.schemas.field_insights import SoilAssessment
 from app.services.assistant import MAX_TOOL_ROUNDS
 from app.services.assistant_tools import Tool
+from app.services.rotation_advice import InvalidAdviceRequest
 from app.services.weather import WeatherService
 
 RealAsyncClient = httpx.AsyncClient  # captured before tests patch it
@@ -57,6 +58,37 @@ class StubM2:
     def lookup(self, lat, lng, crop=None, treatments=None):
         self.calls.append((lat, lng, crop, treatments))
         return self.result
+
+
+class StubRotation:
+    def __init__(self):
+        self.calls = []
+
+    def advise(self, field, crop, priorities, units):
+        self.calls.append((crop, priorities, units))
+        if crop == "kale":
+            raise InvalidAdviceRequest("Crop 'kale' is not a candidate crop for this field")
+
+        def candidate(name, rank):
+            return {
+                "crop": name, "label": name.title(), "group": "g", "rank": rank,
+                "isIntended": rank == 2, "score": rank * 10.0, "scoreBreakdown": [],
+                "risks": [{"ruleId": "r1", "title": "Repeat crop", "trigger": {"big": 1},
+                           "points": 5.0, "kind": "risk", "category": "rotation"}],
+                "benefits": [], "advisories": [], "yield": {"mid": 9.0},
+                "revenue": {"midUsd": 100.0}, "calendar": {"stages": {}}, "soil": [],
+                "dataGaps": [], "needsLocalReview": False,
+            }  # fmt: skip
+
+        return {
+            "intendedCrop": crop or "corn", "intendedCropSource": "requested", "region": "us",
+            "asOf": "2026-01-01", "areaHa": 5.0, "units": units, "priorities": priorities,
+            "historySource": {"kind": "cdl"}, "history": [], "weatherRecord": None,
+            "offSeason": None, "scoring": {}, "dataGaps": [],
+            "cropOptions": [{"id": "corn", "label": "Corn", "group": "g"}],
+            "candidates": [candidate(n, i + 1) for i, n in enumerate(["a", "b", "c", "d", "e"])],
+            "seasonTiming": {"big": "block"}, "resultVersion": "v",
+        }  # fmt: skip
 
 
 class StubSoil:
@@ -150,6 +182,8 @@ class AssistantChatTests(unittest.TestCase):
         self.m2 = StubM2()
         self.app.state.m3_advice = self.m3
         self.app.state.m2_evidence = self.m2
+        self.rotation = StubRotation()
+        self.app.state.rotation = self.rotation
         self.app.state.soil_assessments = self.soil
         self.client = TestClient(self.app)
         self.addCleanup(self.client.close)
@@ -223,6 +257,7 @@ class AssistantChatTests(unittest.TestCase):
                 "get_soil_depletion",
                 "get_neighbour_evidence",
                 "get_soil_moisture",
+                "get_rotation_advice",
             ],
         )
         self.assertEqual((self.m3.calls, self.soil.calls), ([], []))
@@ -278,6 +313,28 @@ class AssistantChatTests(unittest.TestCase):
         self.chat(gemini, field_id=field["id"])
         (response,) = [r["response"] for r in tool_responses(gemini.requests[1])]
         self.assertEqual(response["status"], "unavailable")
+
+    def test_rotation_advice_tool_trims_detail_and_helps_with_a_bad_crop(self):
+        field = self.login_with_field()
+        gemini = FakeGemini(
+            call("get_rotation_advice", crop="soybeans", priorities=["water", "luck"]),
+            call("get_rotation_advice", crop="kale"),
+            text("done"),
+        )
+        self.chat(gemini, field_id=field["id"])
+        self.assertEqual(
+            self.rotation.calls,
+            [("soybeans", ["water"], "metric"), ("kale", [], "metric"), (None, [], "metric")],
+        )
+        ok = tool_responses(gemini.requests[1])[0]["response"]
+        self.assertEqual(ok["status"], "ready")
+        self.assertEqual(ok["cropOptions"], ["corn"])
+        self.assertNotIn("seasonTiming", ok)
+        detailed = [c["crop"] for c in ok["candidates"] if "yield" in c]
+        self.assertEqual(detailed, ["a", "b", "c"])  # rank <= 3; the intended crop is rank 2
+        self.assertNotIn("trigger", ok["candidates"][0]["risks"][0])
+        bad = tool_responses(gemini.requests[2])[-1]["response"]
+        self.assertEqual((bad["status"], bad["cropOptions"]), ("unavailable", ["corn"]))
 
     def test_soil_moisture_tool_compares_only_when_asked(self):
         field = self.login_with_field()
@@ -444,6 +501,7 @@ class AssistantChatTests(unittest.TestCase):
                 "get_soil_depletion",
                 "get_neighbour_evidence",
                 "get_soil_moisture",
+                "get_rotation_advice",
                 "get_crop_zones",
             ],
         )

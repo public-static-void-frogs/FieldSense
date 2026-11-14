@@ -1416,5 +1416,6 @@
   "Fields within 30 km in drought: median {{value}} ({{fields}} fields)": "Поля в межах 30 км у посуху: медіана {{value}} (полів: {{fields}})",
   "Neighbour evidence": "Дані сусідніх полів",
   "Checking evidence from neighbouring fields…": "Перевіряю дані сусідніх полів…",
-  "Checking soil moisture…": "Перевіряю вологість ґрунту…"
+  "Checking soil moisture…": "Перевіряю вологість ґрунту…",
+  "Reviewing crop recommendations…": "Переглядаю рекомендації щодо культур…"
 }

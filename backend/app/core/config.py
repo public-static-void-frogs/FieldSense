@@ -45,7 +45,8 @@ class Settings:
 
     assistant_prompt_file: Path = field(
         default_factory=lambda: Path(
-            os.getenv("ASSISTANT_PROMPT_FILE", "") or BACKEND_ROOT / "app" / "prompts" / "assistant.txt"
+            os.getenv("ASSISTANT_PROMPT_FILE", "")
+            or BACKEND_ROOT / "app" / "prompts" / "assistant.txt"
         )
     )
     m3_out: Path = field(
@@ -59,7 +60,7 @@ class Settings:
         )
     )
     nass_api_key: str = field(default_factory=lambda: os.getenv("NASS_API_KEY", ""), repr=False)
-      
+
     # Rotation advice inputs (season summaries, weather record, CDL history); may be absent.
     rotation_data_root: str = field(
         default_factory=lambda: os.getenv(

@@ -1416,5 +1416,6 @@
   "Fields within 30 km in drought: median {{value}} ({{fields}} fields)": "Fields within 30 km in drought: median {{value}} ({{fields}} fields)",
   "Neighbour evidence": "Neighbour evidence",
   "Checking evidence from neighbouring fields…": "Checking evidence from neighbouring fields…",
-  "Checking soil moisture…": "Checking soil moisture…"
+  "Checking soil moisture…": "Checking soil moisture…",
+  "Reviewing crop recommendations…": "Reviewing crop recommendations…"
 }
