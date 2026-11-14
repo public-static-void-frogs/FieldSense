@@ -28,6 +28,7 @@ class TeamMember(BaseModel):
     name: str
     roles: str
     alt: str
+    linkedin: str
 
 
 class DemoSource(BaseModel):

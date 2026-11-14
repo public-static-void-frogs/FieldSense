@@ -17,8 +17,8 @@
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   align-items: center;
-  gap: clamp(12px, 2.3vw, 26px);
-  padding: 12px clamp(12px, 2vw, 24px) 12px 12px;
+  gap: clamp(12px, 2vw, 20px);
+  padding: 10px clamp(12px, 2vw, 20px) 10px 12px;
   color: #30452a;
   text-decoration: none;
   transition:
@@ -37,19 +37,9 @@
   outline-offset: 3px;
 }
 
-.crop-field-illustration {
-  display: block;
-  width: clamp(76px, 11vw, 120px);
-  aspect-ratio: 5 / 4;
-  border-radius: 9px;
-  background: #e8efdf;
-  height: auto;
-  object-fit: cover;
-}
-
 .crop-field-card-copy h2 {
   margin: 0 0 4px;
-  font-size: clamp(17px, 2vw, 22px);
+  font-size: clamp(17px, 2vw, 20px);
   font-weight: 600;
   line-height: 1.25;
   overflow-wrap: anywhere;
@@ -113,10 +103,6 @@
   height: 100%;
   gap: 12px;
   padding: 8px 14px 8px 8px;
-}
-
-.crop-field-list--compact .crop-field-illustration {
-  width: clamp(56px, 7vw, 80px);
 }
 
 .crop-field-list--compact .crop-field-card-copy h2 {

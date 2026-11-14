@@ -1,18 +1,13 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
 import { Card, Descriptions, Typography } from 'antd';
 import type { ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
-import { fieldQueries } from '../../../api/fields/fields.queries.ts';
+import type { FieldPropertyData } from '../../../types/fields/api.types.ts';
 import type { Field } from '../../../types/fields/field.types.ts';
 
-type FieldPropertiesProps = { field: Field };
+type FieldPropertiesProps = { field: Field; data: FieldPropertyData };
 
-export function FieldProperties({ field }: FieldPropertiesProps) {
+export function FieldProperties({ field, data }: FieldPropertiesProps) {
   const { t } = useTranslation();
-  const { data } = useSuspenseQuery(fieldQueries.properties(field.id));
-  if (!data) {
-    return null;
-  }
   const { soil, crop } = data;
   const number = (value: number | null, unit = '') =>
     value === null

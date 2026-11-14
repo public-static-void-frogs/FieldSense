@@ -1,0 +1,60 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Winter Wheat">
+  <g transform="translate(31 58) rotate(-48)">
+  <path fill="#B77B20" d="M0 0C-4 -7.44 -4 -22.63 0 -31C4 -22.32 4 -7.44 0 0Z"/>
+  <path fill="#DC9A26" d="M0 -1C2.60 -10.54 2.48 -21.08 0 -30Z"/>
+  </g>
+  <g transform="translate(31 58) rotate(49)">
+  <path fill="#B77B20" d="M0 0C-4 -8.16 -4 -24.82 0 -34C4 -24.48 4 -8.16 0 0Z"/>
+  <path fill="#DC9A26" d="M0 -1C2.60 -11.56 2.48 -23.12 0 -33Z"/>
+  </g>
+  <g transform="translate(28 46) rotate(-63) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(28 46) rotate(29) scale(0.82)">
+  <path fill="#DC9A26" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(24 39) rotate(-62) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(24 39) rotate(31) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(20 32) rotate(-63) scale(0.82)">
+  <path fill="#DC9A26" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(20 32) rotate(29) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(15 25) rotate(-42) scale(0.72)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <path fill="none" stroke="#82531E" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" d="M31 58Q27 38 14 22"/>
+  <g transform="translate(34 46) rotate(-33) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(34 46) rotate(64) scale(0.82)">
+  <path fill="#DC9A26" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(37 38) rotate(-31) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(37 38) rotate(66) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(41 30) rotate(-30) scale(0.82)">
+  <path fill="#DC9A26" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(41 30) rotate(64) scale(0.82)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(46 22) rotate(-25) scale(0.72)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(46 22) rotate(62) scale(0.72)">
+  <path fill="#DC9A26" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <g transform="translate(50 14) rotate(32) scale(0.72)">
+  <path fill="#B77B20" d="M0 0C-4.6-4-4.4-9.1 0-13 4.6-9.2 4.5-4.1 0 0Z"/>
+  </g>
+  <path fill="none" stroke="#82531E" stroke-width="2.7" stroke-linecap="round" stroke-linejoin="round" d="M31 58Q35 35 51 13"/>
+</svg>

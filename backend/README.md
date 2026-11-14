@@ -23,6 +23,10 @@ The server listens on `http://localhost:8000`. Start the frontend separately wit
 `http://localhost:8000/api/v1`. Use the same hostname for the frontend and backend
 so session cookies work. Configure `CORS_ORIGINS` for deployed clients.
 
+For an existing virtual environment, run `./.venv/bin/python -m pip install -r requirements.txt`
+from `backend` to install new dependencies such as pandas and PyArrow for M3. Run
+`./.venv/bin/python main.py` to launch with that same interpreter.
+
 ## Fields and selections
 
 `fields` contains the shared catalog. `user_fields` links users to fields with a
@@ -79,6 +83,37 @@ and returns a transparent PNG with its bounds and each class’s share of classi
 API keeps these annual classifications separate from recorded crop seasons.
 Upstream failures return 502. Raster support is included in the standard
 backend requirements.
+
+### Field insights
+
+- `GET /api/v1/fields/{id}/soil-depletion?part=0` uses the same reference point
+  as crop history for a saved polygon, or the saved coordinates for a point
+  field. The index combines USDA crop history, Sentinel-2 peak greenness,
+  SSURGO soil properties and optional NASS county yields. Rotation now accounts
+  for crop demand and reports repeated crops by year. Set `NASS_API_KEY`
+  in `backend/.env` to enable county yields. An overall score requires at
+  least half of the configured input weight. It is a screening estimate
+  with Corn Belt thresholds, and fertility measurements require a soil test.
+  The first request can return `pending` or `busy`; poll the same URL for
+  `ready`. Results and running work are shared within each API process.
+- `GET /api/v1/fields/{id}/soil-moisture?part=0` returns the latest available modeled
+  reading at the parcel reference point, with five depths and a 0–81 cm profile.
+- `GET /api/v1/fields/{id}/soil-moisture/history?part=0&start=2025-06-01&end=2025-06-30`
+  returns per-layer readings and statistics. Open-Meteo ERA5-Land supports hourly
+  ranges of up to 31 days and daily ranges of up to 366 days. Select
+  `source=power` for daily NASA POWER wetness fractions. The Open-Meteo values
+  are volumetric moisture (m³/m³); the NASA POWER values use a different scale.
+- `GET /api/v1/fields/{id}/soil-moisture/comparison?part=0` compares the current
+  0–81 cm profile with each of the previous ten years’ 0–100 cm profiles for the
+  same calendar window. Anomaly and percentile require at least three prior
+  years. Profile means require data at every layer in the advertised profile.
+- `GET /api/v1/fields/{id}/m3-insights` looks up the saved point in the supplied
+  `data/m3_out` tables. Set `M3_OUT` to use another directory and restart the
+  backend after replacing the tables. The response distinguishes a nearby
+  indexed field, a modeled weather cell, and locations outside coverage.
+  It reports historical crop timing and risk and the range across climate
+  models for 2040. The supplied archive contains no Fallow-Zero water result
+  tables, so `fallow_zero` is null with this dataset.
 
 All resource routes use `/api/v1` and require authentication.
 `GET /` remains the public health endpoint.

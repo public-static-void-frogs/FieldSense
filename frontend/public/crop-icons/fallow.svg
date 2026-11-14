@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Fallow/Idle Cropland">
+  <path fill="#775734" d="M32 14 59 33c2 1 2 4 0 6L32 58 5 39c-2-1-2-4 0-6Z"/>
+  <path fill="#A77A4D" d="M32 16 58 34 32 52 6 34Z"/>
+  <path fill="none" stroke="#C89F70" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="M13 35 35 19"/>
+  <path fill="none" stroke="#C89F70" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="M22 42 44 26"/>
+  <path fill="none" stroke="#C89F70" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round" d="M31 49 53 33"/>
+</svg>
