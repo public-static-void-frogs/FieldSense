@@ -27,3 +27,6 @@ ml/field-cv-model/weights/*.pt
 
 # Large local datasets (not committed)
 /data/local/
+
+.idea/
+tmp/
