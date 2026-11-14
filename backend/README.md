@@ -91,7 +91,8 @@ All resource routes use `/api/v1` and require authentication.
 - `tests/`: API, persistence, isolation, migrations and weather checks.
 - `openapi.json`: generated from routes and Pydantic models.
 
-See [authentication](docs/authentication.md), [weather integration](docs/weather-integration.md)
+See [authentication](docs/authentication.md), [assistant chat](docs/assistant.md),
+[weather integration](docs/weather-integration.md)
 the [source-data integration contract](docs/core-and-source-data-contract.md),
 and [SAM2/TempCNN section analysis setup](docs/section-analysis.md).
 

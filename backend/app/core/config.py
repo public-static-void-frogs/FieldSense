@@ -4,7 +4,8 @@ from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).resolve().parents[2] / ".env")
+BACKEND_ROOT = Path(__file__).resolve().parents[2]
+load_dotenv(BACKEND_ROOT / ".env")
 
 
 def cors_origins() -> list[str]:
@@ -35,6 +36,11 @@ class Settings:
     )
     gemini_model: str = field(
         default_factory=lambda: os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
+    )
+    assistant_prompt_file: Path = field(
+        default_factory=lambda: Path(
+            os.getenv("ASSISTANT_PROMPT_FILE", "") or BACKEND_ROOT / "app" / "prompts" / "assistant.txt"
+        )
     )
     weather_timeout_seconds: float = 5
     weather_forecast_ttl_seconds: int = 600

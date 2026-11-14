@@ -4,10 +4,11 @@ from fastapi import Depends, FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
-from app.api import auth, fields, planning, resources, section_analysis
+from app.api import assistant, auth, fields, planning, resources, section_analysis
 from app.core.config import Settings
 from app.core.database import database_engine, session_factory
 from app.core.errors import ResourceConflict, ResourceNotFound
+from app.services.assistant_context import default_registry
 from app.services.crop_conditions import CropWeatherRuleEngine
 from app.services.section_analysis import SectionAnalyzer
 from app.services.weather import WeatherService
@@ -38,6 +39,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
     app.state.weather = WeatherService(config)
     app.state.crop_model = CropWeatherRuleEngine()
     app.state.section_analyzer = SectionAnalyzer()
+    app.state.assistant_contexts = default_registry()
 
     @app.middleware("http")
     async def browser_security(request: Request, call_next):
@@ -70,7 +72,13 @@ def create_app(config: Settings | None = None) -> FastAPI:
         allow_headers=["Content-Type"],
     )
     app.include_router(auth.router, prefix="/api/v1")
-    for router in (fields.router, planning.router, resources.router, section_analysis.router):
+    for router in (
+        assistant.router,
+        fields.router,
+        planning.router,
+        resources.router,
+        section_analysis.router,
+    ):
         app.include_router(router, prefix="/api/v1", dependencies=[Depends(auth.current_user)])
 
     @app.get("/", tags=["health"])
