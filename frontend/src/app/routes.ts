@@ -107,6 +107,12 @@ export const appRoutes: RouteObject[] = [
             lazy: async () => ({ Component: (await import('../pages/MapPage')).MapPage }),
           },
           {
+            id: 'map-guide',
+            path: 'map/guide',
+            handle: { navigationKey: '/map' },
+            lazy: async () => ({ Component: (await import('../pages/MapGuidePage')).MapGuidePage }),
+          },
+          {
             id: 'map-add',
             path: 'map/add',
             handle: { navigationKey: '/map', workspace: 'map' },
