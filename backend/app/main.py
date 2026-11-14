@@ -8,7 +8,7 @@ from app.api import assistant, auth, fields, planning, resources, section_analys
 from app.core.config import Settings
 from app.core.database import database_engine, session_factory
 from app.core.errors import ResourceConflict, ResourceNotFound
-from app.services.assistant_context import default_registry
+from app.services.assistant_tools import default_registry
 from app.services.crop_conditions import CropWeatherRuleEngine
 from app.services.field_insights import SoilAssessments
 from app.services.m3_lookup import M3Advice
@@ -45,7 +45,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
     app.state.crop_model = CropWeatherRuleEngine()
     app.state.section_analyzer = SectionAnalyzer()
 
-    app.state.assistant_contexts = default_registry()
+    app.state.assistant_tools = default_registry()
     app.state.m3_advice = M3Advice(config.m3_out)
     app.state.rotation = RotationAdvice(
         config.rotation_data_root,

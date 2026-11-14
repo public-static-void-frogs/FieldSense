@@ -9,6 +9,7 @@ import type { FieldRouteData } from '../app/route-loaders.ts';
 import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
+import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
 import { CropRotationPlan } from '../features/fields/components/CropRotationPlan';
 import { FieldCropHistory } from '../features/fields/components/FieldCropHistory';
 import { FieldM3Insights } from '../features/fields/components/FieldM3Insights';
@@ -67,6 +68,7 @@ export function FieldDetailsPage() {
         actions={
           <Space wrap>
             {field.status && <FieldStatus status={field.status} />}
+            <FieldAssistant key={field.id} field={field} />
             {propertyData && field.crop && (
               <RouterButton
                 type="primary"
