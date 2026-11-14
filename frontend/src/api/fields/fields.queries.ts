@@ -1,6 +1,5 @@
 import { queryOptions } from '@tanstack/react-query';
 import { fieldsApi } from './fields.api.ts';
-import { sampleFieldRecommendation } from './mocks/fieldRecommendation.ts';
 
 export const fieldQueryKeys = {
   all: () => ['fields'] as const,
@@ -10,7 +9,7 @@ export const fieldQueryKeys = {
   crops: () => [...fieldQueryKeys.all(), 'crops'] as const,
   properties: (id: string) => [...fieldQueryKeys.byId(id), 'properties'] as const,
   history: (id: string) => [...fieldQueryKeys.byId(id), 'history'] as const,
-  recommendation: (id: string) => [...fieldQueryKeys.byId(id), 'recommendation'] as const,
+  strategyOptions: () => [...fieldQueryKeys.all(), 'strategy-options'] as const,
 };
 export const fieldQueries = {
   list: () =>
@@ -43,15 +42,9 @@ export const fieldQueries = {
       queryKey: fieldQueryKeys.history(id),
       queryFn: ({ signal }) => fieldsApi.getHistory(id, signal),
     }),
-  recommendation: (id: string) =>
+  strategyOptions: () =>
     queryOptions({
-      queryKey: fieldQueryKeys.recommendation(id),
-      queryFn: async ({ signal }) => {
-        const recommendation = await fieldsApi.getRecommendation(id, signal);
-        return {
-          recommendation: recommendation ?? sampleFieldRecommendation,
-          isSample: !recommendation,
-        };
-      },
+      queryKey: fieldQueryKeys.strategyOptions(),
+      queryFn: fieldsApi.getStrategyOptions,
     }),
 };

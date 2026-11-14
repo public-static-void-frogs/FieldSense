@@ -784,5 +784,14 @@
   "No data": "Немає даних",
   "Crop share in {{year}}": "Частки культур за {{year}} рік",
   "Share of classified pixels in the displayed area": "Частка класифікованих пікселів у показаній області",
-  "Other": "Інше"
+  "Other": "Інше",
+  "Crop strategies for next season": "Стратегії вирощування на наступний сезон",
+  "Soil cover": "Захист ґрунту покривом",
+  "Nitrogen fixation": "Фіксація азоту",
+  "Long-term fertility": "Довгострокова родючість",
+  "Learn more": "Дізнатися більше",
+  "Learn more about {{crop}}": "Дізнатися більше про {{crop}}",
+  "Back to field": "Назад до поля",
+  "Strategy not found": "Стратегію не знайдено",
+  "More strategy details are coming soon.": "Незабаром тут з’явиться більше інформації про стратегію."
 }

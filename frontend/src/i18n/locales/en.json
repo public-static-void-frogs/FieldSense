@@ -784,5 +784,14 @@
   "No data": "No data",
   "Crop share in {{year}}": "Crop share in {{year}}",
   "Share of classified pixels in the displayed area": "Share of classified pixels in the displayed area",
-  "Other": "Other"
+  "Other": "Other",
+  "Crop strategies for next season": "Crop strategies for next season",
+  "Soil cover": "Soil cover",
+  "Nitrogen fixation": "Nitrogen fixation",
+  "Long-term fertility": "Long-term fertility",
+  "Learn more": "Learn more",
+  "Learn more about {{crop}}": "Learn more about {{crop}}",
+  "Back to field": "Back to field",
+  "Strategy not found": "Strategy not found",
+  "More strategy details are coming soon.": "More strategy details are coming soon."
 }

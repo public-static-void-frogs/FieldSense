@@ -1,0 +1,77 @@
+.field-strategies-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+  gap: 16px;
+}
+
+.field-strategy-card.ant-card {
+  display: flex;
+  overflow: hidden;
+}
+
+.field-strategy-card > .ant-card-body {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  padding: 0;
+}
+
+.field-strategy-card[data-strategy='soil-cover'] {
+  --strategy-tint: #f7edce;
+  --strategy-ink: #76500e;
+}
+
+.field-strategy-card[data-strategy='nitrogen-fixation'] {
+  --strategy-tint: #e5efd9;
+  --strategy-ink: #315327;
+}
+
+.field-strategy-card[data-strategy='long-term-fertility'] {
+  --strategy-tint: #dfefea;
+  --strategy-ink: #315d54;
+}
+
+.field-strategy-banner {
+  display: flex;
+  align-items: center;
+  min-height: 96px;
+  padding: 16px 20px;
+  color: var(--strategy-ink);
+  background:
+    repeating-radial-gradient(
+      circle at 92% 0%,
+      transparent 0 26px,
+      rgb(255 255 255 / 55%) 27px 28px
+    ),
+    var(--strategy-tint);
+}
+
+.field-strategy-icon {
+  display: grid;
+  width: 52px;
+  height: 52px;
+  place-items: center;
+  border-radius: 12px;
+  background: rgb(255 255 255 / 88%);
+}
+
+.field-strategy-content {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: 18px 20px 20px;
+}
+
+.field-strategy-content h4.ant-typography {
+  margin: 0;
+}
+
+.field-strategy-content .field-strategy-label {
+  margin-bottom: 8px;
+  color: var(--strategy-ink);
+}
+
+.field-strategy-link.ant-btn {
+  margin-top: auto;
+}

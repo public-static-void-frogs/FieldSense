@@ -1,5 +1,5 @@
 import type { RouteObject } from 'react-router-dom';
-import { calendarLoader, fieldLoader } from './route-loaders.ts';
+import { calendarLoader, fieldLoader, strategyOptionLoader } from './route-loaders.ts';
 
 export type AppRouteHandle = {
   navigationKey?: string;
@@ -80,6 +80,15 @@ export const appRoutes: RouteObject[] = [
             handle: { navigationKey: '/fields' },
             lazy: async () => ({
               Component: (await import('../pages/FieldStrategyPage')).FieldStrategyPage,
+            }),
+          },
+          {
+            id: 'strategy-option',
+            path: 'fields/:fieldId/strategy/:strategyId',
+            loader: strategyOptionLoader,
+            handle: { navigationKey: '/fields' },
+            lazy: async () => ({
+              Component: (await import('../pages/FieldStrategyOptionPage')).FieldStrategyOptionPage,
             }),
           },
           {

@@ -96,9 +96,9 @@ export function FieldDetailsPage() {
       </div>
       <div className="field-detail-stack">
         <CropRotationPlan field={field} />
-        <FieldRecommendation field={field} />
         <FieldProperties field={field} />
         <FieldCropHistory key={field.id} field={field} />
+        <FieldRecommendation fieldId={field.id} />
       </div>
       <Modal
         open={confirmRemove}

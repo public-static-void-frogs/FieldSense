@@ -17,7 +17,8 @@ export interface FieldHistory {
   events: LandEvent[];
   seasons: CropSeason[];
 }
-export interface FieldRecommendationData {
-  title: string;
+export interface FieldStrategyOption {
+  id: 'soil-cover' | 'nitrogen-fixation' | 'long-term-fertility';
+  crop: string;
   description: string;
 }
