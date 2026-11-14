@@ -1,11 +1,13 @@
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Button, Spin } from 'antd';
+import { Alert, Button, Spin, Tooltip } from 'antd';
+import { CircleHelp } from 'lucide-react';
 import { useCallback } from 'react';
 import 'leaflet/dist/leaflet.css';
 import { useTranslation } from 'react-i18next';
-import { useSearchParams } from 'react-router-dom';
+import { useLocation, useSearchParams } from 'react-router-dom';
 import { MapContainer, ScaleControl, TileLayer } from 'react-leaflet';
 import { mapQueries } from '../../../api/maps/maps.queries.ts';
+import { RouterButton } from '../../../components/common/RouterButton';
 import { satelliteTiles } from '../constants/maps.constants.ts';
 import { useCatalogLayers } from '../hooks/useCatalogLayers.ts';
 import { useMapSections } from '../hooks/useMapSections.ts';
@@ -22,6 +24,7 @@ import './CatalogMap.css';
 export function CatalogMap() {
   const { t } = useTranslation();
   const summary = useQuery(mapQueries.summary());
+  const { pathname, search } = useLocation();
   const [parameters] = useSearchParams();
   const savedView = parseMapPosition(parameters);
   if (!summary.data) {
@@ -43,6 +46,17 @@ export function CatalogMap() {
   return (
     <div className="fullscreen-map">
       <section className="field-map expanded catalog-map" aria-label={t('Field map')}>
+        <div className="map-guide-control">
+          <Tooltip title={t('Field Map guide')}>
+            <RouterButton
+              type="text"
+              icon={<CircleHelp size={17} aria-hidden />}
+              aria-label={t('Field Map guide')}
+              to="/map/guide"
+              state={{ mapPath: pathname, mapSearch: search }}
+            />
+          </Tooltip>
+        </div>
         <MapContainer
           className="map-canvas"
           center={savedView?.center ?? summary.data.defaultCenter}

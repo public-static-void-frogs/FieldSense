@@ -1,0 +1,111 @@
+.map-guide {
+  display: grid;
+  justify-items: start;
+  gap: 18px;
+  max-width: 1120px;
+  margin-inline: auto;
+  padding-block: 22px 40px;
+  color: #233a2a;
+}
+.map-guide .map-guide-back {
+  padding-inline: 0;
+}
+.map-guide-intro h1 {
+  margin: 0 0 8px;
+  font-size: clamp(30px, 4vw, 42px);
+  line-height: 1.1;
+  letter-spacing: -0.04em;
+}
+.map-guide-intro p,
+.map-guide-instructions p {
+  margin: 0;
+  color: #4d6550;
+}
+.map-guide-steps {
+  display: grid;
+  width: 100%;
+  gap: 14px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.map-guide-step {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.1fr);
+  align-items: center;
+  gap: clamp(16px, 3vw, 36px);
+  padding: clamp(16px, 2.5vw, 24px);
+  border: 1px solid #dce5d8;
+  border-radius: 12px;
+  background: #fff;
+}
+.map-guide-step h2,
+.map-guide-questions h2 {
+  margin: 0;
+  font-size: clamp(19px, 2vw, 24px);
+  line-height: 1.25;
+}
+.map-guide-step h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.map-guide-step h2 svg {
+  flex: none;
+  color: #4b7653;
+}
+.map-guide-instructions {
+  display: grid;
+  gap: 12px;
+}
+.map-guide-demo {
+  position: relative;
+  min-width: 0;
+  margin: 0;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #354638;
+}
+.map-guide-demo img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.map-guide-play {
+  position: absolute;
+  inset: auto auto 10px 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding-inline: 10px;
+  border: 1px solid #dce5d8;
+  border-radius: 7px;
+  background: #fffef9;
+  color: #233a2a;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 650;
+  cursor: pointer;
+}
+.map-guide-play:hover {
+  background: #edf3e9;
+}
+.map-guide-play:focus-visible {
+  outline: 2px solid #fffef9;
+  outline-offset: 3px;
+}
+.map-guide-questions {
+  display: grid;
+  width: 100%;
+  gap: 12px;
+  padding-top: 6px;
+}
+.map-guide-questions .ant-collapse {
+  background: #fff;
+}
+@media (max-width: 760px) {
+  .map-guide-step {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
