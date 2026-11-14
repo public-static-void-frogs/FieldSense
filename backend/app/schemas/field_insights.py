@@ -135,6 +135,35 @@ class M3Error(BaseModel):
     nearest_cell_km: float | None = None
 
 
+class M2Match(BaseModel):
+    level: Literal["field", "neighbourhood", "region"]
+    csbid: str | None = None
+    distance_km: float | None = None
+    n_neighbour_fields: int | None = None
+
+
+class M2Error(BaseModel):
+    code: Literal["outside_coverage", "bad_input"]
+    nearest_field_km: float | None = None
+    detail: str | None = None
+
+
+class M2Insights(BaseModel):
+    """Neighbour evidence on rotation practices and drought resilience."""
+
+    ok: bool
+    query: dict[str, float]
+    evidence_label: str | None = None
+    match: M2Match | None = None
+    region: dict[str, dict[str, dict[str, JsonValue]]] | None = None
+    field: dict[str, dict[str, dict[str, dict[str, JsonValue]]]] | None = None
+    neighbourhood: dict[str, dict[str, dict[str, dict[str, JsonValue]]]] | None = None
+    summary: list[str] = []
+    warnings: list[str] = []
+    meta: dict[str, JsonValue] | None = None
+    error: M2Error | None = None
+
+
 class M3Insights(BaseModel):
     ok: bool
     query: dict[str, float]

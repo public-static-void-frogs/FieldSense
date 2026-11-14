@@ -12,6 +12,7 @@ import { RouterButton } from '../components/common/RouterButton';
 import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
 import { CropRotationPlan } from '../features/fields/components/CropRotationPlan';
 import { FieldCropHistory } from '../features/fields/components/FieldCropHistory';
+import { FieldM2Insights } from '../features/fields/components/FieldM2Insights';
 import { FieldM3Insights } from '../features/fields/components/FieldM3Insights';
 import { FieldProperties } from '../features/fields/components/FieldProperties';
 import { FieldRecommendation } from '../features/fields/components/FieldRecommendation';
@@ -27,6 +28,7 @@ const sections = {
   recommendations: { id: 'crop-recommendations', label: 'Crop strategies for next season' },
   history: { id: 'crop-history', label: 'Crop history' },
   timing: { id: 'crop-timing-and-climate-risk', label: 'Crop timing and climate risk' },
+  evidence: { id: 'neighbour-evidence', label: 'Neighbour evidence' },
 } as const;
 
 export function FieldDetailsPage() {
@@ -156,6 +158,9 @@ export function FieldDetailsPage() {
         </div>
         <div className="field-detail-anchor" id={sections.timing.id}>
           <FieldM3Insights field={field} />
+        </div>
+        <div className="field-detail-anchor" id={sections.evidence.id}>
+          <FieldM2Insights field={field} />
         </div>
       </div>
       <Modal

@@ -11,6 +11,7 @@ from app.core.errors import ResourceConflict, ResourceNotFound
 from app.services.assistant_tools import default_registry
 from app.services.crop_conditions import CropWeatherRuleEngine
 from app.services.field_insights import SoilAssessments
+from app.services.m2_lookup import M2Evidence
 from app.services.m3_lookup import M3Advice
 from app.services.rotation_advice import InvalidAdviceRequest, RotationAdvice
 from app.services.season_timing import SeasonTiming
@@ -47,6 +48,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
 
     app.state.assistant_tools = default_registry()
     app.state.m3_advice = M3Advice(config.m3_out)
+    app.state.m2_evidence = M2Evidence(config.m2_out)
     app.state.rotation = RotationAdvice(
         config.rotation_data_root,
         config.rotation_soil_lookup,

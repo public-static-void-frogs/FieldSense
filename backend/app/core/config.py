@@ -53,6 +53,11 @@ class Settings:
             os.getenv("M3_OUT") or Path(__file__).resolve().parents[3] / "data/m3_out"
         )
     )
+    m2_out: Path = field(
+        default_factory=lambda: Path(
+            os.getenv("M2_OUT") or Path(__file__).resolve().parents[3] / "data/m2_out"
+        )
+    )
     nass_api_key: str = field(default_factory=lambda: os.getenv("NASS_API_KEY", ""), repr=False)
       
     # Rotation advice inputs (season summaries, weather record, CDL history); may be absent.

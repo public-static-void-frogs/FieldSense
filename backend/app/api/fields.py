@@ -8,7 +8,7 @@ from fastapi import APIRouter, HTTPException, Query, Request
 from app.api.auth import CurrentUser
 from app.api.dependencies import FieldId, ParcelId, Store
 from app.schemas.crop_history import CropHistory, CropLayer
-from app.schemas.field_insights import M3Insights, SoilDepletion
+from app.schemas.field_insights import M2Insights, M3Insights, SoilDepletion
 from app.schemas.fields import (
     CreateField,
     Crop,
@@ -234,6 +234,20 @@ def compare_soil_moisture(
     return moisture_service.compare_to_history(
         weather, coordinates, moisture_service.current(weather, coordinates)
     )
+
+
+@router.get("/fields/{field_id}/m2-insights", response_model=M2Insights)
+def m2_insights(field_id: FieldId, store: Store, request: Request):
+    """Read precomputed neighbour evidence on rotation and drought for the saved field point."""
+    lon, lat = store.require_field(field_id)["geometry"]["coordinates"]
+    try:
+        return request.app.state.m2_evidence.lookup(lat, lon)
+    except ImportError as error:
+        logger.exception("M2 dependencies unavailable. Install backend/requirements.txt.")
+        raise HTTPException(503, "Neighbour evidence is temporarily unavailable") from error
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        logger.exception("Could not read the M2 model output")
+        raise HTTPException(503, "Neighbour evidence is temporarily unavailable") from error
 
 
 @router.get("/fields/{field_id}/m3-insights", response_model=M3Insights)
