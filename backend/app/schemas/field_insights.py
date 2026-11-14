@@ -1,11 +1,38 @@
 from typing import Literal
 
-from pydantic import BaseModel, JsonValue
+from pydantic import BaseModel, Field, JsonValue
 
 SoilSignal = Literal["rotation", "greenness", "soil", "county"]
 
 
+DemandClass = Literal["high", "moderate", "low", "restorative"]
+RepeatMark = Literal["repeat", "heavy_repeat"]
+
+
+class RotationMark(BaseModel):
+    year: int
+    crop: str
+    demand: float
+    demand_class: DemandClass
+    run: int
+    mark: RepeatMark | None
+
+
 class SoilMetrics(BaseModel):
+    demand_latest_crop: float | None = None
+    demand_class_latest: DemandClass | None = None
+    latest_repeat_mark: RepeatMark | None = None
+    demand_mean_5y: float | None = None
+    rotation_repeat: float | None = None
+    rotation_load: float | None = None
+    rotation_concentration: float | None = None
+    rotation_marks: list[RotationMark] = Field(default_factory=list)
+    unrated_crops: list[str] = Field(default_factory=list)
+    latest_ndvi: float | None = None
+    latest_evi: float | None = None
+    latest_vs_peak_mean: float | None = None
+    latest_greenness_date: str | None = None
+    peak_scene_count: dict[int, int] | None = None
     years_same_crop: int | None = None
     latest_crop: str | None = None
     top_crop_5y: str | None = None

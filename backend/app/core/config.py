@@ -29,6 +29,11 @@ class Settings:
             "WEATHER_ARCHIVE_URL", "https://archive-api.open-meteo.com/v1/archive"
         )
     )
+    soil_moisture_power_url: str = field(
+        default_factory=lambda: os.getenv(
+            "SOIL_MOISTURE_POWER_URL", "https://power.larc.nasa.gov/api/temporal/daily/point"
+        )
+    )
     gemini_api_key: str = field(default_factory=lambda: os.getenv("GEMINI_API_KEY", ""), repr=False)
     gemini_enabled: bool = field(
         default_factory=lambda: os.getenv("GEMINI_ENABLED", "false").lower() == "true"

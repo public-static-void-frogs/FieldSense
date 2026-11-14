@@ -92,3 +92,15 @@ class FieldInsightTests(unittest.TestCase):
             self.assertIsNone(assessment["components"]["greenness"])
             self.assertIn("greenness_unavailable", assessment["notes"])
             history.assert_called_once()
+
+    def test_rotation_weights_demand_and_breaks_runs_at_gaps(self):
+        corn, metrics = soil_depletion.rotation(dict.fromkeys(range(2022, 2026), "Corn"))
+        self.assertAlmostEqual(corn, 1)
+        self.assertEqual(metrics["rotation_marks"][-1]["mark"], "heavy_repeat")
+        alfalfa, _ = soil_depletion.rotation(dict.fromkeys(range(2022, 2026), "Alfalfa"))
+        self.assertAlmostEqual(alfalfa, 0.07)
+        _, gaps = soil_depletion.rotation({2022: "Corn", 2024: "Corn", 2025: "Corn"})
+        self.assertEqual(gaps["years_same_crop"], 2)
+        score, nonag = soil_depletion.rotation({2024: "Corn", 2025: "Open Water"})
+        self.assertIsNone(score)
+        self.assertEqual(nonag["unrated_crops"], [])

@@ -47,31 +47,120 @@ def _years(history):
     return dict(sorted((year, crop) for year, crop in history.items() if crop))
 
 
-# ------------------------------------------------------------------ rotation
+# Crop demand is a heuristic rating, not a measurement of soil fertility.
+CROP_DEMAND = [
+    (r"dbl crop|double", 0.85),
+    (r"fallow|idle|cover", 0.0),
+    (
+        r"alfalfa|clover|pasture|grass|switchgrass|vetch|hay",
+        None,
+    ),  # resolved below (alfalfa/clover/pasture 0.1, other hay 0.25)
+    (
+        r"sweet corn|pop or orn corn|sorghum|cotton|potato|sugarbeet|beet|tobacco|vegetable|onion|tomato|cabbage|pumpkin|squash|melon|cucumber",
+        0.9,
+    ),
+    (r"^corn$|corn", 1.0),
+    (r"sunflower|safflower|peanut|rice", 0.8),
+    (r"canola|rape|mustard|camelina", 0.7),
+    (r"soy", 0.6),
+    (r"buckwheat", 0.3),
+    (r"wheat|durum", 0.5),
+    (r"dry bean|bean", 0.45),
+    (r"pea|lentil|chickpea|barley|oat|triticale|millet|speltz|flax", 0.4),
+    (r"rye", 0.3),
+]
+CROP_DEMAND_PATTERNS = [(re.compile(pattern, re.I), value) for pattern, value in CROP_DEMAND]
+DEFAULT_DEMAND = 0.6
+NON_AGRICULTURAL = re.compile(
+    r"forest|developed|\bwater\b|wetland|barren|shrub|background|cloud|nonag|ice/snow|aquaculture|^USDA class",
+    re.I,
+)
+
+
+def demand_of(crop):
+    for pattern, rating in CROP_DEMAND_PATTERNS:
+        if pattern.search(crop):
+            if rating is None:
+                return (0.25 if re.search(r"other hay|non.?alfalfa", crop, re.I) else 0.1), True
+            return rating, True
+    return DEFAULT_DEMAND, False
+
+
+def demand_class(demand):
+    if demand >= 0.8:
+        return "high"
+    if demand >= 0.45:
+        return "moderate"
+    if demand >= 0.25:
+        return "low"
+    return "restorative"
+
+
+def repeat_mark(run, demand):
+    if (run >= 2 and demand >= 0.8) or (run >= 3 and demand >= 0.45):
+        return "heavy_repeat"
+    if (run >= 2 and demand >= 0.45) or (run >= 4 and demand >= 0.25):
+        return "repeat"
+    return None
+
+
 def rotation(hist):
-    ys = _years(hist)
-    if len(ys) < 2:
+    years = _years(hist)
+    if not years:
         return None, {}
-    latest = max(ys)
-    latest_crop = ys[latest]
-    if NOT_CROP.search(latest_crop):
-        return None, {}
-    last5 = [crop for year, crop in ys.items() if year >= latest - 4]
-    if len(last5) < 2:
-        return None, {}
-    run = 1
-    while ys.get(latest - run) == latest_crop:
-        run += 1
-    top = max(dict.fromkeys(reversed(last5)), key=last5.count)
-    share = last5.count(top) / len(last5)
-    sc = 0.6 * _clip01((run - 1) / 3) + 0.4 * _clip01((share - 0.5) / 0.5)
-    return sc, {
-        "years_same_crop": run,
-        "latest_crop": latest_crop,
-        "top_crop_5y": top,
-        "share_top_crop_5y": round(share, 2),
-        "observed_years_5y": len(last5),
-    }
+    latest = max(years)
+    marks, unrated = [], set()
+    previous_year, previous_crop, run = None, None, 0
+    for year, crop in years.items():
+        if NON_AGRICULTURAL.search(crop):
+            continue
+        demand, known = demand_of(crop)
+        if not known:
+            unrated.add(crop)
+        run = run + 1 if previous_year == year - 1 and previous_crop == crop.casefold() else 1
+        previous_year, previous_crop = year, crop.casefold()
+        marks.append(
+            {
+                "year": year,
+                "crop": crop,
+                "demand": demand,
+                "demand_class": demand_class(demand),
+                "run": run,
+                "mark": repeat_mark(run, demand),
+            }
+        )
+
+    metrics = {"rotation_marks": marks, "unrated_crops": sorted(unrated)}
+    recent = [mark for mark in marks if mark["year"] >= latest - 4]
+    if not recent or recent[-1]["year"] != latest:
+        return None, metrics
+    current = recent[-1]
+    crops = [mark["crop"] for mark in recent]
+    top = max(dict.fromkeys(reversed(crops)), key=crops.count)
+    share = crops.count(top) / len(crops)
+    mean = sum(mark["demand"] for mark in recent) / len(recent)
+    metrics.update(
+        years_same_crop=current["run"],
+        latest_crop=current["crop"],
+        demand_latest_crop=current["demand"],
+        demand_class_latest=current["demand_class"],
+        latest_repeat_mark=current["mark"],
+        top_crop_5y=top,
+        share_top_crop_5y=round(share, 2),
+        observed_years_5y=len(recent),
+        demand_mean_5y=round(mean, 2),
+    )
+    if len(recent) < 2:
+        return None, metrics
+    repeat = _clip01((current["run"] - 1) * current["demand"] / 3)
+    load = _clip01((mean - 0.8) / 0.2)
+    concentration = _clip01((share - 0.5) / 0.5) * demand_of(top)[0]
+    metrics.update(
+        rotation_repeat=round(repeat, 2),
+        rotation_load=round(load, 2),
+        rotation_concentration=round(concentration, 2),
+    )
+    return 0.5 * repeat + 0.3 * load + 0.2 * concentration, metrics
 
 
 # ------------------------------------------------------------------ Sentinel-2 peak greenness
@@ -125,46 +214,61 @@ def _scene_ve(item, lat, lng):
     return (ndvi, evi) if np.isfinite(ndvi) and np.isfinite(evi) else None
 
 
+def _season_scenes(lat, lng, year):
+    start, end = (dt.date(year, *month_day).isoformat() for month_day in SEASON)
+    scenes = _search(lat, lng, start, end)
+    # Multiple tiles on the same acquisition date are one observation.
+    by_date = {}
+    for scene in sorted(scenes, key=lambda item: item["properties"]["eo:cloud_cover"]):
+        by_date.setdefault(scene["properties"]["datetime"][:10], scene)
+    items = [by_date[date] for date in sorted(by_date)]
+    if len(items) > MAX_SCENES_YEAR:
+        items = [items[i] for i in np.linspace(0, len(items) - 1, MAX_SCENES_YEAR, dtype=int)]
+    return items
+
+
 def yearly_peaks(lat, lng, years, deadline):
-    """Return per-year peaks and whether any source error limited the search."""
+    """Overlap catalog searches and raster reads, keeping the newest seasons first."""
     peaks, incomplete = {}, False
     years = sorted((y for y in years if FIRST_YEAR_S2 <= y <= dt.date.today().year), reverse=True)
-    with ThreadPoolExecutor(max_workers=8) as pool:
-        for year in years:
-            if monotonic() >= deadline:
-                return peaks, True
-            start, end = (dt.date(year, *month_day).isoformat() for month_day in SEASON)
-            try:
-                scenes = _search(lat, lng, start, end)
-                # Multiple tiles on the same acquisition date are one observation.
-                by_date = {}
-                for scene in sorted(scenes, key=lambda item: item["properties"]["eo:cloud_cover"]):
-                    by_date.setdefault(scene["properties"]["datetime"][:10], scene)
-                items = [by_date[date] for date in sorted(by_date)]
-            except (httpx.HTTPError, ValueError, TypeError, KeyError):
+
+    def search(year):
+        if monotonic() >= deadline:
+            return None
+        try:
+            return _season_scenes(lat, lng, year)
+        except (httpx.HTTPError, ValueError, TypeError, KeyError):
+            return None
+
+    def observe(scene):
+        if monotonic() >= deadline:
+            return None, True
+        try:
+            return _scene_ve(scene, lat, lng), False
+        except Exception:
+            return None, True
+
+    with (
+        ThreadPoolExecutor(max_workers=3) as catalog,
+        ThreadPoolExecutor(max_workers=8) as rasters,
+    ):
+        observations = {}
+        for year, scenes in zip(years, catalog.map(search, years)):
+            if scenes is None:
                 incomplete = True
                 continue
-            if len(items) > MAX_SCENES_YEAR:
-                items = [
-                    items[i] for i in np.linspace(0, len(items) - 1, MAX_SCENES_YEAR, dtype=int)
-                ]
+            observations[year] = [rasters.submit(observe, scene) for scene in scenes]
 
-            def observe(scene):
-                if monotonic() >= deadline:
-                    return None, True
-                try:
-                    return _scene_ve(scene, lat, lng), False
-                except Exception:
-                    return None, True
-
+        for year, jobs in observations.items():
             values = []
-            for value, failed in pool.map(observe, items):
+            for job in jobs:
+                value, failed = job.result()
                 incomplete |= failed
                 if value is not None:
                     values.append(value)
             if len(values) >= MIN_SCENES_YEAR:
                 ndvi, evi = np.percentile(values, PEAK_Q, axis=0)
-                peaks[year] = {"ndvi": float(ndvi), "evi": float(evi)}
+                peaks[year] = {"ndvi": float(ndvi), "evi": float(evi), "n_scenes": len(values)}
     return peaks, incomplete
 
 
@@ -183,6 +287,7 @@ def greenness_part(lat, lng, hist, deadline):
     metrics = {
         "peak_ndvi": {y: round(p["ndvi"], 3) for y, p in peaks.items()},
         "peak_evi": {y: round(p["evi"], 3) for y, p in peaks.items()},
+        "peak_scene_count": {y: p["n_scenes"] for y, p in peaks.items()},
     }
     trends, weights = [], []
     for crop in sorted({ys[y] for y in peaks}):
@@ -196,6 +301,34 @@ def greenness_part(lat, lng, hist, deadline):
         tr = float(np.average(trends, weights=weights))
         metrics["ndvi_trend_pct_per_yr"] = round(tr, 2)
         score = _clip01(-tr / TREND_BAD)
+    # A recent clear scene adds context without changing the historical trend score.
+    if cropyears and monotonic() < deadline:
+        try:
+            end = dt.date.today()
+            scenes = _search(lat, lng, (end - dt.timedelta(days=45)).isoformat(), end.isoformat())
+            for scene in sorted(
+                scenes, key=lambda item: item["properties"]["datetime"], reverse=True
+            )[:6]:
+                if monotonic() >= deadline:
+                    break
+                try:
+                    current = _scene_ve(scene, lat, lng)
+                except Exception:
+                    continue
+                if current is not None:
+                    ndvi, evi = current
+                    metrics.update(
+                        latest_ndvi=round(ndvi, 3),
+                        latest_evi=round(evi, 3),
+                        latest_greenness_date=scene["properties"]["datetime"][:10],
+                    )
+                    if peaks:
+                        peak_mean = np.mean([peak["ndvi"] for peak in peaks.values()])
+                        if abs(peak_mean) > 1e-6:
+                            metrics["latest_vs_peak_mean"] = round(float(ndvi / peak_mean), 2)
+                    break
+        except (httpx.HTTPError, ValueError, TypeError, KeyError):
+            pass
     note = None
     if incomplete:
         note = "greenness_partial" if peaks else "greenness_unavailable"

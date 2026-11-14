@@ -1087,6 +1087,231 @@
         }
       }
     },
+    "/api/v1/fields/{field_id}/soil-moisture": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Current Soil Moisture",
+        "operationId": "current_soil_moisture_api_v1_fields__field_id__soil_moisture_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          },
+          {
+            "name": "part",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Part"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CurrentSoilMoisture"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/soil-moisture/history": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Soil Moisture History",
+        "operationId": "soil_moisture_history_api_v1_fields__field_id__soil_moisture_history_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          },
+          {
+            "name": "start",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "Start"
+            }
+          },
+          {
+            "name": "end",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "date",
+              "title": "End"
+            }
+          },
+          {
+            "name": "part",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Part"
+            }
+          },
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "openmeteo",
+                "power"
+              ],
+              "type": "string",
+              "default": "openmeteo",
+              "title": "Source"
+            }
+          },
+          {
+            "name": "frequency",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "daily",
+                "hourly"
+              ],
+              "type": "string",
+              "default": "daily",
+              "title": "Frequency"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoilMoistureHistory"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/soil-moisture/comparison": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Compare Soil Moisture",
+        "operationId": "compare_soil_moisture_api_v1_fields__field_id__soil_moisture_comparison_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          },
+          {
+            "name": "part",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "minimum": 0,
+              "default": 0,
+              "title": "Part"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoilMoistureComparison"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/fields/{field_id}/m3-insights": {
       "get": {
         "tags": [
@@ -6778,6 +7003,165 @@
       },
       "SoilMetrics": {
         "properties": {
+          "demand_latest_crop": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Demand Latest Crop"
+          },
+          "demand_class_latest": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "high",
+                  "moderate",
+                  "low",
+                  "restorative"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Demand Class Latest"
+          },
+          "latest_repeat_mark": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "repeat",
+                  "heavy_repeat"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Repeat Mark"
+          },
+          "demand_mean_5y": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Demand Mean 5Y"
+          },
+          "rotation_repeat": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rotation Repeat"
+          },
+          "rotation_load": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rotation Load"
+          },
+          "rotation_concentration": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Rotation Concentration"
+          },
+          "rotation_marks": {
+            "items": {
+              "$ref": "#/components/schemas/RotationMark"
+            },
+            "type": "array",
+            "title": "Rotation Marks"
+          },
+          "unrated_crops": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Unrated Crops"
+          },
+          "latest_ndvi": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Ndvi"
+          },
+          "latest_evi": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Evi"
+          },
+          "latest_vs_peak_mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Vs Peak Mean"
+          },
+          "latest_greenness_date": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Latest Greenness Date"
+          },
+          "peak_scene_count": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "integer"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Peak Scene Count"
+          },
           "years_same_crop": {
             "anyOf": [
               {
@@ -7007,6 +7391,383 @@
         },
         "type": "object",
         "title": "SoilMetrics"
+      },
+      "CurrentSoilMoisture": {
+        "properties": {
+          "coordinates": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Coordinates"
+          },
+          "grid_point": {
+            "anyOf": [
+              {
+                "prefixItems": [
+                  {
+                    "type": "number"
+                  },
+                  {
+                    "type": "number"
+                  }
+                ],
+                "type": "array",
+                "maxItems": 2,
+                "minItems": 2
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Grid Point"
+          },
+          "time_utc": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Utc"
+          },
+          "layers": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Layers"
+          },
+          "profile_mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Profile Mean"
+          },
+          "unit": {
+            "type": "string",
+            "const": "m3/m3",
+            "title": "Unit",
+            "default": "m3/m3"
+          }
+        },
+        "type": "object",
+        "required": [
+          "coordinates",
+          "grid_point",
+          "time_utc",
+          "layers",
+          "profile_mean"
+        ],
+        "title": "CurrentSoilMoisture"
+      },
+      "MoistureObservation": {
+        "properties": {
+          "date": {
+            "type": "string",
+            "format": "date",
+            "title": "Date"
+          },
+          "time_utc": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date-time"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Time Utc"
+          },
+          "values": {
+            "additionalProperties": {
+              "anyOf": [
+                {
+                  "type": "number"
+                },
+                {
+                  "type": "null"
+                }
+              ]
+            },
+            "type": "object",
+            "title": "Values"
+          }
+        },
+        "type": "object",
+        "required": [
+          "date",
+          "values"
+        ],
+        "title": "MoistureObservation"
+      },
+      "MoistureStats": {
+        "properties": {
+          "n": {
+            "type": "integer",
+            "title": "N"
+          },
+          "mean": {
+            "type": "number",
+            "title": "Mean"
+          },
+          "min": {
+            "type": "number",
+            "title": "Min"
+          },
+          "max": {
+            "type": "number",
+            "title": "Max"
+          },
+          "p10": {
+            "type": "number",
+            "title": "P10"
+          },
+          "p50": {
+            "type": "number",
+            "title": "P50"
+          },
+          "p90": {
+            "type": "number",
+            "title": "P90"
+          }
+        },
+        "type": "object",
+        "required": [
+          "n",
+          "mean",
+          "min",
+          "max",
+          "p10",
+          "p50",
+          "p90"
+        ],
+        "title": "MoistureStats"
+      },
+      "RotationMark": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "demand": {
+            "type": "number",
+            "title": "Demand"
+          },
+          "demand_class": {
+            "type": "string",
+            "enum": [
+              "high",
+              "moderate",
+              "low",
+              "restorative"
+            ],
+            "title": "Demand Class"
+          },
+          "run": {
+            "type": "integer",
+            "title": "Run"
+          },
+          "mark": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "repeat",
+                  "heavy_repeat"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Mark"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "crop",
+          "demand",
+          "demand_class",
+          "run",
+          "mark"
+        ],
+        "title": "RotationMark"
+      },
+      "SoilMoistureComparison": {
+        "properties": {
+          "current": {
+            "$ref": "#/components/schemas/CurrentSoilMoisture"
+          },
+          "window_days": {
+            "type": "integer",
+            "title": "Window Days"
+          },
+          "years": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Years"
+          },
+          "unavailable_years": {
+            "items": {
+              "type": "integer"
+            },
+            "type": "array",
+            "title": "Unavailable Years"
+          },
+          "past_mean": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Past Mean"
+          },
+          "anomaly": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Anomaly"
+          },
+          "percentile": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Percentile"
+          }
+        },
+        "type": "object",
+        "required": [
+          "current",
+          "window_days",
+          "years",
+          "unavailable_years",
+          "past_mean",
+          "anomaly",
+          "percentile"
+        ],
+        "title": "SoilMoistureComparison"
+      },
+      "SoilMoistureHistory": {
+        "properties": {
+          "coordinates": {
+            "prefixItems": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "number"
+              }
+            ],
+            "type": "array",
+            "maxItems": 2,
+            "minItems": 2,
+            "title": "Coordinates"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "openmeteo",
+              "power"
+            ],
+            "title": "Source"
+          },
+          "frequency": {
+            "type": "string",
+            "enum": [
+              "daily",
+              "hourly"
+            ],
+            "title": "Frequency"
+          },
+          "start": {
+            "type": "string",
+            "format": "date",
+            "title": "Start"
+          },
+          "end": {
+            "type": "string",
+            "format": "date",
+            "title": "End"
+          },
+          "unit": {
+            "type": "string",
+            "enum": [
+              "m3/m3",
+              "fraction_of_saturation"
+            ],
+            "title": "Unit"
+          },
+          "series": {
+            "items": {
+              "$ref": "#/components/schemas/MoistureObservation"
+            },
+            "type": "array",
+            "title": "Series"
+          },
+          "stats": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/MoistureStats"
+            },
+            "type": "object",
+            "title": "Stats"
+          }
+        },
+        "type": "object",
+        "required": [
+          "coordinates",
+          "source",
+          "frequency",
+          "start",
+          "end",
+          "unit",
+          "series",
+          "stats"
+        ],
+        "title": "SoilMoistureHistory"
       }
     },
     "securitySchemes": {

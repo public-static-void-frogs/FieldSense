@@ -1,4 +1,5 @@
 import logging
+from datetime import date, datetime, timezone
 from typing import get_args
 from uuid import UUID
 
@@ -18,7 +19,15 @@ from app.schemas.fields import (
     Recommendation,
     SaveCropAreas,
 )
+from app.schemas.soil_moisture import (
+    CurrentSoilMoisture,
+    MoistureFrequency,
+    MoistureSource,
+    SoilMoistureComparison,
+    SoilMoistureHistory,
+)
 from app.services import fields as service
+from app.services import soil_moisture as moisture_service
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["fields"])
@@ -144,6 +153,58 @@ def soil_depletion(field_id: FieldId, store: Store, request: Request, part: int 
 
     coordinates = analysis_point(store.require_field(field_id), part)
     return request.app.state.soil_assessments.get(coordinates)
+
+
+@router.get("/fields/{field_id}/soil-moisture", response_model=CurrentSoilMoisture)
+def current_soil_moisture(
+    field_id: FieldId, store: Store, request: Request, part: int = Query(0, ge=0)
+):
+    from app.services.crop_history import analysis_point
+
+    coordinates = analysis_point(store.require_field(field_id), part)
+    return moisture_service.current(request.app.state.weather, coordinates)
+
+
+@router.get("/fields/{field_id}/soil-moisture/history", response_model=SoilMoistureHistory)
+def soil_moisture_history(
+    field_id: FieldId,
+    store: Store,
+    request: Request,
+    start: date,
+    end: date,
+    part: int = Query(0, ge=0),
+    source: MoistureSource = "openmeteo",
+    frequency: MoistureFrequency = "daily",
+):
+    from app.services.crop_history import analysis_point
+
+    coordinates = analysis_point(store.require_field(field_id), part)
+    earliest = date(1950 if source == "openmeteo" else 1981, 1, 1)
+    if not earliest <= start <= end <= datetime.now(timezone.utc).date():
+        raise HTTPException(
+            422, "Choose a valid date range within the source's historical coverage"
+        )
+    if source == "power" and frequency == "hourly":
+        raise HTTPException(422, "NASA POWER is available at daily resolution only")
+    limit = 31 if frequency == "hourly" else 366
+    if (end - start).days >= limit:
+        raise HTTPException(422, f"Choose a range of at most {limit} days")
+    return moisture_service.history(
+        request.app.state.weather, coordinates, start, end, source, frequency
+    )
+
+
+@router.get("/fields/{field_id}/soil-moisture/comparison", response_model=SoilMoistureComparison)
+def compare_soil_moisture(
+    field_id: FieldId, store: Store, request: Request, part: int = Query(0, ge=0)
+):
+    from app.services.crop_history import analysis_point
+
+    coordinates = analysis_point(store.require_field(field_id), part)
+    weather = request.app.state.weather
+    return moisture_service.compare_to_history(
+        weather, coordinates, moisture_service.current(weather, coordinates)
+    )
 
 
 @router.get("/fields/{field_id}/m3-insights", response_model=M3Insights)

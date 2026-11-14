@@ -2,6 +2,9 @@ import type { CropHistoryPoint } from './crop-history.types.ts';
 
 export type SoilSignal = 'rotation' | 'greenness' | 'soil' | 'county';
 
+export type CropDemandClass = 'high' | 'moderate' | 'low' | 'restorative';
+export type CropRepeatMark = 'repeat' | 'heavy_repeat';
+
 export type SoilAssessment = {
   score: number | null;
   level: 'low' | 'moderate' | 'high' | 'very_high' | 'unknown';
@@ -9,6 +12,34 @@ export type SoilAssessment = {
   components: Record<SoilSignal, number | null>;
   drivers: SoilSignal[];
   metrics: {
+    demand_latest_crop: number | null;
+    demand_class_latest: CropDemandClass | null;
+    latest_repeat_mark: CropRepeatMark | null;
+    demand_mean_5y: number | null;
+    rotation_repeat: number | null;
+    rotation_load: number | null;
+    rotation_concentration: number | null;
+    rotation_marks: {
+      year: number;
+      crop: string;
+      demand: number;
+      demand_class: CropDemandClass;
+      run: number;
+      mark: CropRepeatMark | null;
+    }[];
+    unrated_crops: string[];
+    latest_ndvi: number | null;
+    latest_evi: number | null;
+    latest_vs_peak_mean: number | null;
+    latest_greenness_date: string | null;
+    peak_scene_count: Record<string, number> | null;
+    mukey: number | null;
+    soil_component: string | null;
+    drainage_class: string | null;
+    hydrologic_group: string | null;
+    kffact: number | null;
+    county_fips: string | null;
+    county_yield_years: number | null;
     years_same_crop: number | null;
     latest_crop: string | null;
     top_crop_5y: string | null;

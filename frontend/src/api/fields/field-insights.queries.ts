@@ -14,7 +14,7 @@ export const fieldInsightsQueries = {
           return false;
         }
         if (state.data?.status === 'pending') {
-          return 3500;
+          return 1500;
         }
         return state.data?.status === 'busy' ? 8000 : false;
       },

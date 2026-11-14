@@ -327,3 +327,26 @@
 .field-insights-panel .ant-tabs-content-holder {
   min-width: 0;
 }
+
+.field-soil-moisture-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.field-soil-moisture-controls > * {
+  max-width: 100%;
+}
+
+.field-soil-moisture-comparison {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 160px), 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.field-soil-moisture-comparison dd {
+  margin: 4px 0 0;
+  font-size: 20px;
+  font-weight: 600;
+}
