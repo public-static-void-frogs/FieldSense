@@ -9,6 +9,8 @@ from app.core.config import Settings
 from app.core.database import database_engine, session_factory
 from app.core.errors import ResourceConflict, ResourceNotFound
 from app.services.crop_conditions import CropWeatherRuleEngine
+from app.services.field_insights import SoilAssessments
+from app.services.m3_lookup import M3Advice
 from app.services.section_analysis import SectionAnalyzer
 from app.services.weather import WeatherService
 
@@ -24,6 +26,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
             yield
         finally:
             app.state.weather.close()
+            app.state.soil_assessments.close()
             engine.dispose()
 
     app = FastAPI(
@@ -38,6 +41,8 @@ def create_app(config: Settings | None = None) -> FastAPI:
     app.state.weather = WeatherService(config)
     app.state.crop_model = CropWeatherRuleEngine()
     app.state.section_analyzer = SectionAnalyzer()
+    app.state.m3_advice = M3Advice(config.m3_out)
+    app.state.soil_assessments = SoilAssessments(config.nass_api_key)
 
     @app.middleware("http")
     async def browser_security(request: Request, call_next):

@@ -1,10 +1,12 @@
+import logging
 from typing import get_args
 from uuid import UUID
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, HTTPException, Query, Request
 
 from app.api.dependencies import FieldId, ParcelId, Store
 from app.schemas.crop_history import CropHistory, CropLayer
+from app.schemas.field_insights import M3Insights, SoilDepletion
 from app.schemas.fields import (
     CreateField,
     Crop,
@@ -18,6 +20,7 @@ from app.schemas.fields import (
 )
 from app.services import fields as service
 
+logger = logging.getLogger(__name__)
 router = APIRouter(tags=["fields"])
 
 
@@ -132,3 +135,26 @@ def crop_history_layer(
     if not FIRST_YEAR <= year <= LAST_YEAR:
         raise HTTPException(422, "Crop layer year is outside the available range")
     return layer(field, part, year)
+
+
+@router.get("/fields/{field_id}/soil-depletion", response_model=SoilDepletion)
+def soil_depletion(field_id: FieldId, store: Store, request: Request, part: int = Query(0, ge=0)):
+    """Calculate or read the soil screening index at the selected parcel's reference point."""
+    from app.services.crop_history import analysis_point
+
+    coordinates = analysis_point(store.require_field(field_id), part)
+    return request.app.state.soil_assessments.get(coordinates)
+
+
+@router.get("/fields/{field_id}/m3-insights", response_model=M3Insights)
+def m3_insights(field_id: FieldId, store: Store, request: Request):
+    """Read precomputed crop timing and climate risks for the saved field coordinates."""
+    lon, lat = store.require_field(field_id)["geometry"]["coordinates"]
+    try:
+        return request.app.state.m3_advice.lookup(lat, lon, include_delay_scan=True)
+    except ImportError as error:
+        logger.exception("M3 dependencies unavailable. Install backend/requirements.txt.")
+        raise HTTPException(503, "Crop timing and risk data is temporarily unavailable") from error
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        logger.exception("Could not read the M3 model output")
+        raise HTTPException(503, "Crop timing and risk data is temporarily unavailable") from error

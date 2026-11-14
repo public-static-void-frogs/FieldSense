@@ -39,6 +39,7 @@ import type { Field } from '../../../types/fields/field.types.ts';
 import { satelliteTiles } from '../../maps/constants/maps.constants.ts';
 import { useCropPatterns } from '../hooks/useCropPatterns.ts';
 import { cropPatternAt, summarizeCropPattern } from '../utils/cropPatterns.ts';
+import { FieldSoilDepletion } from './FieldSoilDepletion';
 import './FieldCropHistory.css';
 
 const pinIcon = divIcon({
@@ -85,6 +86,7 @@ export function FieldCropHistory({ field }: FieldCropHistoryProps) {
           geometryKey={geometryKey}
         />
       </div>
+      <FieldSoilDepletion fieldId={field.id} part={activePart} geometryKey={geometryKey} />
     </Card>
   );
 }

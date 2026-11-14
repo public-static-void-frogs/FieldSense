@@ -1,0 +1,92 @@
+.field-insights-soil {
+  margin-top: 20px;
+}
+
+.field-insights-panel {
+  display: grid;
+  gap: 16px;
+}
+
+.field-insights-panel :is(p, h3, h4, dl) {
+  margin: 0;
+}
+
+.field-insights-heading {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 8px 16px;
+}
+
+.field-insights-heading > strong:not(.field-insights-signal-label) {
+  font-size: 1.75rem;
+  line-height: 1.2;
+}
+
+.field-insights-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+  gap: 12px;
+}
+
+.field-insights-season,
+.field-insights-signals {
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+}
+
+.field-insights-metric {
+  min-width: 0;
+  height: 100%;
+}
+
+.field-insights-metric .ant-card-body {
+  display: grid;
+  gap: 8px;
+}
+
+.field-insights-metric .ant-progress {
+  line-height: 1;
+  margin: 0;
+}
+
+.field-insights-muted {
+  font-size: 0.875rem;
+}
+
+.field-insights-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.field-insights-table :is(th, td) {
+  text-align: start;
+  padding: 8px;
+  border-bottom: 1px solid #e2e7df;
+}
+
+.field-insights-table th[scope='row'] {
+  font-weight: 500;
+}
+
+.field-insights-notes {
+  margin: 0;
+  padding-inline-start: 1.25rem;
+}
+
+.field-insights-peaks {
+  max-height: 260px;
+  overflow: auto;
+}
+
+.field-insights-panel summary {
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.field-insights-panel details[open] > :not(summary) {
+  margin-top: 8px;
+}
+
+.field-insights-panel .ant-tabs-content-holder {
+  min-width: 0;
+}

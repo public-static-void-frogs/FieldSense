@@ -36,6 +36,12 @@ class Settings:
     gemini_model: str = field(
         default_factory=lambda: os.getenv("GEMINI_MODEL", "gemini-2.5-flash-lite")
     )
+    m3_out: Path = field(
+        default_factory=lambda: Path(
+            os.getenv("M3_OUT") or Path(__file__).resolve().parents[3] / "data/m3_out"
+        )
+    )
+    nass_api_key: str = field(default_factory=lambda: os.getenv("NASS_API_KEY", ""), repr=False)
     weather_timeout_seconds: float = 5
     weather_forecast_ttl_seconds: int = 600
     weather_history_ttl_seconds: int = 21600
