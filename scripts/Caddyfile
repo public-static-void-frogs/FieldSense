@@ -1,0 +1,21 @@
+{
+	admin off
+	persist_config off
+}
+
+http://:27432 {
+	bind 127.0.0.1
+
+	@api path /api/v1 /api/v1/*
+	handle @api {
+		reverse_proxy 127.0.0.1:27431 {
+			header_up X-Forwarded-Proto https
+		}
+	}
+
+	handle {
+		root * "{$FIELD_SHIFT_DIST}"
+		try_files {path} /index.html
+		file_server
+	}
+}
