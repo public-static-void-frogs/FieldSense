@@ -18,7 +18,7 @@ export function ProjectSection() {
         </Typography.Title>
         <Typography.Paragraph>
           {t(
-            'FieldSense is a decision-support prototype for exploring crop rotations at field level. It brings field locations, soil and crop information, environmental history, and rotation recommendations into one place, so farmers can compare strategies and review the actions each one proposes.',
+            'FieldSense is a decision-support tool for exploring crop rotations at field level. It brings field locations, soil and crop information, environmental history, and rotation recommendations into one place, so farmers can compare strategies and review the actions each one proposes.',
           )}
         </Typography.Paragraph>
       </header>
@@ -33,18 +33,30 @@ export function ProjectSection() {
         <Card title={t('The problem')} className="project-information">
           <Typography.Paragraph>
             {t(
-              'A crop that worked well last season may be less suitable as rainfall, soil moisture, and nutrient availability change. Farmers need to weigh those conditions together, understand the trade-offs between rotations, and decide when to prepare, plant, irrigate, or reassess.',
+              'Farmers around the world are making rotation decisions under conditions that no longer behave as they used to. Temperatures are shifting, rainfall is less predictable, and water shortages, erosion, nutrient depletion and extreme weather add uncertainty every season. Soil health is declining across many regions.',
+            )}
+          </Typography.Paragraph>
+          <Typography.Paragraph>
+            {t(
+              'Choosing which crops to add to a rotation has become hard because no crop is good everywhere. A crop that builds soil in one place may use too much water in another, bring in disease, conflict with local markets, or fall outside the expected growing season.',
             )}
           </Typography.Paragraph>
         </Card>
         <Card title={t('Our solution')} className="project-information">
           <Typography.Paragraph>
             {t(
-              'The proposed workflow combines NASA Earth observations with local soil data, crop characteristics, and farmer priorities to support field-specific rotation strategies. Each strategy explains its inputs, compares current and projected conditions, and proposes actions that farmers can review before adding the schedule to their calendar.',
+              'We developed a web-based decision-support tool that helps farmers plan crop rotations for a changing climate. It combines NASA Earth observations (such as POWER weather, GPM IMERG rainfall, SMAP soil moisture, HLS v2.0 imagery and NEX-GDDP-CMIP6 climate projections etc.) with other sources like ESA Sentinel-1 radar, the USDA Cropland Data Layer and USDA soil surveys and more.',
             )}
           </Typography.Paragraph>
           <Typography.Paragraph>
-            {t('This demo illustrates the workflow with sample field data and predictions.')}
+            {t(
+              'Our tool enables farmers to explore real-time and historical metrics of each field. Machine-learning and statistical models provide real-time analysis of each field’s health and several rotation strategies for consideration.',
+            )}
+          </Typography.Paragraph>
+          <Typography.Paragraph>
+            {t(
+              'An SI assistant makes our tool customisable for user’s priorities and constraints and interpretable for people with any level of technical or geospatial experience, explaining each strategy’s benefits, evidence, gaps and risks. It supports farmers’ judgment and local expertise, not replaces them.',
+            )}
           </Typography.Paragraph>
         </Card>
       </div>

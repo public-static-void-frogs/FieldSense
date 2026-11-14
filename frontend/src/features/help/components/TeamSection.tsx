@@ -17,7 +17,7 @@ export function TeamSection() {
         </Typography.Title>
         <Typography.Paragraph>
           {t(
-            'We are a six-frog team from Ukraine. We’ve competed in several hackathons, so we know how to scope tightly, split work cleanly and ship a working demo under pressure. Our strength is turning large, messy datasets into tools people can actually use. We care about validation as much as speed: we test our models against real data and are upfront about what they can and can’t do.',
+            'We are a five-frog team from Ukraine with experience in building high-load production systems, powered with large scale data and machine learning pipelines. We’ve competed in several hackathons, so we know how to scope tightly, split work cleanly and ship a working demo under pressure. Our strength is turning large, messy datasets into tools people can actually use. We care about validation as much as speed: we test our models against real data and are upfront about what they can and can’t do.',
           )}
         </Typography.Paragraph>
       </header>
