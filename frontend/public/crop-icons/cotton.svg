@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Cotton">
+  <path fill="none" stroke="#2E6244" stroke-width="3.8" stroke-linecap="round" stroke-linejoin="round" d="M30 57Q30 38 37 25M31 47 17 36M31 49 48 38"/>
+  <g transform="translate(30 51) rotate(-73)">
+  <path fill="#2E6244" d="M0 0C-7 -5.04 -7 -15.33 0 -21C7 -15.12 7 -5.04 0 0Z"/>
+  <path fill="#589044" d="M0 -1C4.55 -7.14 4.34 -14.28 0 -20Z"/>
+  </g>
+  <g transform="translate(32 53) rotate(65)">
+  <path fill="#2E6244" d="M0 0C-7 -5.52 -7 -16.79 0 -23C7 -16.56 7 -5.52 0 0Z"/>
+  <path fill="#589044" d="M0 -1C4.55 -7.82 4.34 -15.64 0 -22Z"/>
+  </g>
+  <path fill="#697E76" d="M18 28C10 21 15 10 24 11 27 3 40 3 43 12 52 11 57 19 53 26c-3 7-11 11-21 13-7-2-12-5-14-11Z"/>
+  <path fill="#F2EDDA" d="M20 26c-4-4-2-12 4-12 3 0 5 2 6 4-1-7 1-10 5-10 5 0 7 5 6 10 2-4 6-5 9-3 4 3 2 9-1 12-4 4-11 6-16 8-6-2-9-4-13-9Z"/>
+  <path fill="#D3D5C5" d="M24 18c3 2 4 5 7 9 2-4 5-6 8-7-2 4-4 8-4 12-5-2-8-6-11-14Z"/>
+  <path fill="#88603D" d="M19 30c4 1 8 2 12 6 2-5 6-7 10-9-.5 4-2 7-4 10 4-2 8-3 13-4-5 7-10 9-17 9-7-2-10-6-14-12Z"/>
+</svg>

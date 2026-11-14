@@ -23,9 +23,9 @@ import type {
   M3Water,
   M3Window,
 } from '../../../types/fields/field-insights.types.ts';
+import { CropIcon } from '../../../components/common/CropIcon';
 import type { Field } from '../../../types/fields/field.types.ts';
 import { insightDate, insightNumber } from '../utils/fieldInsightFormats.ts';
-import { CropIllustration } from './CropIllustration';
 import './FieldInsights.css';
 
 const crops = { corn: 'Corn', soybeans: 'Soybeans' } as const;
@@ -108,7 +108,7 @@ function M3Results({ insights }: M3ResultsProps) {
           key: crop,
           label: (
             <span className="field-insights-crop-tab">
-              <CropIllustration crop={crops[crop]} />
+              <CropIcon crop={crops[crop]} />
               {t(crops[crop])}
             </span>
           ),

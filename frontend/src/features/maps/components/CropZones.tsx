@@ -2,11 +2,12 @@ import type { SVG } from 'leaflet';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Marker, Polygon } from 'react-leaflet';
+import { CropIcon } from '../../../components/common/CropIcon';
 import type { CropZone } from '../../../types/maps/map.types.ts';
 import { useCropIconClick } from '../hooks/useCropIconClick.ts';
 import { useMapSvgRenderer } from '../hooks/useMapSvgRenderer.ts';
 import { useSectionMarker } from '../hooks/useSectionMarker.ts';
-import { detectedCropIcons, detectedCropColors } from '../constants/maps.constants.ts';
+import { detectedCropColors } from '../constants/maps.constants.ts';
 import type { MapSection } from '../utils/sectionSelection.ts';
 
 type CropZonesProps = {
@@ -78,7 +79,7 @@ function CropZoneMarker({ renderer, zone, number, selected, onToggle }: CropZone
           aria-pressed={selected}
           {...clickHandlers}
         >
-          <span aria-hidden="true">{detectedCropIcons[zone.crop] ?? '🌱'}</span>
+          <CropIcon crop={zone.crop} />
         </button>,
         element,
       )}

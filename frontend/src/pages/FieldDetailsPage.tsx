@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData, useNavigate } from 'react-router-dom';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
+import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { CropRotationPlan } from '../features/fields/components/CropRotationPlan';
@@ -37,12 +38,15 @@ export function FieldDetailsPage() {
         title={field.crop || field.name}
         eyebrow=""
         titlePrefix={
-          <RouterButton
-            type="text"
-            icon={<ArrowLeft size={20} />}
-            aria-label={t('Back to my fields')}
-            to="/fields"
-          />
+          <>
+            <RouterButton
+              type="text"
+              icon={<ArrowLeft size={20} />}
+              aria-label={t('Back to my fields')}
+              to="/fields"
+            />
+            {field.crop && <CropIcon crop={field.crop} size={36} />}
+          </>
         }
         actions={
           <Space wrap>

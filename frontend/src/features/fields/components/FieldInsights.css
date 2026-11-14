@@ -130,13 +130,6 @@
   gap: 8px;
 }
 
-.field-insights-crop-tab > .crop-field-illustration {
-  width: 28px;
-  height: 28px;
-  border-radius: 6px;
-  object-fit: cover;
-}
-
 .field-insights-season-stage {
   display: grid;
   gap: 4px;

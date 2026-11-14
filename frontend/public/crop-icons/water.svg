@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64" role="img" aria-label="Open Water">
+  <path fill="none" stroke="#3A6984" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" d="M8 36q5-4 12 0t12 0t12 0t12 0"/>
+  <path fill="none" stroke="#73ACC1" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" d="M8 45q5-4 12 0t12 0t12 0t12 0"/>
+  <path fill="none" stroke="#3A6984" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" d="M8 54q5-4 12 0t12 0t12 0t12 0"/>
+  <path fill="#3A6984" d="M32 8c4 6 9 10 9 15 0 4-4 7-9 7s-9-3-9-7c0-5 5-9 9-15Z"/>
+  <path fill="#73ACC1" d="M32 14c1 4 4 6 4 9 0 2-2 3-4 3-3 0-4-1-4-3 0-3 3-6 4-9Z"/>
+</svg>
