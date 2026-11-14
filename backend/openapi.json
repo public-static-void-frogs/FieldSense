@@ -1807,6 +1807,7 @@
           "planning"
         ],
         "summary": "Respond",
+        "description": "Accept or decline every calendar event of the field; ``proposed`` clears the decisions.",
         "operationId": "respond_api_v1_fields__field_id__strategy_response_put",
         "security": [
           {

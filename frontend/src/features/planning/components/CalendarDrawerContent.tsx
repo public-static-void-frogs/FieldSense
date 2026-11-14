@@ -67,7 +67,7 @@ function CalendarActionDetails({ event, field, planningToday }: CalendarActionDe
         <EventResponseControls fieldId={event.fieldId} />
       </div>
       <Flex gap={8} wrap className="section-gap">
-        <Tag>{event.category}</Tag>
+        <Tag>{t(event.category)}</Tag>
         <Tag color={priorityColors[event.priority]}>{event.priority}</Tag>
         <Tag>{t(getEventStatus(event.date, planningToday))}</Tag>
       </Flex>

@@ -70,7 +70,10 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 | `saved_crop_areas.py` | Saves one merged boundary per account and crop from analysed map zones. | Writes to the database (fields and the user's selections); computes area from the submitted polygons. | No |
 | `fields.py` | Returns a field's stored properties (soil, crop details). History and recommendation are empty or "not available" until real data exists. | The account's stored field record. | No |
 | `overview.py` | Totals the area per crop for the dashboard chart. Observation trends stay empty until measured. | The account's selected fields. | No |
-| `planning.py` | Today's date in the account's time zone. Events and rotation plans are empty or "not available" until supplied. | The account's saved time zone; field ownership check. | No |
+| `planning.py` | Today's date in the account's time zone, and the planning endpoints: calendar events (`/planning/events`, `/fields/{id}/events`), the rotation plan (`/fields/{id}/rotation`), the strategy (`/fields/{id}/strategy`) and the saved accept/decline responses (`/planning/responses`, `PUT /fields/{id}/strategy/response`). | The account's saved time zone and fields; table `event_responses` for the responses. | No |
+| `rotation_strategy.py` | Turns the ranked rotation advice into the plan and strategy pages: next crop, the crop after it (a second engine run with the next crop added to the history), sowing and window dates, steps with checkpoints, what to do if conditions change, and a rescaled "rotation fit" comparison (100 best candidate, 0 worst; not a yield prediction). Also caches the default advice (6 hours) for the calendar and the strategy. | `rotation_advice.py` (rule engine) and the same sources it reads. | No |
+| `calendar_events.py` | Builds calendar events per field and caches the rotation part for 6 hours. Rotation dates: harvest of the current crop, autumn cover-crop sowing, soil check, field preparation, sowing, flowering scouting and harvest of the best-ranked crop. Warnings: heat stress, cold, heavy rain, strong wind and dry soil from the crop rules, heatwaves (3+ days at 32 °C or more), thunderstorms, extreme rain (50 mm) and wind (60 km/h), hard frost in April-October, and county drought. A failing source drops only its own events. | `rotation_advice.py` (stage calendars, off-season options, season timing), the 14-day forecast from `weather.py` with `crop_conditions.py` alerts, and `drought.py`. | No |
+| `drought.py` | Current drought level of the field's county: the worst category covering at least 30% of the county, and whether it is worsening over the last 5 weeks. U.S. counties only. Cached for 6 hours. | **U.S. Drought Monitor** county statistics (`usdmdataservices.unl.edu`) and the **FCC** census API for the county. | No |
 | `resources.py` | Farm profile, notifications and the team list for the help page. | The account's profile and settings; notifications are empty; the team list is hard-coded. | No |
 
 ### LLM assistant
@@ -89,7 +92,8 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 | NASA POWER | `soil_moisture.py` |
 | USDA Cropland Data Layer | `crop_history.py` (also feeds `soil_depletion.py` and `rotation_advice.py`) |
 | USDA Soil Data Access (SSURGO) | `soil_depletion.py`, `rotation_advice.py` |
-| USDA NASS QuickStats, FCC census API | `soil_depletion.py` |
+| USDA NASS QuickStats, FCC census API | `soil_depletion.py` (FCC also `drought.py`) |
+| U.S. Drought Monitor | `drought.py` |
 | Sentinel-2 via Earth Search STAC | `soil_depletion.py`, `section_analysis.py`, `ml/greenness.py` |
 | Google Gemini | `llm.py` (weather outlook and chat) |
 | Local model output (`data/m2_out`) | `m2_lookup.py` |

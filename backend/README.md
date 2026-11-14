@@ -107,6 +107,17 @@ backend requirements.
   0–81 cm profile with each of the previous ten years’ 0–100 cm profiles for the
   same calendar window. Anomaly and percentile require at least three prior
   years. Profile means require data at every layer in the advertised profile.
+- `GET /api/v1/fields/{id}/rotation` and `/strategy` build the rotation plan and strategy from the
+  ranked rotation advice (next crop, following crop, dates, steps, contingencies); `404` when the
+  advice cannot be computed. `PUT /api/v1/fields/{id}/strategy/response` saves one decision
+  (`accepted`, `declined` or `proposed` to clear) for every calendar event of the field, and
+  `GET /api/v1/planning/responses` lists them. A response stores a fingerprint of the reviewed event,
+  so it stops applying when the event's date or text changes. Migration `0007_event_responses`.
+- `GET /api/v1/planning/events` and `GET /api/v1/fields/{id}/events` return calendar events built
+  from the rotation advice (sowing, soil check, field preparation, harvest, cover crop) and from
+  warnings: crop alerts, heatwaves, thunderstorms, extreme rain, wind and frost from the 14-day
+  forecast, and county drought from the U.S. Drought Monitor (U.S. fields only). Rotation dates
+  are medians of past seasons, not forecasts. A source that fails drops only its own events.
 - `GET /api/v1/fields/{id}/m2-insights` looks up the saved point in the M2 neighbour-evidence
   tables written by `ml/field-prediction-model/neighbour-evidence-engine/m2_neighbour_evidence.py`.
   Set `M2_OUT` (default `data/m2_out`) and restart the backend after replacing the tables. The

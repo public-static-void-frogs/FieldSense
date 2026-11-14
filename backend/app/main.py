@@ -9,11 +9,14 @@ from app.core.config import Settings
 from app.core.database import database_engine, session_factory
 from app.core.errors import ResourceConflict, ResourceNotFound
 from app.services.assistant_tools import default_registry
+from app.services.calendar_events import CalendarEvents
 from app.services.crop_conditions import CropWeatherRuleEngine
+from app.services.drought import DroughtMonitor
 from app.services.field_insights import SoilAssessments
 from app.services.m2_lookup import M2Evidence
 from app.services.m3_lookup import M3Advice
 from app.services.rotation_advice import InvalidAdviceRequest, RotationAdvice
+from app.services.rotation_strategy import AdviceCache, RotationStrategy
 from app.services.season_timing import SeasonTiming
 from app.services.section_analysis import SectionAnalyzer
 from app.services.weather import WeatherService
@@ -30,6 +33,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
             yield
         finally:
             app.state.weather.close()
+            app.state.drought.close()
             app.state.soil_assessments.close()
             engine.dispose()
 
@@ -55,6 +59,12 @@ def create_app(config: Settings | None = None) -> FastAPI:
         SeasonTiming(config.m3_out, app.state.m3_advice),
     )
     app.state.soil_assessments = SoilAssessments(config.nass_api_key)
+    app.state.drought = DroughtMonitor()
+    app.state.advice = AdviceCache(app.state.rotation)
+    app.state.calendar = CalendarEvents(
+        app.state.weather, app.state.crop_model, app.state.advice, app.state.drought
+    )
+    app.state.strategy = RotationStrategy(app.state.advice, app.state.weather)
 
     @app.middleware("http")
     async def browser_security(request: Request, call_next):

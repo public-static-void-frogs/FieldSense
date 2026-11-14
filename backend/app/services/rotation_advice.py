@@ -14,6 +14,7 @@ CDL labels are satellite estimates, not farmer declarations.
 """
 
 import json
+import re
 import sys
 import threading
 from collections import OrderedDict
@@ -172,9 +173,29 @@ class RotationAdvice:
 
     # -- public ------------------------------------------------------------------------
 
-    def advise(self, field: dict, crop: str | None, priorities: list[str], units: str) -> dict:
+    def _after(self, record: dict, previous: str) -> dict:
+        """The record with one more crop year appended: the season after ``previous`` is grown."""
+        crop = self.advisor.catalog.crops.get(previous)
+        properties = dict(record.get("sourceProperties") or {})
+        years = [int(m.group(1)) for key in properties if (m := re.match(r"CDL(\d{4})$", key))]
+        if crop is None or not crop.cdl_codes or not years:
+            raise InvalidAdviceRequest("The crop history cannot be extended by another season")
+        properties[f"CDL{max(years) + 1}"] = crop.cdl_codes[0]
+        return {**record, "sourceProperties": properties}
+
+    def advise(
+        self,
+        field: dict,
+        crop: str | None,
+        priorities: list[str],
+        units: str,
+        after: str | None = None,
+    ) -> dict:
+        """Ranked crops for the coming season; with ``after``, for the season after that crop."""
         advisor = self.advisor
         record = self.engine_field(field)
+        if after:
+            record = self._after(record, after)
         region, _ = advisor.region_for(record)
         candidates = advisor.candidate_ids(region)
         if crop is None:

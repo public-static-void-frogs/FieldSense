@@ -49,7 +49,7 @@ export function CalendarPage() {
         </Button>
       ),
     },
-    { title: t('Type'), dataIndex: 'category', render: (value: string) => <Tag>{value}</Tag> },
+    { title: t('Type'), dataIndex: 'category', render: (value: string) => <Tag>{t(value)}</Tag> },
     {
       title: t('Status'),
       key: 'response',

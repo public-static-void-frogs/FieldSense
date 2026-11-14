@@ -19,7 +19,7 @@ export function CropRotationPlan({ field, plan }: CropRotationPlanProps) {
           <Space size={8}>
             <Sprout size={19} />
             <Typography.Text strong>{t('Rotation recommendation')}</Typography.Text>
-            <Tag>{t('Model draft')}</Tag>
+            <Tag>{t('Rule engine')}</Tag>
           </Space>
           <Typography.Title level={4}>{`${field.crop} → ${plan.nextCrop}`}</Typography.Title>
           <Typography.Paragraph type="secondary" className="no-margin">

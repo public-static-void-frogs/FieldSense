@@ -39,7 +39,7 @@ export function PlanEventCard({ event, highlighted = false, onSelect }: PlanEven
       }
     >
       <Flex gap={8} wrap align="center" justify="space-between" className="plan-event-meta">
-        <Typography.Text className="plan-event-category">{event.category}</Typography.Text>
+        <Typography.Text className="plan-event-category">{t(event.category)}</Typography.Text>
         <Tag color={getEventUrgencyColor(event, planningToday)}>
           {event.priority === 'High priority'
             ? event.priority

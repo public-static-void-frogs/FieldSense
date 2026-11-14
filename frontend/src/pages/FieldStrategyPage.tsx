@@ -41,7 +41,7 @@ export function FieldStrategyPage() {
   const { t } = useTranslation();
   const forecastMetrics = [
     {
-      title: t('Crop health improvement'),
+      title: t('Rotation fit'),
       currentKey: 'currentHealth',
       projectedKey: 'health',
       gainKey: 'healthImprovement',
@@ -49,7 +49,7 @@ export function FieldStrategyPage() {
       unit: '/100',
       deltaUnit: t('points'),
       description: t(
-        'Projected crop health after the recommended checks and rotation. The dashed line keeps today’s reading as a reference.',
+        'Rule-engine fit of the recommended crop against the current crop, rescaled across all candidate crops: 100 is the best-scoring crop, 0 the worst. It compares crops for this field; it does not predict yield.',
       ),
     },
   ] as const;
@@ -73,10 +73,11 @@ export function FieldStrategyPage() {
       <PageHeading
         eyebrow={t('{{value0}} · FIELD STRATEGY', { value0: field.name.toUpperCase() })}
         title={t('{{value0}} rotation strategy', { value0: plan.nextCrop })}
-        description={t('{{value0}} → {{value1}} → {{value2}} · 2026–2028 outlook', {
+        description={t('{{value0}} → {{value1}} → {{value2}} · {{value3}} outlook', {
           value0: field.crop,
           value1: plan.nextCrop,
           value2: plan.followingCrop,
+          value3: `${plan.sowingDate.slice(0, 4)}–${plan.followingDate.slice(0, 4)}`,
         })}
         actions={
           <Space wrap>
@@ -99,7 +100,7 @@ export function FieldStrategyPage() {
               {t('Model recommendation')}
             </Space>
           }
-          extra={<Tag className="ai-insight-tag">{t('DEMO MODEL OUTPUT')}</Tag>}
+          extra={<Tag className="ai-insight-tag">{t('RULE ENGINE')}</Tag>}
         >
           <Typography.Paragraph>{plan.reasons[0]}</Typography.Paragraph>
           <Descriptions
@@ -113,14 +114,14 @@ export function FieldStrategyPage() {
               { key: 'window', label: t('Window ends'), children: formatPlanDate(plan.windowEnd) },
               {
                 key: 'confidence',
-                label: t('Model score'),
-                children: t('{{value0}}% · illustrative', { value0: plan.confidence }),
+                label: t('Lead over next-best crop'),
+                children: t('{{value0}}%', { value0: plan.confidence }),
               },
             ]}
           />
           <Typography.Paragraph type="secondary" className="strategy-demo-note">
             {t(
-              'Draft strategy from the app’s sample model data. Forecasts and model scores illustrate the product; they are not live model predictions or calibrated confidence estimates.',
+              'Dates are medians of past seasons and the plan comes from the rule engine’s risk scores. It supports your decision; it is not a forecast of yield or weather.',
             )}
           </Typography.Paragraph>
         </Card>
@@ -177,7 +178,7 @@ export function FieldStrategyPage() {
         </div>
 
         <section
-          aria-label={t('Illustrative strategy forecasts')}
+          aria-label={t('Strategy fit comparison')}
           className="strategy-forecast-grid"
         >
           {forecastMetrics.map((metric, index) => {
@@ -188,7 +189,7 @@ export function FieldStrategyPage() {
               <Card
                 key={metric.projectedKey}
                 title={metric.title}
-                extra={<Tag>{t('Sample prediction')}</Tag>}
+                extra={<Tag>{t('Score-based')}</Tag>}
               >
                 <div className="strategy-forecast-summary">
                   <div>
