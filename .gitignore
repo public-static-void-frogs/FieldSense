@@ -24,3 +24,5 @@ ml/field-cv-model/weights/*.pt
 
 # macOS metadata
 .DS_Store
+.idea/
+tmp/

@@ -70,7 +70,7 @@ class WeatherInsightTests(unittest.TestCase):
 
         params = {"day": records[1]["date"], "field_id": field["id"], "locale": "uk-UA"}
         with patch(
-            "app.services.weather_insight.httpx.AsyncClient",
+            "app.services.llm.httpx.AsyncClient",
             return_value=httpx.AsyncClient(
                 transport=httpx.MockTransport(gemini),
             ),

@@ -1,8 +1,7 @@
 import json
 
-import httpx
-
 from app.core.config import Settings
+from app.services.llm import stream_gemini
 
 INSTRUCTIONS = (
     "Write a compact weather outlook for a general reader in the language of the supplied locale. "
@@ -71,39 +70,9 @@ def forecast_insight_input(series, day, locale):
     }
 
 
-async def stream_weather_insight(config: Settings, forecast):
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/{config.gemini_model}:streamGenerateContent"
-    generation = {"maxOutputTokens": 300}
-    if config.gemini_model.startswith("gemini-2.5-"):
-        generation["thinkingConfig"] = {"thinkingBudget": 0}
-    payload = {
-        "systemInstruction": {"parts": [{"text": INSTRUCTIONS}]},
-        "contents": [{"role": "user", "parts": [{"text": json.dumps(forecast)}]}],
-        "generationConfig": generation,
-    }
-    has_text = False
-    try:
-        async with httpx.AsyncClient(timeout=12) as client:
-            async with client.stream(
-                "POST",
-                url,
-                params={"alt": "sse"},
-                headers={"x-goog-api-key": config.gemini_api_key.strip()},
-                json=payload,
-            ) as response:
-                response.raise_for_status()
-                async for line in response.aiter_lines():
-                    if not line.startswith("data:"):
-                        continue
-                    event = json.loads(line[5:])
-                    for candidate in event.get("candidates", []):
-                        for part in candidate.get("content", {}).get("parts", []):
-                            delta = part.get("text")
-                            if isinstance(delta, str) and delta and not part.get("thought"):
-                                has_text = has_text or bool(delta.strip())
-                                yield json.dumps({"delta": delta}) + "\n"
-                        if has_text and candidate.get("finishReason") == "STOP":
-                            yield '{"done":true}\n'
-                            return
-    except (httpx.HTTPError, ValueError):
-        return
+def stream_weather_insight(config: Settings, forecast):
+    return stream_gemini(
+        config,
+        INSTRUCTIONS,
+        [{"role": "user", "parts": [{"text": json.dumps(forecast)}]}],
+    )
