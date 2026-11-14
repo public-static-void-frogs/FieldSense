@@ -34,6 +34,8 @@ class FieldInsightTests(unittest.TestCase):
         result = response.json()
         self.assertEqual(result["query"], {"lat": 41.98, "lng": -93.62})
         self.assertEqual(result["match"]["level"], "field")
+        match = result["match"]
+        self.assertGreater(match["reference_awc_mm"], 0)
         self.assertIsNotNone(result["windows"]["now"]["corn:sow"]["date_q50"])
         self.assertIn("ssp245", result["risk"]["future"])
         self.assertIsNone(result["fallow_zero"])

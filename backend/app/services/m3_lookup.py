@@ -86,6 +86,11 @@ class M3Advice:
             win = self._read("chronoshift/windows_cell.parquet", True)
             rk = self._read("chronoshift/risk_cell.parquet", True)
             self.fi = fi.dropna(subset=["lat", "lon", "cell_id"]).reset_index(drop=True)
+            self.cell_aws_median = {}
+            if "aws_mm" in self.fi:
+                valid_aws = self.fi.loc[np.isfinite(self.fi["aws_mm"]) & (self.fi["aws_mm"] > 0)]
+                stats = valid_aws.groupby("cell_id")["aws_mm"].agg(["median", "count"])
+                self.cell_aws_median = stats.loc[stats["count"] >= 5, "median"].to_dict()
             self.fi_lat, self.fi_lon = (
                 self.fi["lat"].to_numpy(float),
                 self.fi["lon"].to_numpy(float),
@@ -146,6 +151,7 @@ class M3Advice:
                 field_lat=_py(r["lat"]),
                 field_lon=_py(r["lon"]),
                 awc_mm=_py(r.get("aws_filled", r.get("aws_mm"))),
+                reference_awc_mm=_py(self.cell_aws_median.get(r["cell_id"])),
                 awc_bin_mm=_py(r.get("awc_bin_mm")),
             ), None
         dc = _hav_km(lat, lng, self.cell_lat, self.cell_lon)

@@ -49,6 +49,7 @@ class M3Match(BaseModel):
     cell_id: str
     distance_km: float
     awc_mm: float | None
+    reference_awc_mm: float | None = None
 
     # Preserve indexed-field context supplied by the lookup.
     model_config = {"extra": "allow"}

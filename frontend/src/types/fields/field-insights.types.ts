@@ -90,6 +90,7 @@ export type M3Insights = {
     level: 'field' | 'cell';
     distance_km: number;
     awc_mm: number | null;
+    reference_awc_mm?: number | null;
   } | null;
   windows: {
     now: Record<string, M3Window>;

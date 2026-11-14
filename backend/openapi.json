@@ -6496,6 +6496,17 @@
               }
             ],
             "title": "Awc Mm"
+          },
+          "reference_awc_mm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Reference Awc Mm"
           }
         },
         "additionalProperties": true,
