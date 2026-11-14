@@ -1,0 +1,185 @@
+.public-page {
+  min-height: 100dvh;
+  background: #f7f9f3;
+}
+.public-header,
+.public-footer {
+  max-width: 1120px;
+  margin: 0 auto;
+  padding: 24px 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+.public-header {
+  border-bottom: 1px solid #dfe5d5;
+}
+.public-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: #3e5534;
+  font-size: 22px;
+  font-weight: 650;
+  text-decoration: none;
+}
+.public-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+.public-header-actions .ant-select {
+  min-width: 130px;
+}
+.public-content {
+  max-width: 960px;
+  padding: 52px 32px 64px;
+  margin: 0 auto;
+}
+.public-intro {
+  max-width: 780px;
+  margin-bottom: 36px;
+}
+.public-eyebrow {
+  color: #627653;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 1.8px;
+}
+.public-intro h1 {
+  margin: 12px 0 20px;
+  color: #303b2c;
+  font-size: clamp(32px, 4vw, 52px);
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: -1.2px;
+}
+.public-intro > p:last-child {
+  color: #5d6d54;
+  font-size: 18px;
+}
+.public-page a,
+.legal-links a {
+  color: #3e6133;
+  text-underline-offset: 4px;
+}
+.public-page a:hover,
+.legal-links a:hover {
+  color: #263f1d;
+  text-decoration: underline;
+}
+.public-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  margin-bottom: 32px;
+}
+.public-feature {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #dfe5d5;
+  border-radius: 12px;
+}
+.public-feature h2 {
+  font-size: 20px;
+  line-height: 1.4;
+  margin-top: 0;
+}
+.public-feature p {
+  margin-bottom: 0;
+  color: #5d6d54;
+}
+.public-callout {
+  background: #eaf0df;
+  border: 1px solid #d7e2c8;
+  border-radius: 12px;
+  padding: 24px;
+  margin: 32px 0;
+}
+.public-callout h2 {
+  margin-top: 0;
+  font-size: 23px;
+}
+.policy-section {
+  margin-top: 32px;
+  scroll-margin-top: 24px;
+}
+.policy-section h2 {
+  margin-bottom: 12px;
+  font-size: 23px;
+  font-weight: 550;
+  line-height: 1.4;
+}
+.policy-updated {
+  color: #627653;
+}
+.policy-contents {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 20px;
+  padding: 18px 0;
+  border-top: 1px solid #dfe5d5;
+  border-bottom: 1px solid #dfe5d5;
+}
+.scope-value {
+  overflow-wrap: anywhere;
+}
+.public-primary-link {
+  display: inline-block;
+  background: #476b3c;
+  color: #fff !important;
+  padding: 10px 20px;
+  border-radius: 8px;
+  margin-top: 12px;
+}
+.public-footer {
+  border-top: 1px solid #dfe5d5;
+  color: #627653;
+}
+.legal-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  font-size: 14px;
+}
+.product-notice {
+  padding: 18px 22px;
+  border: 1px solid #dfe5d5;
+  background: #fdfefb;
+  border-radius: 12px;
+  margin-bottom: 24px;
+}
+.product-notice p {
+  margin: 0 0 10px;
+  color: #5d6d54;
+}
+.login-clearing .legal-links {
+  margin-top: 24px;
+  justify-content: center;
+  gap: 10px 16px;
+  text-align: center;
+}
+.login-demo-note {
+  color: #627653;
+  font-size: 13px;
+  text-align: center;
+}
+@media (max-width: 700px) {
+  .public-feature-grid {
+    grid-template-columns: 1fr;
+  }
+  .public-header,
+  .public-footer {
+    padding: 20px;
+    gap: 16px;
+  }
+  .public-content {
+    padding: 32px 20px 48px;
+  }
+  .public-header-actions {
+    flex-wrap: wrap;
+    gap: 14px;
+  }
+}

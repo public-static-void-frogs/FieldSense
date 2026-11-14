@@ -1,0 +1,285 @@
+.field-map {
+  position: relative;
+  flex: 1;
+  min-height: 570px;
+  overflow: hidden;
+  background: #dce4d4;
+  isolation: isolate;
+  container-type: inline-size;
+}
+
+.field-map.expanded {
+  min-height: 650px;
+}
+
+.field-map .map-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+  z-index: 0;
+}
+
+.map-canvas:active {
+  cursor: grabbing;
+}
+
+.map-location {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 10px 13px;
+  border-radius: 6px;
+  color: #545f47;
+  background: #fffef9f5;
+  box-shadow: 0 2px 5px #29331c12;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.map-location > span {
+  color: #8c997b;
+}
+
+.map-layer {
+  position: absolute;
+  top: 72px;
+  left: 18px;
+}
+
+.map-layer .ant-select {
+  width: 192px;
+  background: #fffef9;
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.map-controls {
+  position: absolute;
+  right: 18px;
+  bottom: 75px;
+  display: flex;
+  flex-direction: column;
+  padding: 4px;
+  border-radius: 8px;
+  background: #fffef9;
+  box-shadow: 0 2px 5px #29331c20;
+}
+
+.map-controls .ant-btn {
+  width: 40px;
+  height: 40px;
+  color: #647057;
+}
+
+.map-controls .ant-btn + .ant-btn {
+  border-top: 1px solid #e9eade;
+  border-radius: 0;
+}
+
+.map-legend {
+  position: absolute;
+  bottom: 18px;
+  left: 18px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  padding: 10px 13px;
+  border-radius: 6px;
+  color: #5f6d50;
+  background: #fffef9f5;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+.map-legend > span {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.map-legend i {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+}
+
+.green {
+  background: #82a66a;
+}
+.yellow {
+  background: #c8b969;
+}
+.orange {
+  background: #d59a62;
+}
+
+.add-map-prompt {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  max-width: 260px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  color: #4c6540;
+  background: #fffff6;
+  box-shadow: 0 4px 15px #3334;
+  font-size: 14px;
+  pointer-events: none;
+}
+
+@media (max-width: 700px) {
+  .field-map,
+  .field-map.expanded {
+    min-height: 530px;
+  }
+
+  .map-location,
+  .map-layer,
+  .map-legend {
+    left: 12px;
+  }
+
+  .map-legend {
+    max-width: calc(100% - 24px);
+    gap: 8px 12px;
+  }
+
+  .map-controls {
+    bottom: 150px;
+    right: 12px;
+  }
+
+  .add-map-prompt {
+    top: 130px;
+    left: 12px;
+    right: auto;
+    max-width: calc(100% - 24px);
+  }
+}
+
+.fullscreen-map {
+  position: relative;
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.fullscreen-map .field-map.expanded {
+  min-height: 0;
+  height: 100%;
+}
+
+.fullscreen-map .map-canvas {
+  left: 0;
+  width: 100%;
+}
+
+.map-cancel-adding.ant-btn {
+  position: absolute;
+  top: 80px;
+  right: 18px;
+}
+
+@media (max-width: 700px) {
+  .map-cancel-adding.ant-btn {
+    top: 200px;
+    left: 12px;
+    right: auto;
+  }
+}
+
+/* Keep existing controls above Leaflet's map panes without covering app dialogs. */
+.map-location,
+.map-layer,
+.map-controls,
+.map-legend,
+.add-map-prompt {
+  z-index: 1;
+}
+
+.field-map .leaflet-container {
+  font-family: inherit;
+}
+
+.field-map .leaflet-tooltip.field-map-label {
+  padding: 8px 12px;
+  border: 1px solid #e1e7d7;
+  border-radius: 6px;
+  color: #343c2f;
+  background: #fffef9f5;
+  box-shadow: 0 2px 8px #29331c20;
+  text-align: left;
+}
+
+.field-map-label strong,
+.field-map-label span {
+  display: block;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.field-map-label span {
+  color: #707d65;
+}
+
+.field-map .leaflet-control-scale {
+  margin-right: 18px;
+  margin-bottom: 6px;
+}
+
+.field-map .leaflet-control-scale-line {
+  border-color: #fffef2;
+  color: #fffef2;
+  background: #303b2c88;
+  text-shadow: none;
+}
+
+.field-map .leaflet-control-attribution {
+  max-width: 100%;
+  font-size: 10px;
+  line-height: 1.4;
+  background: #fffef9e8;
+}
+
+.map-cancel-adding.ant-btn {
+  z-index: 2;
+}
+
+@container (max-width: 700px) {
+  .leaflet-tooltip.field-map-label {
+    max-width: 124px;
+    padding: 6px 8px;
+  }
+
+  .field-map-label strong {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .field-map-label span {
+    display: none;
+  }
+}
+
+.map-location-note {
+  position: absolute;
+  z-index: 1;
+  bottom: 20px;
+  left: 18px;
+  padding: 8px 12px;
+  max-width: calc(100% - 90px);
+  border-radius: 6px;
+  color: #545f47;
+  background: #fffef9f5;
+  font-size: 11px;
+}

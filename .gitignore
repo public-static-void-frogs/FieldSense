@@ -1,0 +1,26 @@
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+
+ml/field-cv-model/weights/*.pt
+
+# Local database configuration and signing secrets
+.env
+.env.*
+!.env.example
+*.db
+
+# Backend Postman workspace
+/backend/postman/
+
+# Downloaded inference weights (setup step, never runtime-generated source)
+/backend/.cache/
+
+# Local uncommitted notes
+/local-notes/
+/CLAUDE.md
+
+# macOS metadata
+.DS_Store

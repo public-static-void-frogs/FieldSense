@@ -1,0 +1,137 @@
+{
+  "sampleSourceId": "441825005255235",
+  "coordinates": [
+    -71.422211,
+    41.755008
+  ],
+  "sourcePropertiesPreserved": true,
+  "areaConversionVerified": true,
+  "stableIdentityVerified": true,
+  "countyCodesPreserved": true,
+  "fieldColumns": [
+    "id",
+    "parcel_id",
+    "name",
+    "crop",
+    "area",
+    "attributes",
+    "created_at",
+    "source_id",
+    "state_fips",
+    "county_fips",
+    "county",
+    "longitude",
+    "latitude",
+    "location_kind"
+  ],
+  "constraints": [
+    {
+      "name": "fields_area_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_attributes_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_created_at_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_id_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_latitude_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_location_kind_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_longitude_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_name_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "fields_parcel_id_key",
+      "type": "u",
+      "validated": true
+    },
+    {
+      "name": "fields_pkey",
+      "type": "p",
+      "validated": true
+    },
+    {
+      "name": "positive_field_area",
+      "type": "c",
+      "validated": true
+    },
+    {
+      "name": "uq_fields_source_id",
+      "type": "u",
+      "validated": true
+    },
+    {
+      "name": "user_fields_field_id_fkey",
+      "type": "f",
+      "validated": true
+    },
+    {
+      "name": "user_fields_field_id_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "user_fields_pkey",
+      "type": "p",
+      "validated": true
+    },
+    {
+      "name": "user_fields_selected_at_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "user_fields_user_id_fkey",
+      "type": "f",
+      "validated": true
+    },
+    {
+      "name": "user_fields_user_id_not_null",
+      "type": "n",
+      "validated": true
+    },
+    {
+      "name": "valid_field_latitude",
+      "type": "c",
+      "validated": true
+    },
+    {
+      "name": "valid_field_longitude",
+      "type": "c",
+      "validated": true
+    }
+  ],
+  "browserVerification": {
+    "pointPreviewSourceId": "441825005255235",
+    "selectionAddedAndRemoved": true,
+    "fieldDetailPointMapVerified": true,
+    "clusterBadgesVerified": true,
+    "pointLayerUpdateMs": 2.4,
+    "frontendImportStateIncluded": false
+  }
+}

@@ -1,0 +1,26 @@
+export interface FieldProperties {
+  soilType: string | null;
+  soilPh: number | null;
+  phosphorus: number | null;
+  potassium: number | null;
+  organicMatter: number | null;
+  soilTemperature: number | null;
+  conductivity: number | null;
+  cationExchange: number | null;
+  bulkDensity: number | null;
+  rootingDepth: number | null;
+  variety: string | null;
+  emergence: number | null;
+  plantDensity: number | null;
+  vegetationIndex: number | null;
+  yieldTarget: number | null;
+  harvestWindow: string | null;
+  elevation: number | null;
+  slope: number | null;
+  drainage: string | null;
+  irrigation: string | null;
+  lastIrrigation: string | null;
+  waterApplied: number | null;
+  rainfall: number | null;
+  waterCapacity: number | null;
+}

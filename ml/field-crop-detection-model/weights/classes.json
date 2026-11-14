@@ -1,0 +1,6 @@
+{
+  "0": { "cdl_code": 1, "name": "Corn" },
+  "1": { "cdl_code": 5, "name": "Soybeans" },
+  "2": { "cdl_code": 36, "name": "Alfalfa" },
+  "3": { "cdl_code": 176, "name": "Grassland/Pasture" }
+}

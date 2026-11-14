@@ -1,0 +1,197 @@
+.app-shell.ant-layout {
+  min-height: 100vh;
+}
+
+.sidebar.ant-layout-sider {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid #e0e5d7;
+  background: #fdfefb;
+}
+
+.sidebar .ant-layout-sider-children {
+  display: flex;
+  flex-direction: column;
+  padding: 28px 16px 0;
+  overflow-y: auto;
+  scrollbar-width: thin;
+}
+
+.sidebar-brand-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-bottom: 30px;
+}
+
+.sidebar-collapse.ant-btn {
+  flex-shrink: 0;
+  width: 26px;
+  height: 28px;
+  padding: 0;
+  color: #627653;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  margin: 0;
+  color: #3e5534;
+  font-size: 23px;
+  font-weight: 650;
+  letter-spacing: -0.9px;
+  text-decoration: none;
+}
+
+.brand-symbol {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 42px;
+  flex-shrink: 0;
+}
+
+.brand-symbol img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar-label {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  line-height: 1.6;
+}
+
+.sidebar-label .ant-typography,
+.sidebar-label > span {
+  font-size: 14px;
+}
+
+.sidebar-label strong {
+  font-size: 15px;
+  font-weight: 550;
+}
+
+.sidebar .ant-menu {
+  border-inline-end: 0 !important;
+  background: transparent;
+}
+
+.sidebar .ant-menu-item {
+  margin-inline: 0;
+  width: 100%;
+  padding-left: 15px !important;
+}
+
+.sidebar .ant-menu-title-content {
+  font-size: 15px;
+}
+
+.sidebar .ant-menu-item-selected {
+  font-weight: 550;
+}
+
+.sidebar-bottom {
+  margin-top: auto;
+  padding-top: 40px;
+}
+
+.profile.ant-btn {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  height: 48px;
+  padding: 0 15px;
+  margin: 4px 0 16px;
+  border: 0;
+  border-radius: 12px;
+  color: #707d65;
+  transition-property: color, background-color;
+}
+
+.sidebar .profile.ant-btn:not(:disabled):is(:hover, :active) {
+  border: 0;
+  box-shadow: none;
+}
+
+.sidebar .profile.ant-btn:not(:disabled):hover {
+  color: #476b3c;
+  background: #f0f4e8;
+}
+
+.ant-avatar {
+  color: #73674e;
+  background: #eae4d5;
+}
+
+.workspace.ant-layout {
+  min-width: 0;
+}
+
+.main-content.ant-layout-content {
+  width: 100%;
+  max-width: 1900px;
+  min-width: 0;
+  padding: 8px 36px 20px;
+  margin-inline: auto;
+}
+
+.sidebar.ant-layout-sider-collapsed .brand-word,
+.sidebar.ant-layout-sider-collapsed .sidebar-label {
+  display: none;
+}
+
+.sidebar.ant-layout-sider-collapsed .ant-layout-sider-children {
+  padding-inline: 10px;
+}
+
+.sidebar.ant-layout-sider-collapsed .sidebar-brand-row {
+  gap: 2px;
+}
+
+.sidebar.ant-layout-sider-collapsed .sidebar-collapse.ant-btn {
+  width: 26px;
+}
+
+.sidebar.ant-layout-sider-collapsed .brand-symbol {
+  width: 26px;
+  height: 28px;
+}
+
+.sidebar.ant-layout-sider-collapsed .ant-menu-item {
+  padding-left: 18px !important;
+}
+
+.sidebar.ant-layout-sider-collapsed .profile {
+  justify-content: center;
+  padding-inline: 0;
+}
+
+@media (max-width: 1100px) {
+  .main-content.ant-layout-content {
+    padding-inline: 24px;
+  }
+}
+
+@media (max-width: 600px) {
+  .main-content.ant-layout-content {
+    padding-inline: 16px;
+  }
+}
+
+.main-content.main-content-map.ant-layout-content {
+  height: 100dvh;
+  max-width: none;
+  padding: 0;
+  overflow: hidden;
+}

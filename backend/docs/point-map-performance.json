@@ -1,0 +1,239 @@
+{
+  "verifiedAt": "2026-11-07T13:11:45.099229+00:00",
+  "target": "http://127.0.0.1:8000",
+  "scope": "Real local HTTP, PostgreSQL, full source catalog; no map API mocks",
+  "scenarios": [
+    {
+      "name": "national",
+      "bounds": [
+        -125,
+        25,
+        -66,
+        50
+      ],
+      "zoom": 4,
+      "samples": 30,
+      "mode": "clusters",
+      "representedFields": 15973095,
+      "features": 76,
+      "responseBytes": 17607,
+      "p50Ms": 6.01,
+      "p95Ms": 10.57,
+      "maxMs": 59.79
+    },
+    {
+      "name": "iowa",
+      "bounds": [
+        -96.7,
+        40.3,
+        -90.1,
+        43.6
+      ],
+      "zoom": 7,
+      "samples": 30,
+      "mode": "clusters",
+      "representedFields": 1018310,
+      "features": 400,
+      "responseBytes": 91323,
+      "p50Ms": 9.91,
+      "p95Ms": 33.31,
+      "maxMs": 40.78
+    },
+    {
+      "name": "county",
+      "bounds": [
+        -94.2,
+        41.85,
+        -93.55,
+        42.25
+      ],
+      "zoom": 11,
+      "samples": 30,
+      "mode": "clusters",
+      "representedFields": 10171,
+      "features": 80,
+      "responseBytes": 18206,
+      "p50Ms": 10.05,
+      "p95Ms": 13.52,
+      "maxMs": 62.07
+    },
+    {
+      "name": "farm",
+      "bounds": [
+        -93.9,
+        42.02,
+        -93.85,
+        42.055
+      ],
+      "zoom": 14,
+      "samples": 30,
+      "mode": "fields",
+      "representedFields": 57,
+      "features": 57,
+      "responseBytes": 18930,
+      "p50Ms": 7.01,
+      "p95Ms": 22.09,
+      "maxMs": 28.7
+    },
+    {
+      "name": "source_sample",
+      "bounds": [
+        -103.2497,
+        35.853,
+        -103.247,
+        35.8555
+      ],
+      "zoom": 16,
+      "samples": 30,
+      "mode": "fields",
+      "representedFields": 1,
+      "features": 1,
+      "responseBytes": 505,
+      "p50Ms": 5.71,
+      "p95Ms": 7.59,
+      "maxMs": 10.53
+    },
+    {
+      "name": "outside_coverage",
+      "bounds": [
+        30.4,
+        50.4,
+        30.5,
+        50.5
+      ],
+      "zoom": 14,
+      "samples": 30,
+      "mode": "fields",
+      "representedFields": 0,
+      "features": 0,
+      "responseBytes": 161,
+      "p50Ms": 5.43,
+      "p95Ms": 6.28,
+      "maxMs": 7.02
+    }
+  ],
+  "catalog": {
+    "total": 15973095,
+    "bounds": [
+      -124.561184,
+      25.212157,
+      -66.970798,
+      49.359191
+    ],
+    "defaultCenter": [
+      42.05,
+      -93.87
+    ],
+    "defaultZoom": 11,
+    "source": "USDA NASS CSB 2025",
+    "locationKind": "interior_point",
+    "importedAt": "2026-11-07T13:11:42.805026+00:00",
+    "status": "ready"
+  },
+  "databaseRows": 15973095,
+  "overviewCounts": [
+    {
+      "level": 4,
+      "fields": 15973095,
+      "cells": 11
+    },
+    {
+      "level": 6,
+      "fields": 15973095,
+      "cells": 76
+    },
+    {
+      "level": 8,
+      "fields": 15973095,
+      "cells": 928
+    },
+    {
+      "level": 10,
+      "fields": 15973095,
+      "cells": 12365
+    },
+    {
+      "level": 12,
+      "fields": 15973095,
+      "cells": 146162
+    }
+  ],
+  "spatialQueryPlan": [
+    {
+      "Plan": {
+        "Node Type": "Limit",
+        "Parallel Aware": false,
+        "Async Capable": false,
+        "Startup Cost": 0.42,
+        "Total Cost": 2413.88,
+        "Plan Rows": 601,
+        "Plan Width": 53,
+        "Actual Startup Time": 0.699,
+        "Actual Total Time": 1.274,
+        "Actual Rows": 57.0,
+        "Actual Loops": 1,
+        "Disabled": false,
+        "Shared Hit Blocks": 18,
+        "Shared Read Blocks": 24,
+        "Shared Dirtied Blocks": 0,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0,
+        "Plans": [
+          {
+            "Node Type": "Index Scan",
+            "Parent Relationship": "Outer",
+            "Parallel Aware": false,
+            "Async Capable": false,
+            "Scan Direction": "Forward",
+            "Index Name": "ix_fields_spatial",
+            "Relation Name": "fields",
+            "Alias": "fields",
+            "Startup Cost": 0.42,
+            "Total Cost": 64151.98,
+            "Plan Rows": 15975,
+            "Plan Width": 53,
+            "Actual Startup Time": 0.699,
+            "Actual Total Time": 1.268,
+            "Actual Rows": 57.0,
+            "Actual Loops": 1,
+            "Disabled": false,
+            "Index Cond": "(point(longitude, latitude) <@ '(-93.85,42.055),(-93.9,42.02)'::box)",
+            "Rows Removed by Index Recheck": 0,
+            "Index Searches": 1,
+            "Shared Hit Blocks": 18,
+            "Shared Read Blocks": 24,
+            "Shared Dirtied Blocks": 0,
+            "Shared Written Blocks": 0,
+            "Local Hit Blocks": 0,
+            "Local Read Blocks": 0,
+            "Local Dirtied Blocks": 0,
+            "Local Written Blocks": 0,
+            "Temp Read Blocks": 0,
+            "Temp Written Blocks": 0
+          }
+        ]
+      },
+      "Planning": {
+        "Shared Hit Blocks": 61,
+        "Shared Read Blocks": 11,
+        "Shared Dirtied Blocks": 4,
+        "Shared Written Blocks": 0,
+        "Local Hit Blocks": 0,
+        "Local Read Blocks": 0,
+        "Local Dirtied Blocks": 0,
+        "Local Written Blocks": 0,
+        "Temp Read Blocks": 0,
+        "Temp Written Blocks": 0
+      },
+      "Planning Time": 6.56,
+      "Triggers": [],
+      "Execution Time": 1.296
+    }
+  ],
+  "fieldStorageBytes": 10335797248
+}

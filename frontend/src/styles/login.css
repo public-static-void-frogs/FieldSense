@@ -1,0 +1,163 @@
+.login-page {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 100dvh;
+  min-height: 0;
+  overflow: hidden;
+  padding: 24px;
+  isolation: isolate;
+  background: #e9eddd;
+}
+
+.login-clearing {
+  width: min(100%, 400px);
+  max-height: 100%;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 34px 38px 38px;
+  border: 1px solid #dce4cf;
+  border-radius: 24px 8px 24px 8px;
+  background: #fdfefb;
+  box-shadow:
+    0 12px 48px #3e55340d,
+    0 0 0 10px #fdfefb66;
+  animation: login-form-arrive 0.6s ease-out both;
+}
+
+.login-brand {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 28px;
+  color: #3e5534;
+  font-size: 24px;
+  font-weight: 650;
+  letter-spacing: -0.9px;
+}
+
+.login-brand img {
+  display: block;
+  width: 64px;
+  height: 64px;
+  object-fit: contain;
+}
+
+.login-clearing h1 {
+  margin: 0 0 24px;
+  color: #303b2c;
+  font-size: 22px;
+  line-height: 1.4;
+  font-weight: 500;
+  text-align: center;
+  letter-spacing: -0.4px;
+}
+
+.login-clearing .ant-form-item {
+  margin-bottom: 20px;
+}
+
+.login-clearing .ant-form-item-label > label {
+  font-size: 14px;
+}
+
+.login-clearing .ant-input,
+.login-clearing .ant-input-affix-wrapper {
+  background: #fff;
+}
+
+.login-clearing .ant-input::placeholder {
+  color: #7b8772;
+}
+
+.login-clearing .ant-btn-primary {
+  margin-top: 6px;
+  height: 44px;
+}
+
+.login-corner-brand {
+  position: absolute;
+  top: 28px;
+  left: 32px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #3e5534;
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.5px;
+}
+
+.login-corner-brand img {
+  object-fit: contain;
+}
+
+@keyframes login-form-arrive {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 600px) {
+  .login-page {
+    padding-inline: 24px;
+  }
+
+  .login-clearing {
+    padding: 28px;
+  }
+
+  .login-corner-brand {
+    top: 20px;
+    left: 24px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .login-clearing {
+    animation: none;
+  }
+}
+
+.registration-clearing {
+  width: min(100%, 680px);
+}
+
+.registration-clearing .login-brand {
+  margin-bottom: 16px;
+}
+.registration-steps {
+  margin-bottom: 24px;
+}
+.registration-account-step {
+  max-width: 420px;
+  margin-inline: auto;
+}
+.registration-actions {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 12px;
+}
+.registration-actions .ant-btn-primary {
+  margin-top: 0;
+}
+.login-clearing > .ant-alert,
+.login-clearing form > .ant-alert {
+  margin-bottom: 16px;
+}
+
+@media (max-width: 600px) {
+  .login-page:has(.registration-clearing) {
+    padding: 72px 16px 16px;
+  }
+  .registration-clearing {
+    padding: 24px 20px;
+  }
+}

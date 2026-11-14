@@ -1,0 +1,135 @@
+.crop-field-list {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.crop-field-card,
+.crop-field-empty {
+  border: 1px solid #e2e7db;
+  border-radius: 14px;
+  background: #fffef9;
+}
+
+.crop-field-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: clamp(12px, 2.3vw, 26px);
+  padding: 12px clamp(12px, 2vw, 24px) 12px 12px;
+  color: #30452a;
+  text-decoration: none;
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.crop-field-card:hover {
+  border-color: #a0b68d;
+  background: #f6f8ee;
+  color: #30452a;
+}
+
+.crop-field-card:focus-visible {
+  outline: 2px solid #527445;
+  outline-offset: 3px;
+}
+
+.crop-field-illustration {
+  display: block;
+  width: clamp(76px, 11vw, 120px);
+  aspect-ratio: 5 / 4;
+  border-radius: 9px;
+  background: #e8efdf;
+  height: auto;
+  object-fit: cover;
+}
+
+.crop-field-card-copy h2 {
+  margin: 0 0 4px;
+  font-size: clamp(17px, 2vw, 22px);
+  font-weight: 600;
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+}
+
+.crop-field-card-copy p {
+  margin: 0;
+  color: #66735c;
+  font-size: 14px;
+}
+
+.crop-field-card-arrow {
+  color: #55744c;
+}
+
+.main-content:has(> .crop-field-empty) {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.crop-field-empty {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  place-items: center;
+  flex: 1;
+  padding: clamp(20px, 5vw, 48px);
+  overflow: hidden;
+}
+
+.crop-field-empty-content {
+  width: min(100%, 390px);
+  padding: clamp(22px, 4vw, 36px);
+  border: 1px solid #ffffff;
+  border-radius: 18px;
+  background: #fffef9f5;
+  box-shadow: 0 12px 40px #283c2524;
+  color: #30452a;
+  text-align: center;
+}
+
+.crop-field-empty-content h2 {
+  margin: 0;
+  font-size: clamp(22px, 3vw, 30px);
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.crop-field-empty-content p {
+  margin: 10px 0 20px;
+  color: #53644a;
+  line-height: 1.5;
+}
+
+.crop-field-list--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.crop-field-list--compact .crop-field-card {
+  height: 100%;
+  gap: 12px;
+  padding: 8px 14px 8px 8px;
+}
+
+.crop-field-list--compact .crop-field-illustration {
+  width: clamp(56px, 7vw, 80px);
+}
+
+.crop-field-list--compact .crop-field-card-copy h2 {
+  font-size: 17px;
+}
+
+.crop-field-empty--compact {
+  min-height: 240px;
+  padding: 16px;
+}
+
+@media (max-width: 720px) {
+  .crop-field-list--compact {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

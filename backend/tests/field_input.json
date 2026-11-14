@@ -1,0 +1,70 @@
+{
+  "name": "North Meadow",
+  "crop": "Winter wheat",
+  "area": 24.8,
+  "geometry": {
+    "type": "Point",
+    "coordinates": [
+      -93.745,
+      42.045
+    ]
+  },
+  "properties": {
+    "crop": {
+      "soilType": "Silt loam",
+      "soilPh": 6.5,
+      "phosphorus": 34,
+      "potassium": 185,
+      "organicMatter": 3.8,
+      "soilTemperature": 18.4,
+      "conductivity": 0.4,
+      "cationExchange": 18.2,
+      "bulkDensity": 1.25,
+      "rootingDepth": 95,
+      "elevation": 284,
+      "slope": 1.8,
+      "drainage": "Well drained",
+      "irrigation": "Rain-fed",
+      "lastIrrigation": "Not irrigated",
+      "waterApplied": 0,
+      "rainfall": 24.6,
+      "waterCapacity": 182,
+      "variety": "Everest",
+      "emergence": 96,
+      "plantDensity": 285,
+      "vegetationIndex": 0.82,
+      "yieldTarget": 7.2,
+      "harvestWindow": "July 8\u201318, 2026"
+    },
+    "growthStage": "Heading \u00b7 BBCH 55",
+    "lastSample": "May 23, 2026 \u00b7 0\u201330 cm depth",
+    "cultivationPractice": "Reduced tillage",
+    "tenure": "Owner operated",
+    "soil": {
+      "soilType": "Silt loam",
+      "soilPh": 6.5,
+      "phosphorus": 34,
+      "potassium": 185,
+      "organicMatter": 3.8,
+      "soilTemperature": 18.4,
+      "conductivity": 0.4,
+      "cationExchange": 18.2,
+      "bulkDensity": 1.25,
+      "rootingDepth": 95,
+      "elevation": 284,
+      "slope": 1.8,
+      "drainage": "Well drained",
+      "irrigation": "Rain-fed",
+      "lastIrrigation": "Not irrigated",
+      "waterApplied": 0,
+      "rainfall": 24.6,
+      "waterCapacity": 182,
+      "variety": "Everest",
+      "emergence": 96,
+      "plantDensity": 285,
+      "vegetationIndex": 0.82,
+      "yieldTarget": 7.2,
+      "harvestWindow": "July 8\u201318, 2026"
+    }
+  }
+}

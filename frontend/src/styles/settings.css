@@ -1,0 +1,73 @@
+.settings-grid,
+.settings-location-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.settings-grid > .ant-card {
+  min-width: 0;
+}
+
+.settings-profile-photo {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.settings-profile-photo > div {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.settings-profile-photo .ant-avatar {
+  flex-shrink: 0;
+  font-size: 24px;
+}
+
+.settings-account-role {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #e5eadb;
+}
+
+.settings-profile-photo .settings-logout {
+  margin-inline-start: auto;
+}
+
+.settings-location-grid {
+  grid-template-columns: 1fr;
+  row-gap: 0;
+}
+
+.settings-location-grid .ant-form-item:last-child {
+  margin-bottom: 0;
+}
+
+.settings-grid .ant-card-head-wrapper {
+  flex-wrap: wrap;
+  gap: 12px;
+  padding-block: 12px;
+}
+
+.settings-grid .ant-card-head-title {
+  white-space: normal;
+}
+
+.settings-grid .ant-card-extra {
+  margin-inline-start: auto;
+}
+
+@media (max-width: 900px) {
+  .settings-grid,
+  .settings-location-grid {
+    grid-template-columns: 1fr;
+  }
+}
