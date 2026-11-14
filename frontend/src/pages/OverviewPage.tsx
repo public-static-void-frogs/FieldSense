@@ -1,69 +1,61 @@
-import { LegalLinks } from '../features/legal/components/LegalLinks.tsx';
-import '../features/legal/components/legal.css';
-import { useSuspenseQuery } from '@tanstack/react-query';
-import { ArrowUpRight, CalendarDays, Plus } from 'lucide-react';
+import { useSuspenseQueries } from '@tanstack/react-query';
+import { MapPin, Plus, Sprout } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
-import { PageHeading } from '../components/common/PageHeading';
+import { farmQueries } from '../api/farm/farm.queries.ts';
 import { RouterButton } from '../components/common/RouterButton';
-import { CropFieldCards } from '../features/fields/components/CropFieldCards.tsx';
-import { MapCard } from '../features/maps/components/MapCard';
-import { OverviewCharts } from '../features/overview/components/OverviewCharts';
-import { getFarmSummary } from '../features/overview/utils/farmSummary.ts';
-import { WeatherCard } from '../features/weather/components/WeatherCard';
+import { LegalLinks } from '../features/legal/components/LegalLinks.tsx';
+import { OverviewInventory } from '../features/overview/components/OverviewInventory';
+import { OverviewMonitoring } from '../features/overview/components/OverviewMonitoring';
+import {
+  OverviewAgenda,
+  OverviewNotifications,
+  OverviewWeather,
+} from '../features/overview/components/OverviewOperations';
+import '../features/legal/components/legal.css';
+import '../features/overview/components/Overview.css';
 
 export function OverviewPage() {
-  const { t, i18n } = useTranslation();
-  const { data: fields } = useSuspenseQuery(fieldQueries.list());
-  const { totalArea, attentionCount, criticalCount } = getFarmSummary(fields);
-  const summary = fields.length
-    ? t('Farm summary', {
-        count: fields.length,
-        area: totalArea.toLocaleString(i18n.resolvedLanguage, { maximumFractionDigits: 1 }),
-        attention: attentionCount,
-        critical: criticalCount,
-      })
-    : t('No fields added yet. Add a field to view its location and monitor crop conditions.');
+  const { t } = useTranslation();
+  const [{ data: fields }, { data: profile }] = useSuspenseQueries({
+    queries: [fieldQueries.list(), farmQueries.profile()],
+  });
 
   return (
-    <>
-      <PageHeading
-        eyebrow=""
-        title={t('Overview')}
-        description={summary}
-        actions={
-          <>
-            <RouterButton icon={<CalendarDays size={18} />} to="/history">
-              {t('Environment')}
-            </RouterButton>
-            <RouterButton type="primary" icon={<Plus size={19} />} to="/map/add">
-              {t('Add field')}
-            </RouterButton>
-          </>
-        }
-      />
-      <section className="map-weather-grid">
-        <MapCard />
-        <WeatherCard />
-      </section>
-      <OverviewCharts />
-      <section className="overview-fields" aria-labelledby="overview-fields-title">
-        <div className="overview-fields-heading">
-          <h2 id="overview-fields-title">{t('Your fields')}</h2>
-          <RouterButton
-            type="link"
-            icon={<ArrowUpRight size={17} />}
-            iconPlacement="end"
-            to="/fields"
-          >
-            {t('View all fields')}
-          </RouterButton>
+    <div className="farm-overview">
+      <header className="farm-overview-heading">
+        <div className="farm-overview-title">
+          <h1>{t('Overview')}</h1>
+          {profile.locationLabel && (
+            <p>
+              <MapPin size={15} aria-hidden />
+              {profile.locationLabel}
+            </p>
+          )}
         </div>
-        <CropFieldCards fields={fields} compact />
-      </section>
-      <footer className="overview-legal-footer">
+        <RouterButton type="primary" icon={<Plus size={18} />} to="/map/add">
+          {t('Add field')}
+        </RouterButton>
+      </header>
+      <div className="farm-overview-grid">
+        {fields.length > 0 ? (
+          <OverviewInventory fields={fields} />
+        ) : (
+          <section className="farm-panel farm-panel-wide farm-empty">
+            <Sprout size={32} aria-hidden />
+            <h2>{t('Add your first field')}</h2>
+            <p>{t('Choose your fields on the map to start tracking crop conditions.')}</p>
+            <RouterButton to="/map/add">{t('Explore map')}</RouterButton>
+          </section>
+        )}
+        <OverviewWeather profile={profile} />
+        {fields.length > 0 && <OverviewMonitoring fields={fields} />}
+        <OverviewAgenda />
+        <OverviewNotifications />
+      </div>
+      <footer>
         <LegalLinks />
       </footer>
-    </>
+    </div>
   );
 }

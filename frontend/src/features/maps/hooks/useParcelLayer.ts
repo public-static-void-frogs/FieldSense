@@ -15,6 +15,7 @@ type UseParcelLayerOptions = {
   onSelect: (field: Field) => void;
   onAdd: (id: number) => void;
   adding: boolean;
+  permanentLabels: boolean;
 };
 
 export function useParcelLayer({
@@ -24,6 +25,7 @@ export function useParcelLayer({
   onSelect,
   onAdd,
   adding,
+  permanentLabels,
 }: UseParcelLayerOptions) {
   const { t } = useTranslation();
   const map = useMap();
@@ -99,7 +101,7 @@ export function useParcelLayer({
             content.append(detail);
           }
           point.bindTooltip(content, {
-            permanent: true,
+            permanent: permanentLabels,
             direction: 'top',
             className: 'field-map-label',
             opacity: 1,
@@ -110,5 +112,5 @@ export function useParcelLayer({
     return () => {
       parcels.remove();
     };
-  }, [map, geojson, fields, layer, onSelect, onAdd, adding, t]);
+  }, [map, geojson, fields, layer, onSelect, onAdd, adding, permanentLabels, t]);
 }

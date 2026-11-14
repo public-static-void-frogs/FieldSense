@@ -28,6 +28,8 @@ type FieldMapProps = {
   /** Plain satellite view with field points, without metric layers or legend. */
   locationOnly?: boolean;
   hideControls?: boolean;
+  permanentLabels?: boolean;
+  scrollWheelZoom?: boolean;
 };
 
 export function FieldMap({
@@ -39,6 +41,8 @@ export function FieldMap({
   expanded = false,
   locationOnly = false,
   hideControls = false,
+  permanentLabels = true,
+  scrollWheelZoom = true,
 }: FieldMapProps) {
   const { t } = useTranslation();
   const { map, setLayer, layer, recenter } = useFieldMap(geojson, fields, locationOnly);
@@ -57,7 +61,7 @@ export function FieldMap({
         minZoom={2}
         maxZoom={19}
         zoomControl={false}
-        scrollWheelZoom
+        scrollWheelZoom={scrollWheelZoom}
       >
         <TileLayer
           url={satelliteTiles.url}
@@ -86,6 +90,7 @@ export function FieldMap({
           onSelect={onSelect}
           onAdd={onAdd}
           adding={adding}
+          permanentLabels={permanentLabels}
         />
         {!hideControls && <ScaleControl position="bottomright" imperial={false} />}
       </MapContainer>
@@ -162,7 +167,15 @@ function MapViewport({ data, fields }: MapViewportProps) {
 
 type ParcelLayerProps = FieldMapProps & { layer: MapLayer };
 
-function ParcelLayer({ fields, geojson, layer, onSelect, onAdd, adding }: ParcelLayerProps) {
-  useParcelLayer({ fields, geojson, layer, onSelect, onAdd, adding });
+function ParcelLayer({
+  fields,
+  geojson,
+  layer,
+  onSelect,
+  onAdd,
+  adding,
+  permanentLabels = true,
+}: ParcelLayerProps) {
+  useParcelLayer({ fields, geojson, layer, onSelect, onAdd, adding, permanentLabels });
   return null;
 }

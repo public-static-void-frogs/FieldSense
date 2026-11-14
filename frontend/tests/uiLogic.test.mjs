@@ -5,7 +5,6 @@ import ts from 'typescript';
 import { filterFields, filterLandHistory } from '../src/features/fields/utils/fieldFilters.ts';
 import { getNitrogenAssessment } from '../src/features/fields/utils/fieldPresentation.ts';
 import { parcelStyle } from '../src/features/maps/utils/mapStyles.ts';
-import { getFarmSummary } from '../src/features/overview/utils/farmSummary.ts';
 import {
   countEventDecisions,
   filterCalendarEvents,
@@ -204,11 +203,6 @@ test('weather selection falls back after a range change and compares the previou
   assert.equal(selectWeatherReading(records, 1), records[1]);
   assert.equal(getWeatherChange(records, records[0], 'rainfall'), -6.4);
   assert.equal(getWeatherChange(records, records[1], 'rainfall'), null);
-});
-
-test('farm summary counts critical fields within the attention total', () => {
-  assert.deepEqual(getFarmSummary(fields), { totalArea: 65, attentionCount: 2, criticalCount: 1 });
-  assert.deepEqual(getFarmSummary([]), { totalArea: 0, attentionCount: 0, criticalCount: 0 });
 });
 
 async function sourceFiles(directory) {
