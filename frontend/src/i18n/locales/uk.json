@@ -1414,5 +1414,7 @@
   "This field: not enough comparable fields.": "Це поле: недостатньо порівнянних полів.",
   "This field in drought: {{value}} [{{low}}, {{high}}]": "Це поле в посуху: {{value}} [{{low}}, {{high}}]",
   "Fields within 30 km in drought: median {{value}} ({{fields}} fields)": "Поля в межах 30 км у посуху: медіана {{value}} (полів: {{fields}})",
-  "Neighbour evidence": "Дані сусідніх полів"
+  "Neighbour evidence": "Дані сусідніх полів",
+  "Checking evidence from neighbouring fields…": "Перевіряю дані сусідніх полів…",
+  "Checking soil moisture…": "Перевіряю вологість ґрунту…"
 }

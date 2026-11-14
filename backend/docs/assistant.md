@@ -65,6 +65,8 @@ frontend endpoints) and never modify them.
 | --- | --- | --- |
 | `get_weather_forecast` | forecast + crop-risk rule alerts | next 3 days; uses the selected field, or the account location without one |
 | `get_m3_insights` | `services/m3_lookup.py` | planting/frost timing windows, heat/frost risk, Fallow-Zero. Optional `include_delay_scan` (large; only when the user asks about delaying sowing). Needs a field; `status: unavailable` outside model coverage. Reads local model output files (`M3_OUT`). |
+| `get_neighbour_evidence` | `services/m2_lookup.py` | rotation practices vs drought resilience from neighbouring fields: verdict, extra drought effect with intervals, what-if for the field or fields within 30 km, warnings. Optional `crop` and `treatments` (T1-T5). Per-outcome tables are dropped to keep the result small. Needs a field; `status: unavailable` outside coverage. Reads local model output files (`M2_OUT`). |
+| `get_soil_moisture` | `services/soil_moisture.py` | latest modelled soil moisture per layer and profile mean at the field's reference point (Open-Meteo). Optional `compare_to_past_years` adds anomaly and percentile against past years (slower). Needs a field. |
 | `get_soil_depletion` | `services/soil_depletion.py` via `SoilAssessments` | same cache as `GET /fields/{id}/soil-depletion`. Never waits: the first call starts the background calculation and returns `status: pending`; once it is ready (up to ~100 s) later calls return the full assessment. Needs a field. |
 
 ## Adding a tool (for example an ML model)

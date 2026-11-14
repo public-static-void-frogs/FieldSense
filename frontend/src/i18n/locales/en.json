@@ -1414,5 +1414,7 @@
   "This field: not enough comparable fields.": "This field: not enough comparable fields.",
   "This field in drought: {{value}} [{{low}}, {{high}}]": "This field in drought: {{value}} [{{low}}, {{high}}]",
   "Fields within 30 km in drought: median {{value}} ({{fields}} fields)": "Fields within 30 km in drought: median {{value}} ({{fields}} fields)",
-  "Neighbour evidence": "Neighbour evidence"
+  "Neighbour evidence": "Neighbour evidence",
+  "Checking evidence from neighbouring fields…": "Checking evidence from neighbouring fields…",
+  "Checking soil moisture…": "Checking soil moisture…"
 }

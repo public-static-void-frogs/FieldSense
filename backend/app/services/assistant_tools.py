@@ -162,6 +162,48 @@ def soil_depletion_tool(ctx: ChatContext, args: dict) -> dict | None:
     }
 
 
+def m2_evidence_tool(ctx: ChatContext, args: dict) -> dict | None:
+    if not ctx.field:
+        return NO_FIELD
+    lon, lat = ctx.field["geometry"]["coordinates"]
+    crop = args.get("crop") if args.get("crop") in ("corn", "soybeans") else None
+    treatments = [t for t in args.get("treatments") or [] if t in ("T1", "T2", "T3", "T4", "T5")]
+    result = ctx.state.m2_evidence.lookup(lat, lon, crop, treatments or None)
+    if not result.get("ok"):
+        return {"status": "unavailable", "error": result.get("error")}
+    # Per-outcome tables and file bookkeeping are large; the headline and summary answer
+    # agronomic questions.
+    region = {
+        crop_name: {
+            name: {key: value for key, value in block.items() if key != "outcomes"}
+            for name, block in blocks.items()
+        }
+        for crop_name, blocks in result["region"].items()
+    }
+    keep = ("evidence_label", "match", "field", "neighbourhood", "summary", "warnings")
+    return {
+        "status": "ready",
+        **{key: result[key] for key in keep if result.get(key)},
+        "region": region,
+    }
+
+
+def soil_moisture_tool(ctx: ChatContext, args: dict) -> dict | None:
+    if not ctx.field:
+        return NO_FIELD
+    from app.services import soil_moisture
+    from app.services.crop_history import analysis_point  # heavy import, as in the fields API
+
+    weather = ctx.state.weather
+    coordinates = analysis_point(ctx.field, 0)
+    current = soil_moisture.current(weather, coordinates)
+    result = {"status": "ready", "current": current.model_dump(mode="json", exclude_none=True)}
+    if args.get("compare_to_past_years") is True:
+        comparison = soil_moisture.compare_to_history(weather, coordinates, current)
+        result["comparison"] = comparison.model_dump(mode="json", exclude_none=True)
+    return result
+
+
 def default_registry() -> ToolRegistry:
     registry = ToolRegistry()
     registry.register(
@@ -206,6 +248,57 @@ def default_registry() -> ToolRegistry:
             "crop rotation load or nutrient depletion. It can take a minute on first use: the "
             "result may say pending. Needs a selected field.",
             soil_depletion_tool,
+        )
+    )
+    registry.register(
+        Tool(
+            "get_neighbour_evidence",
+            "Observational evidence from neighbouring fields on whether crop-rotation practices "
+            "(continuous cropping, diverse rotation, small grain or hay, winter cover, "
+            "host-crop return interval) changed drought resilience, measured from satellite "
+            "greenness under the same weather. Returns a verdict, the extra effect in drought "
+            "with intervals, and a what-if for this field or the fields within 30 km. It is an "
+            "adjusted association, not a guaranteed effect: state that and any warnings. Use "
+            "for questions about rotation, drought resilience or what neighbours' practices "
+            "suggest. Needs a selected field.",
+            m2_evidence_tool,
+            {
+                "type": "object",
+                "properties": {
+                    "crop": {
+                        "type": "string",
+                        "enum": ["corn", "soybeans"],
+                        "description": "Limit the answer to one crop.",
+                    },
+                    "treatments": {
+                        "type": "array",
+                        "items": {"type": "string", "enum": ["T1", "T2", "T3", "T4", "T5"]},
+                        "description": "Limit to practices: T1 continuous crop, T2 diverse "
+                        "rotation, T3 small grain or hay, T4 winter cover, T5 host-crop "
+                        "return interval.",
+                    },
+                },
+            },
+        )
+    )
+    registry.register(
+        Tool(
+            "get_soil_moisture",
+            "Modelled soil moisture at the selected field's reference point: latest value per "
+            "soil layer (m3/m3) and the profile mean. Optionally compares it with the same "
+            "time of year in past years (anomaly and percentile). Use for questions about how "
+            "wet or dry the soil is now, irrigation or field access. Needs a selected field.",
+            soil_moisture_tool,
+            {
+                "type": "object",
+                "properties": {
+                    "compare_to_past_years": {
+                        "type": "boolean",
+                        "description": "Also compare with past years. Slower; set true only "
+                        "when the user asks whether it is wetter or drier than usual.",
+                    }
+                },
+            },
         )
     )
     return registry

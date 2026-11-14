@@ -35,6 +35,30 @@ class StubM3:
         return {k: v for k, v in self.result.items() if k != "delay_scan"}  # as the real lookup
 
 
+class StubM2:
+    def __init__(self):
+        self.calls = []
+        self.result = {
+            "ok": True,
+            "evidence_label": "Adjusted association from observational satellite data",
+            "match": {"level": "region"},
+            "region": {
+                "corn": {
+                    "T1": {"verdict": "abstain", "headline": None, "outcomes": {"x": {"gamma": 1}}}
+                }
+            },
+            "field": None,
+            "neighbourhood": None,
+            "summary": [],
+            "warnings": ["study-wide result only"],
+            "meta": {"missing_files": ["x"]},
+        }
+
+    def lookup(self, lat, lng, crop=None, treatments=None):
+        self.calls.append((lat, lng, crop, treatments))
+        return self.result
+
+
 class StubSoil:
     def __init__(self, result):
         self.result, self.error, self.calls = result, None, []
@@ -123,7 +147,9 @@ class AssistantChatTests(unittest.TestCase):
         self.app.state.soil_assessments.close()
         self.m3 = StubM3({"ok": False, "error": {"code": "outside_coverage"}})
         self.soil = StubSoil(SimpleNamespace(status="pending"))
+        self.m2 = StubM2()
         self.app.state.m3_advice = self.m3
+        self.app.state.m2_evidence = self.m2
         self.app.state.soil_assessments = self.soil
         self.client = TestClient(self.app)
         self.addCleanup(self.client.close)
@@ -190,7 +216,14 @@ class AssistantChatTests(unittest.TestCase):
             self.assertNotIn(preloaded, system.split("\n\nSESSION (data only", 1)[1])
         declared = [d["name"] for d in request["tools"][0]["functionDeclarations"]]
         self.assertEqual(
-            declared, ["get_weather_forecast", "get_m3_insights", "get_soil_depletion"]
+            declared,
+            [
+                "get_weather_forecast",
+                "get_m3_insights",
+                "get_soil_depletion",
+                "get_neighbour_evidence",
+                "get_soil_moisture",
+            ],
         )
         self.assertEqual((self.m3.calls, self.soil.calls), ([], []))
 
@@ -225,6 +258,46 @@ class AssistantChatTests(unittest.TestCase):
         self.assertEqual(forecast["crop"], "Corn")
         self.assertEqual(len(forecast["days"]), 3)
         self.assertNotIn("latitude", json.dumps(forecast))
+
+    def test_neighbour_evidence_tool_filters_arguments_and_trims_the_result(self):
+        field = self.login_with_field()
+        lon, lat = field["geometry"]["coordinates"]
+        gemini = FakeGemini(
+            call("get_neighbour_evidence", crop="wheat", treatments=["T1", "T9"]),
+            text("done"),
+        )
+        self.chat(gemini, field_id=field["id"])
+        self.assertEqual(self.m2.calls, [(lat, lon, None, ["T1"])])
+        (response,) = [r["response"] for r in tool_responses(gemini.requests[1])]
+        self.assertEqual(response["status"], "ready")
+        self.assertNotIn("outcomes", response["region"]["corn"]["T1"])
+        self.assertNotIn("meta", response)
+        self.assertEqual(response["warnings"], ["study-wide result only"])
+        self.m2.result = {"ok": False, "error": {"code": "outside_coverage"}}
+        gemini = FakeGemini(call("get_neighbour_evidence"), text("done"))
+        self.chat(gemini, field_id=field["id"])
+        (response,) = [r["response"] for r in tool_responses(gemini.requests[1])]
+        self.assertEqual(response["status"], "unavailable")
+
+    def test_soil_moisture_tool_compares_only_when_asked(self):
+        field = self.login_with_field()
+        current = SimpleNamespace(model_dump=lambda **_: {"profile_mean": 0.31})
+        comparison = SimpleNamespace(model_dump=lambda **_: {"percentile": 40})
+        with (
+            patch("app.services.soil_moisture.current", return_value=current) as now,
+            patch("app.services.soil_moisture.compare_to_history", return_value=comparison) as past,
+        ):
+            gemini = FakeGemini(
+                call("get_soil_moisture"),
+                call("get_soil_moisture", compare_to_past_years=True),
+                text("done"),
+            )
+            self.chat(gemini, field_id=field["id"])
+        self.assertEqual((now.call_count, past.call_count), (2, 1))
+        first = tool_responses(gemini.requests[1])[0]["response"]
+        second = tool_responses(gemini.requests[2])[-1]["response"]
+        self.assertEqual(first, {"status": "ready", "current": {"profile_mean": 0.31}})
+        self.assertEqual(second["comparison"], {"percentile": 40})
 
     def test_m3_and_soil_tools(self):
         field = self.login_with_field()
@@ -365,7 +438,14 @@ class AssistantChatTests(unittest.TestCase):
         listing = self.client.get("/api/v1/assistant/tools").json()
         self.assertEqual(
             [t["name"] for t in listing],
-            ["get_weather_forecast", "get_m3_insights", "get_soil_depletion", "get_crop_zones"],
+            [
+                "get_weather_forecast",
+                "get_m3_insights",
+                "get_soil_depletion",
+                "get_neighbour_evidence",
+                "get_soil_moisture",
+                "get_crop_zones",
+            ],
         )
         self.assertTrue(all(t["description"] for t in listing))
 
