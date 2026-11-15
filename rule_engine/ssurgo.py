@@ -42,6 +42,51 @@ COLUMNS = {  # SDA column -> (soil key, converter)
 }
 
 
+# The NCCPI productivity index (0 to 1) and the shallowest restrictive layer, per map unit.
+NCCPI = "NCCPI - National Commodity Crop Productivity Index (Ver 3.0)"
+SUBMODELS = {
+    "nccpi_all": NCCPI,
+    "nccpi_corn": "NCCPI - NCCPI Corn Submodel (I)",
+    "nccpi_soy": "NCCPI - NCCPI Soybeans Submodel (I)",
+    "nccpi_small_grains": "NCCPI - NCCPI Small Grains Submodel (II)",
+}
+INDEX_QUERY = """
+SELECT {pivots},
+ (SELECT MIN(r.resdept_r) FROM component c3 JOIN corestrictions r ON r.cokey = c3.cokey
+  WHERE c3.mukey = {mukey} AND c3.majcompflag = 'Yes') AS restriction_depth_cm
+FROM component c JOIN cointerp ci ON ci.cokey = c.cokey
+WHERE c.mukey = {mukey} AND c.majcompflag = 'Yes' AND ci.mrulename = '{rule}'
+"""
+
+
+def index_query(mukey: str) -> str:
+    pivots = ", ".join(
+        f"SUM(CASE WHEN ci.rulename = '{rule}' THEN ci.interphr * c.comppct_r END) / "
+        f"NULLIF(SUM(CASE WHEN ci.rulename = '{rule}' THEN c.comppct_r END), 0) AS {name}"
+        for name, rule in SUBMODELS.items()
+    )
+    return INDEX_QUERY.format(pivots=pivots, mukey=int(mukey), rule=NCCPI)
+
+
+def parse_index(payload: dict) -> dict:
+    """The productivity indexes and restriction depth of a map unit, {} when it has none."""
+    table = payload.get("Table") or []
+    if len(table) < 2:
+        return {}
+    row = dict(zip(table[0], table[1], strict=True))
+    return {k: round(float(v), 3) for k, v in row.items() if v not in (None, "")}
+
+
+def _post(query: str, timeout: float) -> dict:
+    request = urllib.request.Request(
+        SDA_URL,
+        data=json.dumps({"format": "JSON+COLUMNNAME", "query": query}).encode(),
+        headers={"Content-Type": "application/json"},
+    )
+    with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
+        return json.load(response)
+
+
 def parse_soil(payload: dict) -> dict | None:
     """Turn an SDA JSON+COLUMNNAME response into a `field["soil"]` mapping."""
     table = payload.get("Table") or []
@@ -58,11 +103,10 @@ def parse_soil(payload: dict) -> dict | None:
 
 def fetch_soil(lat: float, lon: float, timeout: float = 30.0) -> dict | None:
     """Soil properties at a point, or None when SSURGO has no map unit there."""
-    body = {"format": "JSON+COLUMNNAME", "query": QUERY.format(lon=float(lon), lat=float(lat))}
-    request = urllib.request.Request(
-        SDA_URL,
-        data=json.dumps(body).encode(),
-        headers={"Content-Type": "application/json"},
-    )
-    with urllib.request.urlopen(request, timeout=timeout) as response:  # noqa: S310
-        return parse_soil(json.load(response))
+    soil = parse_soil(_post(QUERY.format(lon=float(lon), lat=float(lat)), timeout))
+    if soil and soil.get("mukey"):
+        try:
+            soil.update(parse_index(_post(index_query(soil["mukey"]), timeout)))
+        except (OSError, ValueError):
+            pass  # the soil is still usable without the productivity index
+    return soil

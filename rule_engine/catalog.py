@@ -14,7 +14,18 @@ import yaml
 
 DEFAULT_CATALOG = Path(__file__).resolve().parent / "data" / "crops.yaml"
 STATE_CROPS = "state_crops.csv"  # region, crop, ...: next to the catalog file, optional
-NON_CANDIDATE_GROUPS = frozenset({"fallow", "non_crop"})
+# history-only groups: recognised in the crop history, never planned (vegetables are too mixed a
+# class to price)
+NON_CANDIDATE_GROUPS = frozenset({"fallow", "non_crop", "permanent_crop", "specialty_annual"})
+# t/ha per (unit per acre) for the mass units: the same for every crop. Short ton, pound,
+# hundredweight (100 lb).
+MASS_T_HA = {"ton": 2.24170, "lb": 0.00112085, "cwt": 0.112085}
+
+
+def unit_kind(unit: str | None) -> str:
+    """"bu/acre", "tons", "$ / CWT" -> "bu", "ton", "cwt"."""
+    head = (unit or "").lower().replace("$", "").strip(" /").split("/")[0].strip()
+    return {"tons": "ton", "lbs": "lb", "bushel": "bu", "bushels": "bu"}.get(head, head)
 
 
 class CatalogError(ValueError):
@@ -52,6 +63,16 @@ class Crop:
     components: tuple[str, ...] = ()
     calendar: dict[str, int] | None = None  # crop-level override of the group calendar
     calendar_source: str | None = None
+
+    def t_ha_per(self, unit: str | None) -> float | None:
+        """t/ha per one `unit` per acre ("bu", "ton", "lb", "cwt", with or without "/acre").
+        Bushels depend on the crop; the mass units do not. None when it cannot be converted."""
+        kind = unit_kind(unit)
+        if kind == "bu":
+            return self.bu_to_t_ha
+        if kind == "ton":
+            return self.ton_to_t_ha or MASS_T_HA["ton"]
+        return MASS_T_HA.get(kind)
 
     def trait(self, name: str) -> Trait:
         if name in self.traits:

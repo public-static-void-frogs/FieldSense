@@ -70,7 +70,7 @@ rules:
   - id: same_site_of_action_repeat
     title: Same herbicide site of action two seasons running
     category: weed
-    applies_to: {groups: [warm_season_grain, grain_legume]}
+    applies_to: {groups: [warm_season_grain, grain_legume, fiber_crop]}
     when:
       - {fact: herbicide.repeated_group_count, op: ge, value: 1}
     effect: {kind: advisory}
@@ -83,7 +83,7 @@ rules:
   - id: weed_escapes_row_crop
     title: Weed escapes reported in a corn-soybean-only rotation
     category: weed
-    applies_to: {groups: [warm_season_grain, grain_legume]}
+    applies_to: {groups: [warm_season_grain, grain_legume, fiber_crop]}
     when:
       - {fact: field.practice.weed_escapes, op: eq, value: true}
       - {fact: history.distinct_groups_5y, op: le, value: 2}

@@ -60,9 +60,12 @@ class RegionTests(unittest.TestCase):
         crops = {c["crop"] for c in result["candidates"]}
         self.assertEqual(crops, set(self.advisor.candidate_ids("KS")))
 
-    def test_unrecognised_fips_uses_the_default_region(self):
+    def test_unknown_state_uses_the_default_region_with_gap(self):
+        gap = [{"code": "region_unknown", "usedRegion": "IA"}]
         record = kansas_field() | {"stateFips": "99", "countyFips": "99001"}
-        self.assertEqual(self.advisor.region_for(record), ("IA", []))
+        self.assertEqual(self.advisor.region_for(record), ("IA", gap))
+        located = {k: v for k, v in kansas_field().items() if k not in ("stateFips", "countyFips")}
+        self.assertEqual(self.advisor.region_for(located), ("IA", gap))
 
     def test_state_without_candidates_falls_back_with_gap(self):
         candidates = self.advisor.catalog.candidates

@@ -10,7 +10,7 @@
 #
 # Group default calendars are day-of-year medians for the pilot region (Iowa) used only when
 # no NASS crop-progress calendar exists for the crop; the response labels them "group default".
-version: "2026-11-10"
+version: "2026-11-15"
 
 groups:
   warm_season_grain:
@@ -135,6 +135,111 @@ groups:
       bare_soil_months: 0
       min_return_years: 0
       humus_balance: 0
+      hosts: []
+    calendar: {}
+
+  fiber_crop:
+    label: Fiber crop
+    traits:
+      family: Malvaceae
+      season: warm
+      lifecycle: annual
+      n_fixer: false
+      n_demand: medium
+      water_demand: high
+      residue: low
+      rusle_c: {value: 0.45, verified: false, text: "0.40-0.50", source: "crop_coefficients.csv cotton row UNVERIFIED"}
+      bare_soil_months: {value: 6, verified: false, source: "harvest (Oct-Nov) to canopy closure (Jul); calendar estimate"}
+      min_return_years: {value: 1, verified: false, text: "1-2", source: "crop_coefficients.csv: verticillium UNVERIFIED"}
+      humus_balance: {value: -600, verified: false, text: "-400..-800", source: "not in VDLUFA; crop_coefficients.csv proxy UNVERIFIED"}
+      heat_threshold_c: {value: 35, verified: false, source: "no sourced cotton boll-set heat threshold; corn value reused"}
+      frost_threshold_c: {value: -1, verified: false, source: "no sourced killing-frost value for cotton; placeholder"}
+      hosts: [root_knot_nematode, reniform_nematode, verticillium_wilt]
+    calendar: {planted: 130, emerged: 140, flowering: 195, grain_fill: 230, mature: 260, harvested: 300}
+  paddy_grain:
+    label: Flooded grain (rice)
+    traits:
+      family: Poaceae
+      season: warm
+      lifecycle: annual
+      n_fixer: false
+      n_demand: high
+      water_demand: high
+      residue: high
+      rusle_c: {value: 0.10, verified: false, source: "crop_coefficients.csv rice row: paddy ~0.1 UNVERIFIED"}
+      bare_soil_months: {value: 6, verified: false, source: "harvest (Aug-Sep) to flood (May); calendar estimate"}
+      min_return_years: {value: 0, verified: false, text: "0-1", source: "crop_coefficients.csv: flooded monoculture tolerated UNVERIFIED"}
+      humus_balance: {value: 0, verified: false, source: "not in VDLUFA; paddy conserves soil carbon (crop_coefficients.csv) UNVERIFIED"}
+      heat_threshold_c: {value: 35, verified: false, source: "spikelet sterility above about 35 C at anthesis; not sourced in the project notes"}
+      frost_threshold_c: {value: 0, verified: false, source: "placeholder"}
+      hosts: [rice_blast, sheath_blight]
+    calendar: {planted: 110, emerged: 125, flowering: 200, grain_fill: 215, mature: 235, harvested: 255}
+  root_crop:
+    label: Root or tuber crop
+    traits:
+      family: none
+      season: cool
+      lifecycle: annual
+      n_fixer: false
+      n_demand: high
+      water_demand: high
+      residue: low
+      rusle_c: {value: 0.50, verified: false, source: "crop_coefficients.csv: proxy 'seasonal horticultural' UNVERIFIED"}
+      bare_soil_months: {value: 7, verified: false, source: "harvest lifts the soil (Sep-Oct) to canopy closure (Jun); calendar estimate"}
+      min_return_years: {value: 3, verified: false, text: "3-4", source: "crop_coefficients.csv: cyst nematodes, Cercospora, blight UNVERIFIED"}
+      humus_balance: {value: -1000, verified: true, source: "VDLUFA 2014, root crops (crop_coefficients.csv S1)"}
+      heat_threshold_c: {value: 30, verified: false, source: "placeholder"}
+      frost_threshold_c: {value: -2, verified: false, source: "placeholder"}
+      hosts: []
+    calendar: {planted: 120, emerged: 138, flowering: 185, grain_fill: 210, mature: 255, harvested: 275}
+  perennial_cane:
+    label: Perennial cane
+    traits:
+      family: Poaceae
+      season: warm
+      lifecycle: perennial
+      n_fixer: false
+      n_demand: high
+      water_demand: high
+      residue: high
+      rusle_c: {value: 0.20, verified: false, source: "no sourced value; ratoon cane keeps a canopy most of the year; placeholder"}
+      bare_soil_months: {value: 3, verified: false, source: "harvest (Oct-Jan) to ratoon canopy (Apr); calendar estimate"}
+      min_return_years: 0
+      humus_balance: {value: -200, verified: false, source: "not in VDLUFA; placeholder"}
+      heat_threshold_c: {value: 38, verified: false, source: "placeholder"}
+      frost_threshold_c: {value: -2, verified: false, source: "placeholder"}
+      hosts: []
+    calendar: {planted: 240, emerged: 80, flowering: 180, grain_fill: 230, mature: 290, harvested: 310}
+  permanent_crop:
+    label: Orchard, vineyard or other permanent crop
+    traits:
+      family: none
+      season: none
+      lifecycle: perennial
+      n_fixer: false
+      n_demand: medium
+      water_demand: high
+      residue: low
+      rusle_c: {value: 0.10, verified: false, source: "placeholder"}
+      bare_soil_months: 0
+      min_return_years: 0
+      humus_balance: 0
+      hosts: []
+    calendar: {}
+  specialty_annual:
+    label: Vegetables and other specialty crops
+    traits:
+      family: none
+      season: warm
+      lifecycle: annual
+      n_fixer: false
+      n_demand: high
+      water_demand: high
+      residue: low
+      rusle_c: {value: 0.50, verified: false, source: "crop_coefficients.csv: proxy 'seasonal horticultural' UNVERIFIED"}
+      bare_soil_months: {value: 7, verified: false, source: "calendar estimate"}
+      min_return_years: 0
+      humus_balance: {value: -1000, verified: false, source: "VDLUFA root-crop value as a proxy"}
       hosts: []
     calendar: {}
 
@@ -324,6 +429,251 @@ crops:
     traits:
       bare_soil_months: {value: 3, verified: false, source: "winter wheat covers autumn to July, soybeans to October; calendar estimate"}
       hosts: [soybean_cyst_nematode, white_mold, sudden_death_syndrome, take_all, fusarium_head_blight]
+  durum_wheat:
+    label: Durum wheat
+    group: small_grain
+    cdl_codes: [22]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06725
+    stage_names: {flowering: heading, grain_fill: grain fill, mature: ripe}
+    traits:
+      hosts: [take_all, fusarium_head_blight]
+  triticale:
+    label: Triticale
+    group: small_grain
+    cdl_codes: [205]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.05380  # 48 lb bushel
+    stage_names: {flowering: heading, grain_fill: grain fill, mature: ripe}
+    traits:
+      hosts: [take_all, fusarium_head_blight]
+  flax:
+    label: Flax (seed)
+    group: small_grain
+    cdl_codes: [32]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06277  # 56 lb bushel
+    stage_names: {flowering: blooming, grain_fill: boll fill, mature: ripe}
+    traits:
+      family: Linaceae
+      min_return_years: {value: 3, verified: false, text: "3-4", source: "Fusarium wilt of flax; not in crop_coefficients.csv; placeholder"}
+      hosts: [flax_fusarium_wilt]
+  millet:
+    label: Proso millet
+    group: warm_season_grain
+    cdl_codes: [29]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.05604  # 50 lb bushel
+    stage_names: {flowering: heading, grain_fill: grain fill, mature: ripe}
+    traits:
+      n_demand: low
+      water_demand: low
+      residue: medium
+      rusle_c: {value: 0.35, verified: false, source: "cereal proxy (OMAFRA cereals)"}
+      humus_balance: {value: -400, verified: false, source: "VDLUFA cereals as a proxy"}
+      hosts: []
+  rice:
+    label: Rice
+    group: paddy_grain
+    cdl_codes: [3]
+    regions: []
+    display_unit: cwt/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: heading, grain_fill: grain fill, mature: ripe}
+    traits: {}
+  cotton:
+    label: Cotton (upland lint)
+    group: fiber_crop
+    cdl_codes: [2]
+    regions: []
+    display_unit: lb/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: setting bolls, grain_fill: bolls opening, mature: defoliation}
+    traits: {}
+  peanuts:
+    label: Peanuts
+    group: grain_legume
+    cdl_codes: [10]
+    regions: []
+    display_unit: lb/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: pegging, grain_fill: pod fill, mature: digging}
+    traits:
+      min_return_years: {value: 2, verified: false, text: "2-3", source: "leaf spot, stem rot and nematodes argue for two non-host years; placeholder"}
+      hosts: [root_knot_nematode, southern_stem_rot, cylindrocladium_black_rot]
+  dry_peas:
+    label: Dry peas
+    group: grain_legume
+    cdl_codes: [53]
+    regions: []
+    display_unit: cwt/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: blooming, grain_fill: pod fill, mature: ripe}
+    traits:
+      season: cool
+      min_return_years: {value: 5, verified: false, text: "5-6", source: "crop_coefficients.csv: Aphanomyces, Fusarium UNVERIFIED"}
+      n_credit_kg_ha: {value: 22, verified: false, source: "crop_coefficients.csv: WI 20 lb/ac for pea/beans"}
+      hosts: [aphanomyces_root_rot, white_mold]
+  lentils:
+    label: Lentils
+    group: grain_legume
+    cdl_codes: [52]
+    regions: []
+    display_unit: cwt/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: blooming, grain_fill: pod fill, mature: ripe}
+    traits:
+      season: cool
+      min_return_years: {value: 4, verified: false, text: "4-5", source: "crop_coefficients.csv UNVERIFIED"}
+      n_credit_kg_ha: {value: 20, verified: false, source: "crop_coefficients.csv: pea proxy UNVERIFIED"}
+      hosts: [aphanomyces_root_rot, white_mold, ascochyta_blight]
+  chickpeas:
+    label: Chickpeas
+    group: grain_legume
+    cdl_codes: [51]
+    regions: []
+    display_unit: cwt/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: blooming, grain_fill: pod fill, mature: ripe}
+    traits:
+      season: cool
+      min_return_years: {value: 4, verified: false, text: "4-5", source: "crop_coefficients.csv: Ascochyta UNVERIFIED"}
+      n_credit_kg_ha: {value: 17, verified: false, text: "15-20", source: "crop_coefficients.csv UNVERIFIED"}
+      hosts: [ascochyta_blight, white_mold]
+  sugarbeets:
+    label: Sugarbeets
+    group: root_crop
+    cdl_codes: [41]
+    regions: []
+    display_unit: ton/acre
+    bu_to_t_ha: null
+    ton_to_t_ha: 2.2417
+    stage_names: {flowering: row closure, grain_fill: root bulking, mature: harvest ready}
+    traits:
+      family: Amaranthaceae
+      humus_balance: {value: -1300, verified: true, source: "VDLUFA 2014, sugar beet conventional (crop_coefficients.csv S1)"}
+      hosts: [sugarbeet_cyst_nematode, cercospora_leaf_spot, rhizoctonia_root_rot]
+  potatoes:
+    label: Potatoes
+    group: root_crop
+    cdl_codes: [43]
+    regions: []
+    display_unit: cwt/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: tuber initiation, grain_fill: tuber bulking, mature: vine kill}
+    traits:
+      family: Solanaceae
+      humus_balance: {value: -1000, verified: true, source: "VDLUFA 2014, potato conventional (crop_coefficients.csv S1)"}
+      hosts: [potato_cyst_nematode, verticillium_wilt, late_blight, common_scab]
+  sugarcane:
+    label: Sugarcane
+    group: perennial_cane
+    cdl_codes: [45]
+    regions: []
+    display_unit: ton/acre
+    bu_to_t_ha: null
+    ton_to_t_ha: 2.2417
+    stage_names: {flowering: grand growth, grain_fill: ripening, mature: harvest ready}
+    traits: {}
+  sod_grass_seed:
+    label: Sod or grass seed
+    group: grass_hay_pasture
+    cdl_codes: [59]
+    regions: []
+    display_unit: ""
+    bu_to_t_ha: null
+    stage_names: {}
+    traits: {}
+  double_crop_winter_wheat_corn:
+    label: Double crop winter wheat / corn
+    group: warm_season_grain
+    cdl_codes: [225]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06277
+    stage_names: {flowering: silking, grain_fill: dough, mature: physiological maturity}
+    components: [winter_wheat, corn]
+    traits:
+      bare_soil_months: {value: 3, verified: false, source: "winter wheat covers autumn to June, corn to October; calendar estimate"}
+      hosts: [corn_rootworm, gray_leaf_spot, northern_corn_leaf_blight, take_all, fusarium_head_blight]
+  double_crop_winter_wheat_sorghum:
+    label: Double crop winter wheat / sorghum
+    group: warm_season_grain
+    cdl_codes: [236]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06277
+    stage_names: {flowering: heading, grain_fill: soft dough, mature: physiological maturity}
+    components: [winter_wheat, sorghum]
+    traits:
+      water_demand: medium
+      bare_soil_months: {value: 3, verified: false, source: "calendar estimate"}
+      hosts: [take_all, fusarium_head_blight]
+  double_crop_winter_wheat_cotton:
+    label: Double crop winter wheat / cotton
+    group: fiber_crop
+    cdl_codes: [238]
+    regions: []
+    display_unit: lb/acre
+    bu_to_t_ha: null
+    stage_names: {flowering: setting bolls, grain_fill: bolls opening, mature: defoliation}
+    components: [winter_wheat, cotton]
+    traits:
+      bare_soil_months: {value: 3, verified: false, source: "calendar estimate"}
+      hosts: [root_knot_nematode, reniform_nematode, verticillium_wilt, take_all, fusarium_head_blight]
+  double_crop_triticale_corn:
+    label: Double crop triticale / corn
+    group: warm_season_grain
+    cdl_codes: [228]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06277
+    stage_names: {flowering: silking, grain_fill: dough, mature: physiological maturity}
+    components: [triticale, corn]
+    traits:
+      bare_soil_months: {value: 3, verified: false, source: "calendar estimate"}
+      hosts: [corn_rootworm, gray_leaf_spot, northern_corn_leaf_blight, take_all, fusarium_head_blight]
+  double_crop_barley_soybeans:
+    label: Double crop barley / soybeans
+    group: grain_legume
+    cdl_codes: [254]
+    regions: []
+    display_unit: bu/acre
+    bu_to_t_ha: 0.06725
+    stage_names: {flowering: blooming (R1-R2), grain_fill: pod set to seed fill, mature: dropping leaves}
+    components: [barley, soybeans]
+    traits:
+      bare_soil_months: {value: 3, verified: false, source: "calendar estimate"}
+      hosts: [soybean_cyst_nematode, white_mold, sudden_death_syndrome, take_all, fusarium_head_blight]
+  orchard_vineyard:
+    label: Orchard, vineyard, nuts, citrus or berries
+    group: permanent_crop
+    # cherries, peaches, apples, grapes, christmas trees, other tree crops, citrus, pecans,
+    # almonds, walnuts, pears, pistachios, prunes, olives, oranges, avocados, pomegranates,
+    # nectarines, plums, apricots, blueberries, cranberries, caneberries
+    cdl_codes: [66, 67, 68, 69, 70, 71, 72, 74, 75, 76, 77, 204, 210, 211, 212, 215, 217, 218, 220, 223, 242, 250, 55]
+    regions: []
+    display_unit: ""
+    bu_to_t_ha: null
+    stage_names: {}
+    traits: {}
+  vegetables:
+    label: Vegetables, melons and other specialty crops
+    group: specialty_annual
+    # other crops, sweet potatoes, misc vegs & fruits, watermelons, onions, cucumbers, tomatoes,
+    # herbs, carrots, asparagus, garlic, cantaloupes, honeydew, broccoli, peppers, greens,
+    # strawberries, squash, eggplants, cabbage, cauliflower, celery, radishes, turnips, gourds,
+    # lettuce, pumpkins, hops, mint
+    cdl_codes: [44, 46, 47, 48, 49, 50, 54, 57, 206, 207, 208, 209, 213, 214, 216, 219, 221, 222, 226, 227, 229, 243, 244, 245, 246, 247, 248, 249, 56, 14]
+    regions: []
+    display_unit: ""
+    bu_to_t_ha: null
+    stage_names: {}
+    traits: {}
   non_crop:
     label: Not cropland (developed, water, forest, wetland, barren)
     group: non_crop

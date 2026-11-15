@@ -20,7 +20,14 @@ from app.schemas.fields import (
     Recommendation,
     SaveCropAreas,
 )
-from app.schemas.rotation import Priority, RotationAdvice
+from app.schemas.rotation import (
+    EconomicsView,
+    FieldEconomics,
+    Priority,
+    RotationAdvice,
+    SeasonResults,
+    SoilSurvey,
+)
 from app.schemas.soil_moisture import (
     CurrentSoilMoisture,
     MoistureFrequency,
@@ -30,6 +37,7 @@ from app.schemas.soil_moisture import (
 )
 from app.services import fields as service
 from app.services import soil_moisture as moisture_service
+from app.services.rotation_plan import DEFAULT_SEASONS, MAX_SEASONS, MIN_SEASONS
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["fields"])
@@ -138,6 +146,12 @@ def rotation_advice(
         "satellite-estimated crop",
     ),
     priorities: list[Priority] = Query(default_factory=list),
+    seasons: int = Query(
+        default=DEFAULT_SEASONS,
+        ge=MIN_SEASONS,
+        le=MAX_SEASONS,
+        description="Seasons the plan covers",
+    ),
 ):
     """Rank the candidate crops for the coming season with the rotation rule engine.
 
@@ -145,7 +159,86 @@ def rotation_advice(
     record. Missing inputs are listed in `dataGaps` instead of being guessed.
     """
     field = store.require_field(field_id)
-    return request.app.state.rotation.advise(field, crop, priorities, user.settings.units)
+    return request.app.state.rotation.advise(
+        field,
+        crop,
+        priorities,
+        user.settings.units,
+        store.soil_survey(field_id),
+        seasons,
+        store.season_results(field_id),
+        store.economics(field_id),
+    )
+
+
+@router.delete("/fields/{field_id}/rotation-inputs", status_code=204)
+def reset_rotation_inputs(field_id: FieldId, store: Store):
+    """Clear the caller's overrides together so the advice returns to field defaults."""
+    store.reset_rotation_inputs(field_id)
+
+
+@router.get("/fields/{field_id}/economics", response_model=EconomicsView)
+def economics(field_id: FieldId, store: Store, request: Request):
+    """The calculator: the caller's own price, cost and rent, and the USDA averages behind them."""
+    field = store.require_field(field_id)
+    return {
+        "inputs": store.economics(field_id),
+        "defaults": request.app.state.rotation.economics_defaults(field),
+    }
+
+
+@router.put("/fields/{field_id}/economics", response_model=FieldEconomics)
+def save_economics(field_id: FieldId, store: Store, request: Request, body: FieldEconomics):
+    """Store the caller's own prices, costs and land rent. What is left out keeps the average."""
+    known = request.app.state.rotation.advisor.catalog.crops
+    unknown = sorted({c.crop for c in body.crops} - set(known))
+    if unknown:
+        raise HTTPException(status_code=422, detail=f"Unknown crops: {', '.join(unknown)}")
+    return store.save_economics(field_id, body.model_dump(mode="json", exclude_none=True))
+
+
+@router.delete("/fields/{field_id}/economics", status_code=204)
+def delete_economics(field_id: FieldId, store: Store):
+    store.save_economics(field_id, None)
+
+
+@router.get("/fields/{field_id}/soil-survey", response_model=SoilSurvey | None)
+def soil_survey(field_id: FieldId, store: Store):
+    """The caller's own soil test for the field, or null."""
+    return store.soil_survey(field_id)
+
+
+@router.put("/fields/{field_id}/soil-survey", response_model=SoilSurvey)
+def save_soil_survey(field_id: FieldId, store: Store, survey: SoilSurvey):
+    """Store the caller's soil test. Its pH and organic matter replace the soil survey estimate."""
+    return store.save_soil_survey(field_id, survey.model_dump(mode="json", exclude_none=True))
+
+
+@router.delete("/fields/{field_id}/soil-survey", status_code=204)
+def delete_soil_survey(field_id: FieldId, store: Store):
+    store.save_soil_survey(field_id, None)
+
+
+@router.get("/fields/{field_id}/season-results", response_model=SeasonResults)
+def season_results(field_id: FieldId, store: Store):
+    """The caller's own record of past seasons on the field."""
+    return {"results": store.season_results(field_id)}
+
+
+@router.put("/fields/{field_id}/season-results", response_model=SeasonResults)
+def save_season_results(field_id: FieldId, store: Store, request: Request, body: SeasonResults):
+    """Replace the caller's past seasons. An empty list clears them.
+
+    The crop of a year replaces the satellite (CDL) label of that year; the yields set the
+    field's yield level against the county. The year after the last result becomes the first
+    season of the plan.
+    """
+    known = request.app.state.rotation.advisor.catalog.crops
+    unknown = sorted({r.crop for r in body.results} - set(known))
+    if unknown:
+        raise HTTPException(status_code=422, detail=f"Unknown crops: {', '.join(unknown)}")
+    rows = sorted((r.model_dump(exclude_none=True) for r in body.results), key=lambda r: r["year"])
+    return {"results": store.save_season_results(field_id, rows)}
 
 
 @router.get("/fields/{field_id}/crop-history", response_model=CropHistory)

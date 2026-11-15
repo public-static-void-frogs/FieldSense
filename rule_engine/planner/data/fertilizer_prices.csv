@@ -1,0 +1,3 @@
+nutrient,unit,usd_per_lb,year,verified,source,url
+phosphorus,lb P2O5,0.72,2026,true,"Iowa State University Ag Decision Maker A1-20 (FM 1712), Estimated Costs of Crop Production in Iowa 2026, revised January 2026",https://www.extension.iastate.edu/agdm/crops/html/a1-20.html
+potassium,lb K2O,0.39,2026,true,"Iowa State University Ag Decision Maker A1-20 (FM 1712), Estimated Costs of Crop Production in Iowa 2026, revised January 2026",https://www.extension.iastate.edu/agdm/crops/html/a1-20.html

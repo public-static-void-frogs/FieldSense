@@ -18,7 +18,6 @@ type CandidateListProps = { advice: RotationAdvice };
 
 export function CandidateList({ advice }: CandidateListProps) {
   const { t, i18n } = useTranslation();
-  const { search } = useLocation();
   const candidates = rankedCandidates(advice);
 
   if (candidates.length === 0) {
@@ -32,45 +31,106 @@ export function CandidateList({ advice }: CandidateListProps) {
   return (
     <ol className="rotation-candidates" role="list">
       {candidates.map((candidate) => (
-        <li className="rotation-candidate-row" key={candidate.crop} data-rank={candidate.rank}>
-          <CandidateSummary candidate={candidate} />
-          <div className="rotation-candidate-actions">
-            {candidate.revenue && (
-              <div className="rotation-candidate-revenue">
-                <strong>{formatUsd(candidate.revenue.midUsd, i18n.language)}</strong>
-                <span>{t('Estimated gross revenue')}</span>
-              </div>
-            )}
-            <RouterButton
-              to={{ pathname: recommendationPath(advice.fieldId, candidate.crop), search }}
-              aria-label={t('View details for {{crop}}', { crop: t(candidate.label) })}
-            >
-              {t('View details')}
-            </RouterButton>
-          </div>
-        </li>
+        <CandidateRow
+          key={candidate.crop}
+          fieldId={advice.fieldId}
+          crop={candidate.crop}
+          label={candidate.label}
+          candidate={candidate}
+          amount={
+            candidate.revenue && {
+              value: formatUsd(candidate.revenue.midUsd, i18n.language),
+              label: t('Estimated gross revenue'),
+            }
+          }
+        />
       ))}
     </ol>
   );
 }
 
-type CandidateSummaryProps = { candidate: RotationCandidate };
+type CandidateRowProps = {
+  fieldId: string;
+  crop: string;
+  label: string;
+  candidate?: RotationCandidate;
+  rank?: number;
+  amount?: { value: string; label: string } | null;
+  description?: string;
+  tooltipNote?: string;
+};
 
-function CandidateSummary({ candidate }: CandidateSummaryProps) {
+export function CandidateRow({
+  fieldId,
+  crop,
+  label,
+  candidate,
+  rank = candidate?.rank,
+  amount,
+  description,
+  tooltipNote,
+}: CandidateRowProps) {
+  const { t } = useTranslation();
+  const { search } = useLocation();
+  const cropLabel = t(label);
+
+  return (
+    <li className="rotation-candidate-row" data-rank={rank}>
+      <CandidateSummary
+        label={label}
+        candidate={candidate}
+        rank={rank}
+        description={description}
+        tooltipNote={tooltipNote}
+      />
+      <div className="rotation-candidate-actions">
+        {amount && (
+          <div className="rotation-candidate-revenue">
+            <strong>{amount.value}</strong>
+            <span>{amount.label}</span>
+          </div>
+        )}
+        <RouterButton
+          to={{ pathname: recommendationPath(fieldId, crop), search }}
+          aria-label={t('View details for {{crop}}', { crop: cropLabel })}
+        >
+          {t('View details')}
+        </RouterButton>
+      </div>
+    </li>
+  );
+}
+
+type CandidateSummaryProps = Pick<
+  CandidateRowProps,
+  'label' | 'candidate' | 'rank' | 'description' | 'tooltipNote'
+> & { showNoRisks?: boolean };
+
+export function CandidateSummary({
+  label,
+  candidate,
+  rank,
+  description,
+  tooltipNote,
+  showNoRisks = false,
+}: CandidateSummaryProps) {
   const { t, i18n } = useTranslation();
-  const level = highestRiskLevel(candidate);
+  const level = candidate && highestRiskLevel(candidate);
+  const cropLabel = t(label);
 
   return (
     <div className="rotation-candidate-summary">
-      <span className="rotation-rank" aria-label={t('Rank {{rank}}', { rank: candidate.rank })}>
-        {candidate.rank}
-      </span>
-      <CropIcon crop={candidate.label} size={32} />
+      {rank != null && (
+        <span className="rotation-rank" aria-label={t('Rank {{rank}}', { rank })}>
+          {rank}
+        </span>
+      )}
+      <CropIcon crop={label} size={32} />
       <Flex gap={8} align="center" wrap>
         <Typography.Text strong className="rotation-candidate-name">
-          {t(candidate.label)}
+          {cropLabel}
         </Typography.Text>
-        {candidate.isIntended && (
+        {candidate?.isIntended && (
           <Tag className="rotation-candidate-badge" data-tone="intended">
             {t('Your crop')}
           </Tag>
@@ -80,22 +140,39 @@ function CandidateSummary({ candidate }: CandidateSummaryProps) {
             {t(levelLabels[level])}
           </Tag>
         )}
-        <Tooltip
-          trigger={['hover', 'focus', 'click']}
-          title={t('{{risks}} risks · {{benefits}} benefits · {{points}} points', {
-            risks: candidate.risks.length,
-            benefits: candidate.benefits.length,
-            points: formatNumber(candidate.score, i18n.language),
-          })}
-        >
-          <Button
-            type="text"
-            size="small"
-            shape="circle"
-            icon={<CircleHelp size={16} />}
-            aria-label={t('Ranking information for {{crop}}', { crop: t(candidate.label) })}
-          />
-        </Tooltip>
+        {showNoRisks && candidate && !level && (
+          <Tag className="rotation-candidate-badge">{t('No risks found')}</Tag>
+        )}
+        {candidate && (
+          <Tooltip
+            trigger={['hover', 'focus', 'click']}
+            title={
+              <>
+                <div>
+                  {t('{{risks}} risks · {{benefits}} benefits · {{points}} points', {
+                    risks: candidate.risks.length,
+                    benefits: candidate.benefits.length,
+                    points: formatNumber(candidate.score, i18n.language),
+                  })}
+                </div>
+                {tooltipNote && <div>{tooltipNote}</div>}
+              </>
+            }
+          >
+            <Button
+              type="text"
+              size="small"
+              shape="circle"
+              icon={<CircleHelp size={16} />}
+              aria-label={t('Ranking information for {{crop}}', { crop: cropLabel })}
+            />
+          </Tooltip>
+        )}
+        {description && (
+          <Typography.Text type="secondary" className="rotation-candidate-description">
+            {description}
+          </Typography.Text>
+        )}
       </Flex>
     </div>
   );

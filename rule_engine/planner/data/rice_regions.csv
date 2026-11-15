@@ -1,0 +1,111 @@
+county_fips,region,verified,basis
+05001,Arkansas Non-Delta,true,EIB-202 and Amber Waves 2020: the Grand Prairie is Non-Delta
+05003,Mississippi River Delta,false,EPA ecoregion proxy: 95% of the county's CDL 2021-2023 rice acres
+05011,Arkansas Non-Delta,false,this work: Amber Waves 2020 adds northeast AR and southeast MO
+05017,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+05019,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05021,Arkansas Non-Delta,false,EPA ecoregion proxy: 98% of the county's CDL 2021-2023 rice acres
+05029,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05031,Arkansas Non-Delta,false,EPA ecoregion proxy: 87% of the county's CDL 2021-2023 rice acres
+05035,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+05037,Arkansas Non-Delta,false,EPA ecoregion proxy: 66% of the county's CDL 2021-2023 rice acres
+05041,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+05043,Mississippi River Delta,false,EPA ecoregion proxy: 87% of the county's CDL 2021-2023 rice acres
+05045,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05047,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05055,Arkansas Non-Delta,false,EPA ecoregion proxy: 74% of the county's CDL 2021-2023 rice acres
+05063,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05067,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05069,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05073,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05075,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05077,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+05079,Mississippi River Delta,false,EPA ecoregion proxy: 99% of the county's CDL 2021-2023 rice acres
+05083,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05085,Arkansas Non-Delta,true,EIB-202 and Amber Waves 2020: the Grand Prairie is Non-Delta
+05091,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05093,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+05095,Arkansas Non-Delta,true,EIB-202 and Amber Waves 2020: the Grand Prairie is Non-Delta
+05105,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05107,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+05111,Arkansas Non-Delta,false,EPA ecoregion proxy: 73% of the county's CDL 2021-2023 rice acres
+05115,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05117,Arkansas Non-Delta,true,EIB-202 and Amber Waves 2020: the Grand Prairie is Non-Delta
+05119,Mississippi River Delta,false,EPA ecoregion proxy: 92% of the county's CDL 2021-2023 rice acres
+05121,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05123,Arkansas Non-Delta,false,EPA ecoregion proxy: 70% of the county's CDL 2021-2023 rice acres
+05145,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05147,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+05149,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22001,Gulf Coast,true,EIB-202: Southwest Louisiana is Gulf Coast (NASS district)
+22003,Gulf Coast,true,EIB-202: Southwest Louisiana is Gulf Coast (NASS district)
+22009,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22011,Gulf Coast,true,EIB-202: Southwest Louisiana is Gulf Coast (NASS district)
+22015,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22017,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22019,Gulf Coast,true,EIB-202: Southwest Louisiana is Gulf Coast (NASS district)
+22023,Gulf Coast,true,EIB-202: Southwest Louisiana is Gulf Coast (NASS district)
+22025,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22029,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22035,Mississippi River Delta,true,EIB-202: the Delta holds part of Louisiana (NASS Northeast district)
+22039,Gulf Coast,false,EPA ecoregion proxy: 95% of the county's CDL 2021-2023 rice acres
+22041,Mississippi River Delta,true,EIB-202: the Delta holds part of Louisiana (NASS Northeast district)
+22045,Mississippi River Delta,false,EPA ecoregion proxy: 94% of the county's CDL 2021-2023 rice acres
+22053,Gulf Coast,true,EIB-202: Southwest Louisiana is Gulf Coast (NASS district)
+22055,Gulf Coast,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22065,Mississippi River Delta,true,EIB-202: the Delta holds part of Louisiana (NASS Northeast district)
+22067,Mississippi River Delta,true,EIB-202: the Delta holds part of Louisiana (NASS Northeast district)
+22069,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22073,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22077,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22079,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22081,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22083,Mississippi River Delta,true,EIB-202: the Delta holds part of Louisiana (NASS Northeast district)
+22097,Mississippi River Delta,false,EPA ecoregion proxy: 59% of the county's CDL 2021-2023 rice acres
+22099,Mississippi River Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+22107,Mississippi River Delta,true,EIB-202: the Delta holds part of Louisiana (NASS Northeast district)
+22113,Gulf Coast,true,EIB-202: Southwest Louisiana is Gulf Coast (NASS district)
+22123,Mississippi River Delta,true,EIB-202: the Delta holds part of Louisiana (NASS Northeast district)
+28011,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28015,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28027,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28033,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28053,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28061,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28083,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28105,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28107,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28119,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28133,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28135,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28137,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28143,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+28151,Mississippi River Delta,true,EIB-202: Mississippi rice is in the Mississippi Delta region
+29017,Mississippi River Delta,false,EPA ecoregion proxy: 95% of the county's CDL 2021-2023 rice acres
+29023,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+29069,Mississippi River Delta,false,EPA ecoregion proxy: 92% of the county's CDL 2021-2023 rice acres
+29103,Arkansas Non-Delta,false,this work: Amber Waves 2020 adds northeast AR and southeast MO
+29127,Arkansas Non-Delta,false,this work: Amber Waves 2020 adds northeast AR and southeast MO
+29133,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+29143,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+29155,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+29181,Arkansas Non-Delta,false,EPA ecoregion proxy: 100% of the county's CDL 2021-2023 rice acres
+29201,Mississippi River Delta,false,ERS before 1995: the Delta is the River Counties; this county borders the river
+29207,Mississippi River Delta,false,EPA ecoregion proxy: 67% of the county's CDL 2021-2023 rice acres
+48015,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48039,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48055,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48071,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48089,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48123,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48157,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48167,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48199,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48239,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48245,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48285,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48291,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48321,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48469,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48473,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana
+48481,Gulf Coast,true,EIB-202: Gulf Coast is Texas and Southwest Louisiana

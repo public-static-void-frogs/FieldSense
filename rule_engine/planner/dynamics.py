@@ -68,7 +68,7 @@ class SoilCarbon:
         self, crop: Crop, yield_t_ha: float, cover: str, table: dict[str, CarbonInput]
     ) -> float:
         """Stable-equivalent carbon (t C/ha) one season adds, from the harvested yield."""
-        row = table.get(crop.group.id)
+        row = table.get(crop.id) or table.get(crop.group.id)
         added = self.cover_stable_c if cover != "none" else 0.0
         if row is None:
             return added

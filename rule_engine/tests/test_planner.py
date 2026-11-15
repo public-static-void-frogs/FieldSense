@@ -253,7 +253,9 @@ class CarryOverTests(unittest.TestCase):
         model = self.model(persistence=Persistence(strength=0.0))
         self.assertIsNone(model.chain)
         self.assertIsNone(model.initial_state.prev)
-        self.assertIsNone(build_chain(model.years[:3], {}, model.sampler.basis, Persistence()))
+        self.assertIsNone(
+            build_chain(model.years[:3], {}, model.sampler.price_level, Persistence())
+        )
         self.assertAlmostEqual(exact_plan(model).value, open_loop_plan(model).value)
 
     def test_state_tracks_the_year_just_experienced(self):
@@ -291,6 +293,173 @@ class CarryOverTests(unittest.TestCase):
         self.assertAlmostEqual(total, fixed.value, places=6)
 
 
+class EconomicsTests(unittest.TestCase):
+    def test_prices_are_drawn_as_changes_around_the_planning_price(self):
+        from rule_engine.planner.sampler import price_changes
+
+        changes = price_changes({1990: 2.0, 1991: 3.0, 1992: 3.0, 1993: 1.5})
+        self.assertEqual(sorted(changes), [1991, 1992, 1993])  # the first year has no change
+        self.assertAlmostEqual(sum(changes.values()) / 3, 1.0)
+        self.assertGreater(changes[1991], changes[1992])
+        self.assertGreater(changes[1992], changes[1993])
+
+    def test_soil_test_sets_the_fertilizer_cost_change(self):
+        from rule_engine.planner.nutrients import category, cost_changes, soil_test_effect
+
+        self.assertEqual(category("phosphorus", 9)[0], "very_low")
+        self.assertEqual(category("phosphorus", 10)[0], "low")
+        self.assertEqual(category("phosphorus", 30, "mehlich3_icp")[0], "optimum")
+        self.assertEqual(category("potassium", 150, "moist")[0], "optimum")
+        self.assertEqual(category("potassium", 150, "dried")[0], "low")
+        self.assertIsNone(category("potassium", 150, "unknown"))
+        effects = soil_test_effect({"phosphorus": {"ppm": 40}, "potassium": {"ppm": 100}}, "NE")
+        self.assertEqual([e["category"] for e in effects], ["very_high", "very_low"])
+        self.assertEqual(effects[0]["calibration"], "iowa_applied_elsewhere")
+        # corn: no P (-67 lb x 0.72) and build-up K ((145 - 46) lb x 0.39)
+        self.assertAlmostEqual(cost_changes(effects)["corn"], -67 * 0.72 + 99 * 0.39, places=2)
+        self.assertEqual(
+            cost_changes(soil_test_effect({"phosphorus": {"ppm": 20}}, "IA"))["corn"], 0
+        )
+
+    def test_farmer_cost_replaces_the_level_and_keeps_the_differences(self):
+        table = CostTable(region="Heartland")
+        gap = (
+            table.crop_cost("corn", "corn", "conventional").usd_per_acre
+            - table.crop_cost("corn", "soybeans", "conventional").usd_per_acre
+        )
+        table.override("corn", 500.0)
+        self.assertEqual(table.crop_cost("corn", "soybeans", "conventional").usd_per_acre, 500.0)
+        self.assertAlmostEqual(
+            table.crop_cost("corn", "corn", "conventional").usd_per_acre, 500.0 + gap
+        )
+
+
+class ZeroYieldTests(unittest.TestCase):
+    def test_a_zero_county_yield_is_not_an_observation(self):
+        advisor = build_advisor()
+        base = several_years(build_context(field(), advisor, [FIXTURES], reference_aws_mm=180.0))
+        zeroed = {
+            year: replace(s, scalars={**s.scalars, "yield_corn_bu_ac": 0.0})
+            for year, s in base.seasons.items()
+        }
+        model = RotationModel(
+            replace(base, seasons=zeroed), advisor, crops=("corn", "soybeans"), horizon=1
+        )
+        basis = model.sampler.basis["corn"]
+        self.assertGreater(basis.expected_yield, 0)
+        self.assertNotEqual(basis.yield_level, "county")
+
+
+class FarmerResultTests(unittest.TestCase):
+    """What the farmer reports: the crops replace the CDL labels, the yields set the level."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.advisor = build_advisor()
+
+    def basis(self, own=None, crop="corn"):
+        record = field()
+        if own:
+            record["ownYields"] = {crop: own}
+        context = several_years(
+            build_context(record, self.advisor, [FIXTURES], reference_aws_mm=180.0)
+        )
+        model = RotationModel(context, self.advisor, crops=("corn", "soybeans"), horizon=1)
+        return model.sampler.basis[crop]
+
+    def test_declared_crops_replace_the_satellite_labels(self):
+        record = field()
+        record["declaredHistory"] = {2025: "soybeans", 2026: "corn", 2027: "not_a_crop"}
+        from rule_engine.facts import crop_history
+
+        context = build_context(record, self.advisor, [FIXTURES], reference_aws_mm=180.0)
+        by_year = {y.year: y for y in crop_history(record, [], self.advisor.catalog)}
+        self.assertEqual((by_year[2025].crop, by_year[2025].source), ("soybeans", "declared"))
+        self.assertEqual((by_year[2026].crop, by_year[2026].source), ("corn", "declared"))
+        self.assertEqual((by_year[2024].crop, by_year[2024].source), ("soybeans", "cdl"))
+        self.assertNotIn(2027, by_year)
+        self.assertEqual(context.last_history_year, 2026)  # the plan starts the year after
+
+    def test_own_yields_set_the_field_level(self):
+        plain = self.basis()
+        self.assertEqual((plain.own_ratio, plain.own_points), (1.0, ()))
+        probe = self.basis({2022: 1.0, 2023: 1.0, 2024: 1.0, 2025: 1.0})
+        reference = {year: base for year, _, base in probe.own_points}
+        self.assertEqual(sorted(reference), [2022, 2023, 2024, 2025])
+
+        full = self.basis({year: 1.2 * base for year, base in reference.items()})
+        self.assertAlmostEqual(full.own_ratio, 1.2, places=6)
+        self.assertAlmostEqual(full.expected_yield, 1.2 * plain.expected_yield, places=6)
+        self.assertEqual(full.yield_level, "field")
+
+    def test_few_own_yields_are_pulled_towards_the_county_level(self):
+        plain = self.basis()
+        probe = self.basis({2024: 1.0, 2025: 1.0})
+        two = self.basis({year: 1.2 * base for year, _, base in probe.own_points})
+        # two reported years and two filled at the reference level: (1.2 + 1.2 + 1 + 1) / 4
+        self.assertAlmostEqual(two.own_ratio, 1.1, places=6)
+        self.assertAlmostEqual(two.expected_yield, 1.1 * plain.expected_yield, places=6)
+
+    def test_only_the_latest_ten_own_yields_count(self):
+        own = {year: 100.0 for year in range(2010, 2026)}
+        self.assertEqual(
+            [year for year, _, _ in self.basis(own).own_points], list(range(2016, 2026))
+        )
+
+
+class CropOptionTests(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        cls.advisor = build_advisor()
+        cls.context = build_context(field(), cls.advisor, [FIXTURES], reference_aws_mm=180.0)
+        cls.model = RotationModel(
+            cls.context, cls.advisor, crops=("corn", "soybeans", "oats", "alfalfa"), horizon=3
+        )
+
+    def test_best_option_is_the_best_fixed_plan(self):
+        from rule_engine.planner.solve import crop_options
+
+        options = crop_options(self.model)
+        self.assertEqual(sorted(o["steps"][0][1].crop for o in options), sorted(self.model.crops))
+        values = [o["value"] for o in options]
+        self.assertEqual(values, sorted(values, reverse=True))
+        self.assertAlmostEqual(values[0], open_loop_plan(self.model).value, places=6)
+        self.assertTrue(all(len(o["steps"]) == 3 for o in options))
+
+    def test_replay_runs_the_plan_through_consecutive_years(self):
+        from rule_engine.planner.solve import crop_options, replay
+
+        model = RotationModel(
+            several_years(self.context), self.advisor, crops=("corn", "soybeans", "oats"), horizon=3
+        )
+        steps = crop_options(model)[0]["steps"]
+        found = replay(model, steps)
+        first, runs = found["first"], found["runs"]
+        self.assertEqual([y["year"] for y in first["years"]], list(range(2019, 2026)))
+        self.assertAlmostEqual(sum(y["odds"] for y in first["years"]), 1.0, places=6)
+        summary = model.summary(*steps[0])
+        self.assertAlmostEqual(
+            first["mean"], summary["revenueUsdPerAcre"] - summary["costUsdPerAcre"], delta=0.02
+        )
+        self.assertLessEqual(first["p10"], first["p50"])
+        self.assertLessEqual(first["p50"], first["p90"])
+        self.assertEqual([r["year"] for r in runs["starts"]], list(range(2019, 2024)))
+        self.assertTrue(0.0 <= runs["lossProbability"] <= 1.0)
+
+    def test_a_seeded_perennial_stand_is_kept(self):
+        from rule_engine.planner.dynamics import Action, State
+
+        model = self.model
+        start = model.open_loop_state
+        seeded = model.transition(start, Action("alfalfa", "conventional", "none"))
+        self.assertEqual({a.crop for a in model.actions(seeded)}, {"alfalfa"})
+        old = State(0, ("corn", "alfalfa", "alfalfa", "alfalfa"), start.young, start.old, None)
+        self.assertGreater(len({a.crop for a in model.actions(old)}), 1)
+        # a stand that fills the known history may be older than it looks
+        unknown_age = State(0, ("alfalfa",), start.young, start.old, None)
+        self.assertGreater(len({a.crop for a in model.actions(unknown_age)}), 1)
+
+
 class TabularTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -314,14 +483,47 @@ class TabularTests(unittest.TestCase):
     def test_table_shape(self):
         table = self.table
         self.assertEqual(table.node_t[0], 0)
+        self.assertEqual(table.reward.shape[1:], (self.tabular.LOCAL, self.tabular.MAX_YEARS))
         self.assertEqual(
-            table.reward.shape[1:], (len(self.tabular.ACTIONS), self.tabular.MAX_YEARS)
+            [self.tabular.CROPS[c] for c in table.crops if c >= 0], list(self.model.crops)
         )
-        alfalfa = [i for i, a in enumerate(self.tabular.ACTIONS) if a.crop == "alfalfa"]
-        self.assertFalse(table.mask[:, alfalfa].any())  # not among this model's crops
+        unused = self.tabular.SLOT >= len(self.model.crops)
+        self.assertFalse(table.mask[:, unused].any())
         last = table.node_t == self.model.horizon - 1
         self.assertTrue((table.next_node[last] == -1).all())
         self.assertTrue(np.allclose(table.odds[:7, :7].sum(axis=1), 1.0, atol=1e-5))
+
+    def test_factored_reward_is_the_model_reward(self):
+        table, model = self.table, self.model
+        state = model.open_loop_state
+        actions = self.tabular.ACTIONS
+        for a in np.flatnonzero(table.mask[0]):
+            action = actions[table.global_actions[a]]
+            for y in range(len(model.years)):
+                self.assertAlmostEqual(
+                    float(table.reward[0, a, y]), model.outcome(state, action, y).reward, delta=0.01
+                )
+
+    def test_regional_costs(self):
+        heartland = CostTable(region="Heartland")
+        plain = CostTable()
+        level = heartland.regional["corn"].usd_per_acre
+        self.assertAlmostEqual(
+            heartland.crop_cost("corn", "soybeans", "conventional").usd_per_acre, level
+        )
+        # the corn-after-corn and tillage differences come from the state budgets
+        for previous, tillage in (("corn", "conventional"), ("soybeans", "strip_till")):
+            self.assertAlmostEqual(
+                heartland.crop_cost("corn", previous, tillage).usd_per_acre - level,
+                plain.crop_cost("corn", previous, tillage).usd_per_acre
+                - plain.crop_cost("corn", "soybeans", "conventional").usd_per_acre,
+            )
+        # ERS has no Heartland sorghum table: the national row is used and flagged
+        self.assertFalse(heartland.crop_cost("sorghum", None, "no_till").verified)
+        self.assertEqual(
+            heartland.crop_cost("alfalfa", "alfalfa", "no_till"),
+            plain.crop_cost("alfalfa", "alfalfa", "no_till"),
+        )
 
     def test_learned_policy_trains_scores_and_reloads(self):
         try:
@@ -343,3 +545,80 @@ class TabularTests(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class SoilLevelTests(unittest.TestCase):
+    def test_soil_index_moves_yield_within_limits(self):
+        import unittest.mock
+
+        from rule_engine.planner import soil_level as module
+
+        means = {"19169": {"county_fips": "19169", "fields": "40", "nccpi_corn": "0.60"}}
+        with unittest.mock.patch.object(module, "county_means", lambda: means):
+            better = module.soil_level("corn", {"nccpi_corn": 0.80}, "19169")
+            self.assertAlmostEqual(better.ratio, 1 + 0.44 * 0.20)
+            self.assertEqual(module.soil_level("corn", {"nccpi_corn": 0.05}, "19169").ratio, 0.85)
+            self.assertIsNone(module.soil_level("corn", {}, "19169"))
+            self.assertIsNone(module.soil_level("corn", {"nccpi_corn": 0.8}, "01001"))
+            self.assertIsNone(module.soil_level("oats", {"nccpi_corn": 0.8}, "19169"))
+            self.assertIsNone(module.soil_level("soybeans", {"nccpi_soy": 0.8}, "19169"))
+
+
+class CellIndexTests(unittest.TestCase):
+    """A field outside the sample reads the sampled field of its weather cell and county."""
+
+    @classmethod
+    def setUpClass(cls):
+        import tempfile
+
+        import duckdb
+
+        from rule_engine.cells import CellIndex, cell
+
+        cls.cell = staticmethod(cell)
+        cls.dir = tempfile.TemporaryDirectory()
+        path = Path(cls.dir.name) / "summary_index.parquet"
+        ix, iy = cell(-93.6, 42.0)
+        rows = f"('A', '19169', {ix}, {iy}), ('B', '19169', {ix + 3}, {iy}), ('C', '19015', {ix}, {iy})"
+        duckdb.connect().execute(
+            f"COPY (SELECT * FROM (VALUES {rows}) t(CSBID, county_fips, ix, iy)) TO '{path}' "
+            "(FORMAT PARQUET)"
+        )
+        cls.index = CellIndex(path)
+
+    @classmethod
+    def tearDownClass(cls):
+        cls.dir.cleanup()
+
+    def test_sampled_field_reads_itself(self):
+        twin = self.index.twin("B", "19169", -93.6, 42.0)
+        self.assertEqual((twin.csbid, twin.source, twin.distance_km), ("B", "own", 0.0))
+
+    def test_same_cell_and_county(self):
+        twin = self.index.twin("X", "19169", -93.6, 42.0)
+        self.assertEqual((twin.csbid, twin.source, twin.distance_km), ("A", "weather_cell", 0.0))
+
+    def test_county_decides_before_distance(self):
+        # C is in the same cell but another county: its county yield is not this field's
+        twin = self.index.twin("X", "19015", -93.6 + 2 / 24, 42.0)
+        self.assertEqual((twin.csbid, twin.source), ("C", "nearby_cell"))
+        self.assertGreater(twin.distance_km, 5)
+
+    def test_nothing_close_enough(self):
+        self.assertIsNone(self.index.twin("X", "19169", -90.0, 42.0))
+        self.assertIsNone(self.index.twin("X", "01001", -93.6, 42.0))
+
+    def test_twin_summaries_do_not_supply_crop_history(self):
+        from rule_engine.summary import summary_key, summary_source
+
+        field = {"sourceId": "X", "countyFips": "19169"}
+        self.assertEqual(summary_key(field), ("X", "19169", True))
+        field["summaryTwin"] = {
+            "sourceId": "A",
+            "countyFips": "19169",
+            "source": "weather_cell",
+            "distanceKm": 0.0,
+        }
+        self.assertEqual(summary_key(field), ("A", "19169", False))
+        self.assertEqual(summary_source(field, [1])["kind"], "weather_cell")
+        self.assertEqual(summary_source(field, [])["kind"], "none")

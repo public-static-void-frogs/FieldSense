@@ -50,6 +50,27 @@ PROGRESS = {
                      "flowering": "HEADED", "harvested": "HARVESTED"}),
     # fall-sown: planting and emergence belong to the previous autumn and are left out
     "winter_wheat": ("WHEAT", "WINTER", {"flowering": "HEADED", "harvested": "HARVESTED"}),
+    "durum_wheat": ("WHEAT", "SPRING, DURUM", {"planted": "PLANTED", "emerged": "EMERGED",
+                    "flowering": "HEADED", "grain_fill": "COLORING", "mature": "MATURE",
+                    "harvested": "HARVESTED"}),
+    "cotton": ("COTTON", "UPLAND", {"planted": "PLANTED", "emerged": "EMERGED",
+               "flowering": "SETTING BOLLS", "grain_fill": "BOLLS OPENING",
+               "mature": "DEFOLIATED", "harvested": "HARVESTED"}),
+    "rice": ("RICE", None, {"planted": "PLANTED", "emerged": "EMERGED", "flowering": "HEADED",
+             "mature": "MATURE", "harvested": "HARVESTED"}),
+    "peanuts": ("PEANUTS", None, {"planted": "PLANTED", "emerged": "EMERGED",
+                "flowering": "PEGGING", "mature": "MATURE", "harvested": "HARVESTED"}),
+    "potatoes": ("POTATOES", "ALL CLASSES", {"planted": "PLANTED", "emerged": "EMERGED",
+                 "flowering": "BLOOMING", "mature": "VINES DRY", "harvested": "HARVESTED"}),
+    "dry_peas": ("PEAS", "DRY EDIBLE", {"planted": "PLANTED", "emerged": "EMERGED",
+                 "flowering": "BLOOMING", "grain_fill": "SETTING PODS",
+                 "mature": "DROPPING LEAVES", "harvested": "HARVESTED"}),
+    "lentils": ("LENTILS", None, {"planted": "PLANTED", "emerged": "EMERGED",
+                "flowering": "BLOOMING", "harvested": "HARVESTED"}),
+    "flax": ("FLAXSEED", None, {"planted": "PLANTED", "emerged": "EMERGED",
+             "flowering": "BLOOMING", "grain_fill": "COLORING", "harvested": "HARVESTED"}),
+    # NASS reports only planting and harvest for sugarbeets, sugarcane and proso millet: they
+    # keep the group calendar
 }  # fmt: skip
 GRAIN_FILL_AFTER_HEADING = 15  # days; used when NASS reports no grain-fill stage for a cereal
 MATURE_BEFORE_HARVEST = 10
@@ -67,6 +88,18 @@ YIELDS = {
     "canola": ("CANOLA - YIELD, MEASURED IN LB / ACRE", "bu/acre", 1 / LB_PER_BU_CANOLA),
     "alfalfa": ("HAY, ALFALFA - YIELD, MEASURED IN TONS / ACRE", "ton/acre", 1),
     "other_hay": ("HAY, (EXCL ALFALFA) - YIELD, MEASURED IN TONS / ACRE", "ton/acre", 1),
+    "durum_wheat": ("WHEAT, SPRING, DURUM - YIELD, MEASURED IN BU / ACRE", "bu/acre", 1),
+    "cotton": ("COTTON - YIELD, MEASURED IN LB / ACRE", "lb/acre", 1),  # lint, upland + pima
+    "rice": ("RICE - YIELD, MEASURED IN LB / ACRE", "cwt/acre", 0.01),
+    "peanuts": ("PEANUTS - YIELD, MEASURED IN LB / ACRE", "lb/acre", 1),
+    "sugarbeets": ("SUGARBEETS - YIELD, MEASURED IN TONS / ACRE", "ton/acre", 1),
+    "potatoes": ("POTATOES - YIELD, MEASURED IN CWT / ACRE", "cwt/acre", 1),
+    "sugarcane": ("SUGARCANE, SUGAR - YIELD, MEASURED IN TONS / ACRE", "ton/acre", 1),
+    "dry_peas": ("PEAS, DRY EDIBLE - YIELD, MEASURED IN LB / ACRE", "cwt/acre", 0.01),
+    "lentils": ("LENTILS - YIELD, MEASURED IN LB / ACRE", "cwt/acre", 0.01),
+    "chickpeas": ("CHICKPEAS - YIELD, MEASURED IN LB / ACRE", "cwt/acre", 0.01),
+    "millet": ("MILLET, PROSO - YIELD, MEASURED IN BU / ACRE", "bu/acre", 1),
+    "flax": ("FLAXSEED - YIELD, MEASURED IN BU / ACRE", "bu/acre", 1),
 }
 PRICES = {
     "oats": ("OATS - PRICE RECEIVED, MEASURED IN $ / BU", "bu", 1),
@@ -77,6 +110,18 @@ PRICES = {
     "canola": ("CANOLA - PRICE RECEIVED, MEASURED IN $ / CWT", "bu", CWT_PER_BU["canola"]),
     "alfalfa": ("HAY, ALFALFA - PRICE RECEIVED, MEASURED IN $ / TON", "ton", 1),
     "other_hay": ("HAY, (EXCL ALFALFA) - PRICE RECEIVED, MEASURED IN $ / TON", "ton", 1),
+    "durum_wheat": ("WHEAT, SPRING, DURUM - PRICE RECEIVED, MEASURED IN $ / BU", "bu", 1),
+    "cotton": ("COTTON, UPLAND - PRICE RECEIVED, MEASURED IN $ / LB", "lb", 1),  # lint only
+    "rice": ("RICE - PRICE RECEIVED, MEASURED IN $ / CWT", "cwt", 1),
+    "peanuts": ("PEANUTS - PRICE RECEIVED, MEASURED IN $ / LB", "lb", 1),
+    "sugarbeets": ("SUGARBEETS - PRICE RECEIVED, MEASURED IN $ / TON", "ton", 1),
+    "potatoes": ("POTATOES - PRICE RECEIVED, MEASURED IN $ / CWT", "cwt", 1),
+    "sugarcane": ("SUGARCANE, SUGAR - PRICE RECEIVED, MEASURED IN $ / TON", "ton", 1),
+    "dry_peas": ("PEAS, DRY EDIBLE - PRICE RECEIVED, MEASURED IN $ / CWT", "cwt", 1),
+    "lentils": ("LENTILS - PRICE RECEIVED, MEASURED IN $ / CWT", "cwt", 1),
+    "chickpeas": ("CHICKPEAS - PRICE RECEIVED, MEASURED IN $ / CWT", "cwt", 1),
+    "millet": ("MILLET, PROSO - PRICE RECEIVED, MEASURED IN $ / BU", "bu", 1),
+    "flax": ("FLAXSEED - PRICE RECEIVED, MEASURED IN $ / BU", "bu", 1),
 }  # fmt: skip
 
 

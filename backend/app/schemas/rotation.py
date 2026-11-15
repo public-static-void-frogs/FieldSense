@@ -1,20 +1,339 @@
 """Response contract of the rotation advice. Codes and numbers only: wording is the client's."""
 
+from datetime import date
 from typing import Any, Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, ConfigDict, model_validator
 from pydantic import Field as Value
 
 Priority = Literal["water", "soil", "erosion", "income", "pest_break"]
 
 
+class SoilSurvey(BaseModel):
+    """The farmer's own soil test. pH and organic matter replace the soil survey estimate."""
+
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    sampledOn: date | None = None
+    ph: float | None = Value(default=None, ge=3, le=10)
+    organicMatterPct: float | None = Value(default=None, ge=0, le=30)
+    phosphorusPpm: float | None = Value(default=None, ge=0, le=1000)
+    potassiumPpm: float | None = Value(default=None, ge=0, le=5000)
+    # how the laboratory measured them; the categories differ (defaults: bray_p1, dried)
+    phosphorusTest: Literal["bray_p1", "mehlich3_colorimetric", "mehlich3_icp", "olsen"] | None = (
+        None
+    )
+    potassiumSample: Literal["dried", "moist"] | None = None
+
+    @model_validator(mode="after")
+    def has_a_measurement(self):
+        measured = (self.ph, self.organicMatterPct, self.phosphorusPpm, self.potassiumPpm)
+        if all(value is None for value in measured):
+            raise ValueError("A soil survey needs at least one measurement")
+        return self
+
+
+class SeasonResult(BaseModel):
+    """What the farmer grew in one past season, and what it yielded."""
+
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    year: int = Value(ge=1980, le=2100)
+    crop: str = Value(min_length=1, max_length=64)  # catalog crop id
+    yieldPerAcre: float | None = Value(default=None, gt=0, le=1000)  # bu/acre; hay in ton/acre
+
+
+class SeasonResults(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    results: list[SeasonResult] = Value(max_length=60)
+
+    @model_validator(mode="after")
+    def one_per_year(self):
+        years = [r.year for r in self.results]
+        if len(years) != len(set(years)):
+            raise ValueError("Only one result per year")
+        return self
+
+
+class OwnYieldPoint(BaseModel):
+    year: int
+    yieldPerAcre: float
+    referenceYieldPerAcre: float  # the county, state or reference yield of that year
+
+
+class OwnYieldLevel(BaseModel):
+    """How the farmer's yields moved the expected yield of a crop."""
+
+    crop: str
+    yieldUnit: str
+    ratio: float  # field level / reference level; fewer than 4 years are filled at 1.0
+    expectedYieldPerAcre: float
+    points: list[OwnYieldPoint]
+
+
+class SoilYieldLevel(BaseModel):
+    """How the soil productivity index moved the expected yield of a crop within the county."""
+
+    crop: str
+    index: Literal["nccpi_corn", "nccpi_soy"]  # NRCS NCCPI 3.0 submodel, 0 to 1
+    fieldIndex: float
+    countyIndex: float  # mean over the sampled cropland fields of the county
+    countyFields: int
+    ratio: float  # field level / county level, within 0.85 to 1.15
+    expectedYieldPerAcre: float
+    verified: bool  # False: the slope is our own estimate between counties
+
+
+class SoilInput(BaseModel):
+    """A soil value the advice used, and whether it is the farmer's test or the soil survey."""
+
+    id: Literal["ph", "organicMatterPct", "phosphorusPpm", "potassiumPpm"]
+    value: float
+    source: Literal["survey", "ssurgo"]
+    # empty: stored, not in the calculation
+    usedIn: list[Literal["rules", "soil_carbon", "fertilizer_cost"]]
+
+
+class CropEconomics(BaseModel):
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    crop: str = Value(min_length=1, max_length=64)  # catalog crop id
+    priceUsd: float | None = Value(default=None, gt=0, le=1000)  # per bushel; hay per ton
+    # production cost per acre, land excluded: conventional tillage, after a different crop
+    costUsdPerAcre: float | None = Value(default=None, ge=0, le=5000)
+
+
+class FieldEconomics(BaseModel):
+    """The farmer's own price, cost and rent. What is left out keeps the USDA average."""
+
+    model_config = ConfigDict(extra="forbid", allow_inf_nan=False)
+    landRentUsdPerAcre: float | None = Value(default=None, ge=0, le=2000)
+    crops: list[CropEconomics] = Value(default_factory=list, max_length=40)
+
+    @model_validator(mode="after")
+    def one_per_crop(self):
+        crops = [c.crop for c in self.crops]
+        if len(crops) != len(set(crops)):
+            raise ValueError("Only one entry per crop")
+        return self
+
+
+class LandRentDefault(BaseModel):
+    usdPerAcre: float
+    year: int
+    level: Literal["county", "state", "ers_region"]
+    source: Literal["nass_cash_rents", "ers_land_opportunity_cost"]
+
+
+class CropEconomicsDefault(BaseModel):
+    crop: str
+    priceUsd: float
+    priceUnit: str
+    priceLevel: str
+    costUsdPerAcre: float
+    costLevel: Literal["ers_region", "national", "state_budget"]
+    costYear: int | None
+    costItems: dict[str, float] | None  # USD per acre; ERS items, land excluded
+
+
+class EconomicsDefaults(BaseModel):
+    costRegion: str | None  # USDA ERS farm resource region
+    landRent: LandRentDefault | None
+    irrigatedLandRent: LandRentDefault | None
+    crops: list[CropEconomicsDefault]
+
+
+class EconomicsView(BaseModel):
+    inputs: FieldEconomics | None
+    defaults: EconomicsDefaults
+
+
+class PlanCropEconomics(BaseModel):
+    crop: str
+    priceUsd: float
+    priceSource: Literal["farmer", "planning"]
+    costUsdPerAcre: float  # conventional tillage, after a different crop; rent not included
+    costSource: Literal["farmer", "tables"]
+    soilTestCostChangeUsdPerAcre: float  # part of costUsdPerAcre
+
+
+class PlanEconomics(BaseModel):
+    landRentUsdPerAcre: float  # charged in every season's cost; 0 when the farmer gave none
+    landRentSource: Literal["farmer", "not_charged"]
+    crops: list[PlanCropEconomics]
+
+
+class SoilTestCrop(BaseModel):
+    crop: str
+    rateLbPerAcre: float
+    maintenanceRateLbPerAcre: float
+    costChangeUsdPerAcre: float
+
+
+class SoilTestEffect(BaseModel):
+    """A soil-test nutrient: its category and what the recommended rate does to the cost."""
+
+    nutrient: Literal["phosphorus", "potassium"]
+    ppm: float
+    test: str
+    category: Literal["very_low", "low", "optimum", "high", "very_high"]
+    yieldResponseProbability: float
+    fertilizerUnit: str
+    fertilizerUsdPerLb: float
+    calibration: Literal["iowa", "iowa_applied_elsewhere"]
+    verified: bool
+    crops: list[SoilTestCrop]
+
+
+class PlanStep(BaseModel):
+    """One season of a plan, USD per acre. `objective` = net - risk penalty + soil value."""
+
+    season: int
+    crop: str
+    tillage: Literal["conventional", "strip_till", "no_till"]
+    coverCrop: Literal["none", "rye"]  # grown before this crop
+    autumnBefore: Literal["none", "sow_cover_crop", "sow_winter_crop", "keep_stand"]
+    objectiveUsdPerAcre: float
+    netUsdPerAcre: float  # revenue less production cost, land excluded
+    worstYearUsdPerAcre: float
+    bestYearUsdPerAcre: float
+    worstYear: int
+    revenueUsdPerAcre: float
+    costUsdPerAcre: float
+    riskPenaltyUsdPerAcre: float
+    soilValueUsdPerAcre: float
+    yieldPerAcre: float
+    yieldUnit: str
+    rules: list[str]
+
+
+class PlanAutumn(BaseModel):
+    """What the plan asks for between this harvest and winter."""
+
+    action: Literal["none", "sow_cover_crop", "sow_winter_crop", "keep_stand"]
+    species: str | None
+    establishment: Literal["reliable", "marginal", "unlikely"] | None
+    ryeCoverGainUsdPerAcre: float | None  # plan value with a rye cover crop less without
+    ryeCoverEstablishment: Literal["reliable", "marginal", "unlikely"] | None
+
+
+class SimulatedYear(BaseModel):
+    year: int
+    netUsdPerAcre: float
+
+
+class SimulatedOutcome(BaseModel):
+    """The first season if this past year's weather and (inflation-adjusted) price came again."""
+
+    year: int
+    probability: float
+    netUsdPerAcre: float  # revenue - production cost; land is not charged
+    yieldPerAcre: float
+    priceUsd: float
+    yieldMode: Literal["observed", "modelled", "none"]
+
+
+class SimulatedSpread(BaseModel):
+    lossProbability: float
+    meanUsdPerAcre: float
+    p10UsdPerAcre: float  # one result in ten is worse than this
+    p50UsdPerAcre: float
+    p90UsdPerAcre: float
+    worst: SimulatedYear
+    best: SimulatedYear
+
+
+class YieldSpread(BaseModel):
+    unit: str
+    meanPerAcre: float
+    p10PerAcre: float
+    p50PerAcre: float
+    p90PerAcre: float
+
+
+class SimulatedFirstSeason(SimulatedSpread):
+    """The forecast for the coming season: each past year weighted by its odds of recurring."""
+
+    years: int
+    yieldPerAcre: YieldSpread
+    planningPriceUsd: float
+    observedYieldYears: int  # years whose yield is a county or state record, not a hazard model
+    beatsTopProbability: float | None = None  # share of years it earns >= the first-ranked crop
+    outcomes: list[SimulatedOutcome]
+
+
+class SimulatedPlan(SimulatedSpread):
+    """The whole plan started in each past year and run through the years that followed it."""
+
+    runs: int
+
+
+class PlanSimulation(BaseModel):
+    firstSeason: SimulatedFirstSeason
+    plan: SimulatedPlan | None = None
+
+
+class PlanCrop(BaseModel):
+    """The best plan that starts with this crop."""
+
+    crop: str
+    rank: int
+    tier: Literal["top", "alternative"]
+    demoted: Literal["autumn_establishment_unlikely"] | None = None
+    planObjectiveUsdPerAcre: float  # total over the seasons
+    planNetUsdPerAcre: float
+    autumn: PlanAutumn
+    steps: list[PlanStep]
+    simulation: PlanSimulation
+
+
+class PlanYears(BaseModel):
+    source: Literal["climate_record", "field_seasons", "price_years"]
+    count: int
+    first: int
+    last: int
+
+
+class YearOdds(BaseModel):
+    """How the past years are weighted for the coming season."""
+
+    method: Literal["analog_years", "equal"]
+    effectiveYears: float  # 1 / sum(p^2): how many years really carry the forecast
+    startsAfter: int | None = None  # the year whose end-of-season state the analogs are matched to
+    signals: list[str] = []
+
+
+class RotationPlan(BaseModel):
+    status: Literal["ok", "no_modellable_crop"]
+    objective: str | None = None
+    method: str | None = None
+    seasons: int
+    firstSeason: int | None = None
+    weights: dict[str, float] = {}
+    years: PlanYears | None = None
+    costRegion: str | None = None
+    yearOdds: YearOdds | None = None
+    ownYields: list[OwnYieldLevel] = []
+    soilYield: list[SoilYieldLevel] = []
+    economics: PlanEconomics | None = None
+    soilTest: list[SoilTestEffect] = []
+    crops: list[PlanCrop]
+    notModelled: list[dict[str, Any]] = []
+    gaps: list[dict[str, Any]] = []
+
+
 class HistorySource(BaseModel):
     kind: Literal["cdl", "declared", "none"]
     seasons: int
+    declaredSeasons: int = 0
     firstYear: int | None
     lastYear: int | None
     satelliteEstimate: bool
     unknownCdlCodes: list[int]
+
+
+class SummarySource(BaseModel):
+    """Whose weather, drought and county record the field's seasons are read from."""
+
+    kind: Literal["own", "weather_cell", "nearby_cell", "none"]
+    distanceKm: float | None = None
 
 
 class HistoryYear(BaseModel):
@@ -87,7 +406,10 @@ class Candidate(BaseModel):
     crop: str
     label: str
     group: str
-    rank: int
+    rank: int  # by the plan's return; crops the plan cannot price come last
+    riskRank: int  # by the rule engine's risk score
+    tier: Literal["top", "alternative", "not_modelled"]
+    notModelledCode: str | None = None
     isIntended: bool
     score: float
     scoreBreakdown: list[dict[str, Any]]
@@ -255,9 +577,12 @@ class RotationAdvice(BaseModel):
     historySource: HistorySource
     history: list[HistoryYear]
     seasonsAvailable: list[int]
+    summarySource: SummarySource | None = None
     weatherRecord: WeatherRecord | None = None
     offSeason: OffSeason | None = None
     scoring: dict[str, Any]
     dataGaps: list[dict[str, Any]]
     candidates: list[Candidate]
     seasonTiming: SeasonTiming | None = None
+    soilInputs: list[SoilInput] = []
+    plan: RotationPlan

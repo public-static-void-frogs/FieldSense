@@ -172,3 +172,120 @@ export const sourceKindLabels: Record<string, string> = {
   history: 'the most recent crop seen from satellite',
   default: 'the main crop of this state',
 };
+
+export const planGapLabels: Record<string, string> = {
+  cost_budget_from_another_state: 'Production costs for a crop come from another state’s budget.',
+  cost_unverified: 'Some production costs are not verified for this region.',
+  cover_crop_seed_cost_unverified: 'The cover crop seed cost is an estimate.',
+  history_is_satellite_estimate: 'The crop history comes from satellite maps, not your records.',
+  no_yield_history: 'A crop has no yield records here, so its yield is modelled.',
+  price_history_from_US: 'Past prices are national, not local.',
+  soil_carbon_model_uncalibrated: 'The soil carbon change is a model estimate for this field.',
+  year_odds_from_few_analog_years: 'The odds of each past year rest on few similar years.',
+  yield_not_observed_every_year:
+    'Some yields are modelled from weather because no record exists for that year.',
+  crop_left_out_of_plan: 'A crop was left out of the plan because it could not be priced.',
+};
+
+export const notModelledLabels: Record<string, string> = {
+  no_cost_budget: 'No cost budget',
+  no_price: 'No price',
+  no_yield: 'No yield estimate',
+};
+
+export const autumnActionLabels: Record<string, string> = {
+  none: 'Nothing to sow',
+  sow_cover_crop: 'Sow a cover crop',
+  sow_winter_crop: 'Sow a winter crop',
+  keep_stand: 'Keep the stand',
+};
+
+export const establishmentLabels: Record<string, string> = {
+  reliable: 'Usually establishes here',
+  marginal: 'Establishes in some years',
+  unlikely: 'Rarely establishes here',
+};
+
+export const establishmentColors: Record<string, string> = {
+  reliable: 'green',
+  marginal: 'gold',
+  unlikely: 'red',
+};
+
+export const tillageLabels: Record<string, string> = {
+  conventional: 'Conventional tillage',
+  strip_till: 'Strip-till',
+  no_till: 'No-till',
+};
+
+export const yieldModeLabels: Record<string, string> = {
+  observed: 'County or state record',
+  modelled: 'Modelled from weather',
+  none: 'Average yield assumed',
+};
+
+export const seasonRowErrorLabels: Record<string, string> = {
+  year: 'No year between 1980 and 2100',
+  crop: 'Crop not recognised',
+  yield: 'Yield is not one number between 0 and 1000',
+  duplicate: 'This year is already listed',
+};
+
+export const soilInputLabels: Record<string, string> = {
+  ph: 'pH',
+  organicMatterPct: 'Organic matter, %',
+  phosphorusPpm: 'Phosphorus, ppm',
+  potassiumPpm: 'Potassium, ppm',
+};
+
+export const soilTestCategoryLabels: Record<string, string> = {
+  very_low: 'Very low',
+  low: 'Low',
+  optimum: 'Optimum',
+  high: 'High',
+  very_high: 'Very high',
+};
+
+export const soilTestNutrientLabels: Record<string, string> = {
+  phosphorus: 'Phosphorus',
+  potassium: 'Potassium',
+};
+
+export const phosphorusTestLabels: Record<string, string> = {
+  bray_p1: 'Bray P1',
+  mehlich3_colorimetric: 'Mehlich-3 (colorimetric)',
+  mehlich3_icp: 'Mehlich-3 (ICP)',
+  olsen: 'Olsen',
+};
+
+export const potassiumSampleLabels: Record<string, string> = {
+  dried: 'Dried sample',
+  moist: 'Field-moist sample',
+};
+
+export const rentLevelLabels: Record<string, string> = {
+  county: 'county average',
+  state: 'state average',
+  ers_region: 'regional average',
+};
+
+// Every catalog crop: a crop can be in the history without being a candidate in the state.
+export const catalogCropLabels: Record<string, string> = {
+  corn: 'Corn (grain)',
+  sorghum: 'Sorghum (grain)',
+  soybeans: 'Soybeans',
+  oats: 'Oats',
+  winter_wheat: 'Winter wheat',
+  spring_wheat: 'Spring wheat',
+  rye: 'Rye (grain)',
+  barley: 'Barley',
+  alfalfa: 'Alfalfa',
+  other_hay: 'Other hay (non-alfalfa)',
+  grass_pasture: 'Grassland or pasture',
+  dry_beans: 'Dry beans',
+  canola: 'Canola',
+  sunflower: 'Sunflower',
+  fallow: 'Fallow or idle cropland',
+  double_crop_winter_wheat_soybeans: 'Double crop winter wheat / soybeans',
+  non_crop: 'Not cropland',
+};

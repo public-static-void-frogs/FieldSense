@@ -50,7 +50,7 @@ Facts available to `when` (prefix list is validated at load time):
   `min_return_years`, `humus_balance`, `hosts`, ...).
 - `history.years` (seasons of history known), `history.prev1.crop|group|family|n_fixer|hosts`,
   `history.consecutive_same_crop`, `history.consecutive_same_family`,
-  `history.years_since_same_family` (null if never grown), `history.distinct_groups_5y`,
+  `history.years_since_same_family` (null if never grown), `history.years_since_same_crop` (1: grown last season; null if never grown), `history.distinct_groups_5y`,
   `history.share_same_crop_5y`, `history.corn_soy_alternation_years`,
   `history.shared_hosts_prev1` (hosts in common between the candidate and last year's crop).
 - `county.rma_drought_share_lag1`, `county.rma_excess_moisture_share_lag1`,

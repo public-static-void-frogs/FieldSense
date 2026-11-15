@@ -65,6 +65,9 @@ rules:
     when:
       - {fact: field.practice.cover_crop, op: eq, value: rye}
       - {fact: field.practice.cover_termination_days, op: lt, value: 10}
+    # SP 435 -6 % (SD 7): 0.94 is the mean, 0.87 the mean less one SD (-13 %), taken for planting
+    # green; the PFI 14 bu/ac (5 trials) is about -7 % of a 200 bu/ac crop. The 0.87 end is this
+    # work's reading of the spread, not a single trial.
     effect: {kind: risk, level: medium, yield_factor: [0.87, 0.94]}
     evidence_strength: moderate
     sources:
@@ -80,6 +83,8 @@ rules:
     when:
       - {fact: field.practice.cover_crop, op: eq, value: rye}
       - {fact: field.practice.cover_termination_days, op: is_null}
+    # 1.00: PFI, no yield effect in 32 of 39 early-terminated trials; 0.87: SP 435 mean less one
+    # SD, as for planting green (this work's reading of the spread)
     effect: {kind: risk, level: low, yield_factor: [0.87, 1.00]}
     evidence_strength: moderate
     sources:

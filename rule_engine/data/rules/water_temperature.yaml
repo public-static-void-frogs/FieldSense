@@ -3,7 +3,7 @@ rules:
   - id: heat_at_flowering
     title: Heat at flowering or pollination
     category: temperature
-    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, fiber_crop, paddy_grain]}
     hazard:
       stage: flowering
       window_days: [-10, 10]
@@ -38,7 +38,7 @@ rules:
   - id: frost_after_emergence
     title: Late spring frost after emergence
     category: temperature
-    applies_to: {groups: [warm_season_grain, grain_legume]}
+    applies_to: {groups: [warm_season_grain, grain_legume, fiber_crop, paddy_grain, root_crop]}
     hazard:
       stage: emerged
       window_days: [0, 30]
@@ -55,7 +55,7 @@ rules:
   - id: early_fall_frost
     title: Frost before maturity
     category: temperature
-    applies_to: {groups: [warm_season_grain, grain_legume]}
+    applies_to: {groups: [warm_season_grain, grain_legume, fiber_crop, paddy_grain, root_crop]}
     hazard:
       stage: mature
       window_days: [-21, 0]
@@ -72,7 +72,7 @@ rules:
   - id: drought_in_critical_stage
     title: Root-zone drought in the critical stage
     category: water
-    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, perennial_forage_legume]}
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, perennial_forage_legume, fiber_crop, root_crop, perennial_cane]}
     hazard:
       stage: flowering
       window_days: [-7, 21]
@@ -90,7 +90,7 @@ rules:
   - id: drought_monitor_critical_stage
     title: Drought Monitor D1 or worse in the critical stage
     category: water
-    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, fiber_crop, root_crop, perennial_cane]}
     hazard:
       stage: grain_fill
       window_days: [-14, 14]
@@ -107,7 +107,7 @@ rules:
   - id: wet_planting_window
     title: Wet planting window
     category: water
-    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, fiber_crop, root_crop, paddy_grain]}
     hazard:
       stage: planted
       window_days: [-7, 14]
@@ -136,7 +136,7 @@ rules:
   - id: county_excess_moisture_losses
     title: Excess-moisture losses in the county last year
     category: water
-    applies_to: {groups: [warm_season_grain, grain_legume, small_grain]}
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, fiber_crop, root_crop]}
     when:
       - {fact: county.rma_excess_moisture_share_lag1, op: ge, value: 0.3}
     effect: {kind: advisory}

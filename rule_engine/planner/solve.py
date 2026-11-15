@@ -4,12 +4,15 @@ Every plan is scored the same way, by `evaluate`: the exact expected value of fo
 from the model's initial state under the model's year odds.
 """
 
+from collections.abc import Callable
 from dataclasses import dataclass, replace
 from random import Random
 
 from rule_engine.planner.dynamics import Action, State
 from rule_engine.planner.env import RotationEnv
 from rule_engine.planner.model import RotationModel
+
+Policy = Callable[[State], Action]
 
 
 @dataclass(frozen=True)
@@ -90,8 +93,13 @@ def evaluate(model: RotationModel, policy, method: str) -> Plan:
     return Plan(total, tuple(actions), tuple(steps), method)
 
 
-def _solve(model: RotationModel, start: State) -> dict:
-    """Backward induction over the states reachable from `start`: {state key: (value, _, action)}."""
+def _solve(model: RotationModel, start: State) -> Policy:
+    """Backward induction over the states reachable from `start`; returns the best action of a state.
+
+    States are stored under `model.key`, which rounds the soil pools. A path followed later can
+    land in a rounding bucket the first pass did not visit, so the policy solves a state it has
+    not seen instead of looking it up.
+    """
     best: dict = {}
 
     def value(state: State) -> float:
@@ -109,14 +117,17 @@ def _solve(model: RotationModel, start: State) -> dict:
             best[key] = max(options, key=lambda o: o[:2])
         return best[key][0]
 
+    def policy(state: State) -> Action:
+        value(state)
+        return best[model.key(state)][2]
+
     value(start)
-    return best
+    return policy
 
 
 def exact_plan(model: RotationModel) -> Plan:
     """The optimum: the best action in every state, reacting to the year just experienced."""
-    best = _solve(model, model.initial_state)
-    return evaluate(model, lambda s: best[model.key(s)][2], "dynamic_programming")
+    return evaluate(model, _solve(model, model.initial_state), "dynamic_programming")
 
 
 def open_loop_plan(model: RotationModel) -> Plan:
@@ -124,7 +135,7 @@ def open_loop_plan(model: RotationModel) -> Plan:
     best = _solve(model, model.open_loop_state)
     sequence, state = [], model.open_loop_state
     while not model.terminal(state):
-        sequence.append(best[model.key(state)][2])
+        sequence.append(best(state))
         state = model.transition(state, sequence[-1])
     return evaluate(model, lambda s: sequence[s.t], "dynamic_programming_fixed_sequence")
 
@@ -175,7 +186,11 @@ def fixed_rotation(model: RotationModel, crops: tuple[str, ...], tillage: str, c
 
     def policy(state: State) -> Action:
         crop = crops[state.t % len(crops)]
-        allowed = [a for a in model.actions(state) if a.crop == crop]
+        allowed = [a for a in model.actions(state) if a.crop == crop] or [
+            a
+            for a in model.all_actions
+            if a.crop == crop  # the rotation breaks a planner limit
+        ]
         exact = [a for a in allowed if a.tillage == tillage and a.cover == cover]
         same_tillage = [a for a in allowed if a.tillage == tillage and a.cover == "none"]
         return (exact or same_tillage or allowed)[0]
@@ -190,3 +205,98 @@ def myopic(model: RotationModel) -> Plan:
         lambda s: max(model.actions(s), key=lambda a: model.expected(s, a)),
         "myopic",
     )
+
+
+def crop_options(model: RotationModel) -> list[dict]:
+    """For every crop, the best fixed plan that starts with it; the best plan first.
+
+    Each item: {"value": expected total over the horizon, "steps": [(state, action), ...],
+    "coverGain": value with a rye cover crop before the first crop minus value without one, for
+    the same first crop and tillage (None when a cover crop does not fit there)}.
+    """
+    start = model.open_loop_state
+    best = _solve(model, start)
+    worth: dict[Action, tuple[float, list]] = {}
+    for action in model.actions(start):
+        steps, state = [(start, action)], model.transition(start, action)
+        while not model.terminal(state):
+            following = best(state)
+            steps.append((state, following))
+            state = model.transition(state, following)
+        worth[action] = (sum(model.expected(s, a) for s, a in steps), steps)
+    options: dict[str, dict] = {}
+    for action, (value, steps) in worth.items():
+        if action.crop not in options or value > options[action.crop]["value"]:
+            options[action.crop] = {"value": value, "steps": steps}
+    for option in options.values():
+        first = option["steps"][0][1]
+        pair = [worth.get(Action(first.crop, first.tillage, cover)) for cover in ("rye", "none")]
+        option["coverGain"] = pair[0][0] - pair[1][0] if all(pair) else None
+    return sorted(options.values(), key=lambda o: -o["value"])
+
+
+def _quantile(values: list[float], weights: list[float], q: float) -> float:
+    """Weighted quantile: the smallest value whose cumulative weight reaches q."""
+    total, reached = sum(weights), 0.0
+    for value, weight in sorted(zip(values, weights)):
+        reached += weight
+        if reached >= q * total - 1e-12:
+            return value
+    return max(values)
+
+
+def _spread(values: list[float], weights: list[float]) -> dict:
+    total = sum(weights)
+    return {
+        "lossProbability": sum(w for v, w in zip(values, weights) if v < 0) / total,
+        "mean": sum(v * w for v, w in zip(values, weights)) / total,
+        "p10": _quantile(values, weights, 0.1),
+        "p50": _quantile(values, weights, 0.5),
+        "p90": _quantile(values, weights, 0.9),
+    }
+
+
+def replay(model: RotationModel, steps: list) -> dict:
+    """A fixed plan replayed through the historical years, in cash terms (revenue - cost).
+
+    The risk penalty and the soil value are preferences, not cash, so they are left out.
+    "first": the first season under every year, weighted by that year's odds.
+    "runs": the whole plan started in every year that is followed by enough consecutive years,
+    so a run keeps the real order of years (a drought followed by its real next year).
+    """
+    cash = [
+        [o.revenue - o.cost for o in model._base_outcomes(state.history, action)]
+        for state, action in steps
+    ]
+    first_state, first_action = steps[0]
+    outcomes = model._base_outcomes(first_state.history, first_action)
+    odds = model.distribution(first_state)
+    position = {year.year: i for i, year in enumerate(model.years)}
+    runs = []
+    for year, i in position.items():
+        following = [position.get(year + k) for k in range(len(steps))]
+        if None not in following:
+            runs.append((year, odds[i], sum(cash[k][j] for k, j in enumerate(following))))
+    return {
+        "first": {
+            **_spread(cash[0], odds),
+            "yield": _spread([o.yield_per_acre for o in outcomes], odds),
+            "years": [
+                {
+                    "year": o.year,
+                    "odds": odds[i],
+                    "cash": cash[0][i],
+                    "yield": o.yield_per_acre,
+                    "price": o.price,
+                    "yieldMode": o.detail["yieldMode"],
+                }
+                for i, o in enumerate(outcomes)
+            ],
+        },
+        "runs": {
+            **_spread([r[2] for r in runs], [r[1] for r in runs]),
+            "starts": [{"year": y, "odds": w, "cash": v} for y, w, v in runs],
+        }
+        if runs
+        else None,
+    }

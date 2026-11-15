@@ -82,6 +82,10 @@ class UserField(Base):
     selected_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
+    # The account's own soil test; it overrides the soil survey estimate for this account only.
+    soil_survey: Mapped[dict | None] = mapped_column(JSON)
+    season_results: Mapped[list | None] = mapped_column(JSON)
+    economics: Mapped[dict | None] = mapped_column(JSON)  # own prices, costs and land rent
 
 
 class PendingFieldSelection(Base):
@@ -180,7 +184,7 @@ class FieldRepository:
         )
 
     def create(self, payload: CreateField):
-        from app.services.maps import require_ready, update_cells
+        from app.services.maps import locate_county, require_ready, update_cells
 
         require_ready(self.session)
         data = payload.model_dump(mode="json")
@@ -194,6 +198,7 @@ class FieldRepository:
             longitude=longitude,
             latitude=latitude,
         )
+        locate_county(self.session, row)
         self.session.add(row)
         try:
             self.session.flush()
@@ -231,6 +236,43 @@ class FieldRepository:
                 if self.session.get(UserField, (self.user_id, fid)) is None:
                     raise
         return field_view(row)
+
+    def _selection(self, field_id) -> UserField:
+        row = self.session.get(UserField, (self.user_id, str(field_id)))
+        if row is None:
+            raise ResourceNotFound("Field not found")
+        return row
+
+    def soil_survey(self, field_id) -> dict | None:
+        return self._selection(field_id).soil_survey
+
+    def save_soil_survey(self, field_id, survey: dict | None) -> dict | None:
+        self._selection(field_id).soil_survey = survey
+        self.session.commit()
+        return survey
+
+    def season_results(self, field_id) -> list[dict]:
+        return self._selection(field_id).season_results or []
+
+    def save_season_results(self, field_id, results: list[dict]) -> list[dict]:
+        self._selection(field_id).season_results = results or None
+        self.session.commit()
+        return results
+
+    def economics(self, field_id) -> dict | None:
+        return self._selection(field_id).economics
+
+    def save_economics(self, field_id, economics: dict | None) -> dict | None:
+        self._selection(field_id).economics = economics
+        self.session.commit()
+        return economics
+
+    def reset_rotation_inputs(self, field_id) -> None:
+        selection = self._selection(field_id)
+        selection.season_results = None
+        selection.soil_survey = None
+        selection.economics = None
+        self.session.commit()
 
     def remove(self, field_id):
         self.require_field(field_id)

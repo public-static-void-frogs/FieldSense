@@ -12,6 +12,8 @@ import { fieldQueries, fieldQueryKeys } from '../src/api/fields/fields.queries.t
 import { fieldMutations } from '../src/api/fields/fields.mutations.ts';
 import { mapQueries, mapQueryKeys } from '../src/api/maps/maps.queries.ts';
 import { mapsApi } from '../src/api/maps/maps.api.ts';
+import { rotationMutations } from '../src/api/rotation/rotation.mutations.ts';
+import { rotationQueries } from '../src/api/rotation/rotation.queries.ts';
 import { weatherQueries, weatherQueryKeys } from '../src/api/weather/weather.queries.ts';
 import { settingsApi } from '../src/api/settings/settings.api.ts';
 import {
@@ -157,6 +159,69 @@ test('field-scoped weather uses supplied soil and crop data in independent cache
       hashKey(weatherQueryKeys.forecast(weatherLocation, first.id)),
       hashKey(weatherQueryKeys.forecast(weatherLocation, second.id)),
     );
+  } finally {
+    cache.clear();
+  }
+});
+
+test('saving prices and costs keeps calculator defaults available throughout the refresh', async () => {
+  const cache = client();
+  const options = rotationQueries.economics(first.id);
+  const adviceOptions = rotationQueries.advice({ fieldId: first.id, priorities: [], seasons: 1 });
+  const initial = await cache.fetchQuery(options);
+  cache.setQueryData(adviceOptions.queryKey, null);
+  const snapshots = [];
+  const observer = new QueryObserver(cache, options);
+  const unsubscribe = observer.subscribe(({ data }) => snapshots.push(data));
+  const inputs = { crops: [{ crop: 'corn', priceUsd: 6.25, costUsdPerAcre: 510 }] };
+
+  try {
+    const mutation = cache
+      .getMutationCache()
+      .build(cache, rotationMutations.saveEconomics(cache, first.id));
+    await mutation.execute({ fieldId: first.id, inputs });
+    assert.ok(snapshots.length > 0);
+    for (const snapshot of snapshots) {
+      assert.deepEqual(snapshot.defaults, initial.defaults);
+    }
+    assert.deepEqual(observer.getCurrentResult().data.inputs.crops, inputs.crops);
+    assert.equal(cache.getQueryState(adviceOptions.queryKey).isInvalidated, true);
+  } finally {
+    unsubscribe();
+    cache.clear();
+  }
+});
+
+test('canceling custom metrics clears all saved inputs for that field and invalidates its advice', async () => {
+  const cache = client();
+  const fieldId = second.id;
+  const execute = (options, input) => cache.getMutationCache().build(cache, options).execute(input);
+  const adviceOptions = rotationQueries.advice({ fieldId, priorities: [], seasons: 1 });
+
+  try {
+    await execute(rotationMutations.saveSeasonResults(cache, fieldId), {
+      fieldId,
+      results: [{ year: 2025, crop: 'corn', yieldPerAcre: 200 }],
+    });
+    await execute(rotationMutations.saveSoilSurvey(cache, fieldId), { fieldId, survey: { ph: 6 } });
+    await execute(rotationMutations.saveEconomics(cache, fieldId), {
+      fieldId,
+      inputs: { landRentUsdPerAcre: 0, crops: [] },
+    });
+    cache.setQueryData(adviceOptions.queryKey, null);
+
+    await execute(rotationMutations.resetInputs(cache, fieldId), fieldId);
+
+    assert.equal(cache.getQueryState(adviceOptions.queryKey).isInvalidated, true);
+    const [seasons, soil, economics] = await Promise.all([
+      cache.fetchQuery(rotationQueries.seasonResults(fieldId)),
+      cache.fetchQuery(rotationQueries.soilSurvey(fieldId)),
+      cache.fetchQuery(rotationQueries.economics(fieldId)),
+    ]);
+    assert.deepEqual(seasons.results, []);
+    assert.equal(soil, null);
+    assert.equal(economics.inputs, null);
+    assert.ok(economics.defaults.crops.length > 0);
   } finally {
     cache.clear();
   }

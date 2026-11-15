@@ -34,18 +34,15 @@ class YieldModel(Protocol):
 
 
 def _to_t_ha(crop: Crop, value: float, unit: str) -> float | None:
-    if unit.startswith("bu") and crop.bu_to_t_ha:
-        return value * crop.bu_to_t_ha
-    if unit.startswith("ton") and crop.ton_to_t_ha:
-        return value * crop.ton_to_t_ha
-    return None
+    factor = crop.t_ha_per(unit)
+    return value * factor if factor else None
 
 
 def display_yield(crop: Crop, t_ha: float, units: str) -> tuple[float, str]:
     """Convert t/ha to the crop's display unit for imperial users, else keep t/ha."""
     if units != "imperial":
         return round(t_ha, 2), "t/ha"
-    factor = crop.bu_to_t_ha or crop.ton_to_t_ha
+    factor = crop.t_ha_per(crop.display_unit)
     if factor:
         return round(t_ha / factor, 1), crop.display_unit
     return round(t_ha, 2), "t/ha"
@@ -147,7 +144,7 @@ def gross_revenue(
     """Gross revenue for the whole field, USD. No costs: those vary too much per farm."""
     if price is None or area_ha <= 0:
         return None
-    factor = crop.bu_to_t_ha if price.unit.startswith("bu") else crop.ton_to_t_ha
+    factor = crop.t_ha_per(price.unit)
     if not factor:
         return None
     acres = area_ha / HA_PER_ACRE

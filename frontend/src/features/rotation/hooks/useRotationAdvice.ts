@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { rotationQueries } from '../../../api/rotation/rotation.queries.ts';
 import type { RotationPriority } from '../../../types/rotation/rotation.types.ts';
 import { priorityOptions } from '../constants/rotationLabels.ts';
+import { parseSeasons } from '../utils/planPresentation.ts';
 
 export function useRotationAdvice(fieldId: string) {
   const [search, setSearch] = useSearchParams();
@@ -10,11 +11,18 @@ export function useRotationAdvice(fieldId: string) {
   const priorities = priorityOptions
     .map(({ value }) => value)
     .filter((value) => search.getAll('priorities').includes(value));
-  const query = useQuery(rotationQueries.advice({ fieldId, crop, priorities }));
+  const seasons = parseSeasons(search.get('seasons'));
+  const query = useQuery(rotationQueries.advice({ fieldId, crop, priorities, seasons }));
 
   const setCrop = (selected: string) => {
     const next = new URLSearchParams(search);
     next.set('crop', selected);
+    setSearch(next, { replace: true, preventScrollReset: true });
+  };
+
+  const setSeasons = (selected: number) => {
+    const next = new URLSearchParams(search);
+    next.set('seasons', String(selected));
     setSearch(next, { replace: true, preventScrollReset: true });
   };
 
@@ -34,8 +42,10 @@ export function useRotationAdvice(fieldId: string) {
     error: query.error,
     retry: query.refetch,
     selectedCrop: crop,
+    selectedSeasons: seasons,
     priorities,
     setCrop,
+    setSeasons,
     togglePriority,
   };
 }

@@ -6,8 +6,12 @@ plan is a fixed sequence. Two things do carry over and are known before planting
 - drought: the Drought Monitor class at the field at the end of one season against its class at
   the start of the next. Across the national sample (102,570 field-year pairs, 2015-2025) the
   two correlate at 0.45, and a season that starts in drought stays drier (0.50 with midseason).
-- price: the marketing-year price level of one year against the level of the year before the
-  candidate year.
+- price: the constant-dollar price level of one year against the level of the year before the
+  candidate year. A drawn year carries its price change, so this picks years that started from
+  a similar price level.
+
+In the backtest (scripts/backtest.py, first-season forecasts 1997-2025) these odds are about
+as good as equal odds: slightly better for corn, slightly worse for soybeans.
 
 The next year is drawn from the historical years, weighted by how closely each year's starting
 conditions resemble the conditions the plan has just reached (a nearest-neighbour bootstrap, the
@@ -42,20 +46,16 @@ def _edge(series, part: slice) -> float | None:
     return mean(values) if values else None
 
 
-def year_signals(years, seasons, basis) -> tuple[dict, dict]:
+def year_signals(years, seasons, price_level: dict[int, float]) -> tuple[dict, dict]:
     """({year: start signals}, {year: end signals}) for the drawable years."""
-    priced = [c for c, b in basis.items() if b.price_years > 0]
-    level = {
-        y.year: mean(y.crops[c].price / basis[c].price for c in priced) if priced else None
-        for y in years
-    }
+    level = {y.year: price_level.get(y.year) for y in years}
     start, end = {}, {}
     for y in years:
         season = seasons.get(y.year)
         drought = season.weekly.get("dm_max") if season is not None else None
         start[y.year] = {
             "drought": _edge(drought, slice(0, EDGE_WEEKS)),
-            "price": level.get(y.year - 1),
+            "price": price_level.get(y.year - 1),
         }
         end[y.year] = {
             "drought": _edge(drought, slice(-EDGE_WEEKS, None)),
@@ -128,9 +128,9 @@ def _rounded(value):
     return None if value is None else round(value, 2)
 
 
-def build_chain(years, seasons, basis, persistence: Persistence) -> YearChain | None:
+def build_chain(years, seasons, price_level, persistence: Persistence) -> YearChain | None:
     if persistence.strength <= 0 or len(years) < MIN_YEARS:
         return None
-    start, end = year_signals(years, seasons, basis)
+    start, end = year_signals(years, seasons, price_level)
     chain = YearChain([y.year for y in years], start, end, persistence)
     return chain if chain.signals else None

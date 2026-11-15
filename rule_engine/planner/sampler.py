@@ -14,10 +14,16 @@ Yield of a crop in a drawn year, per acre in the crop's own unit:
   losses in data/weather_yield_response.csv for the hazards that occurred in that season.
 - anomaly "none": no observed yield and no response row; the expected yield is used as is.
 
-Prices are the year's marketing-year price in constant dollars (deflated with the consumer
-price index, data/cpi_u.csv), rescaled so that the crop's mean over the history equals the
-engine's current planning price. Real crop prices have fallen since the 1980s, so early years
-are drawn as high-price years and recent years as below the mean.
+Price of a crop in a drawn year: the current planning price x that year's price change, which is
+the year's marketing-year price over the previous year's, both in constant dollars (consumer
+price index, data/cpi_u.csv), scaled to mean 1. The planning price is the expectation, and a
+drawn year says how far a season's price ended from what was known before it. Drawing the
+constant-dollar price level instead (the earlier version) put most recent years below the
+planning price, because real crop prices have fallen since the 1980s: in the backtest
+(scripts/backtest.py) that overstated the chance of a loss by about a third.
+
+The expected yield is the trend read one year past the last observed yield, which is the season
+being planned.
 
 Prices and state yields come from planner/data/nass_long_history.csv (since 1980, every state)
 where it has the series, otherwise from the rule engine's nass_reference_history.csv.
@@ -29,9 +35,11 @@ from functools import lru_cache
 from pathlib import Path
 from random import Random
 
+from rule_engine.catalog import unit_kind
 from rule_engine.engine import RotationAdvisor
 from rule_engine.planner.adapter import RuleAdapter, WeatherPart
 from rule_engine.planner.context import FieldContext
+from rule_engine.planner.soil_level import SoilLevel, soil_level
 from rule_engine.planner.tables import Response, load_responses
 
 HISTORY_CSV = Path(__file__).parents[1] / "data" / "nass_reference_history.csv"
@@ -39,6 +47,12 @@ LONG_HISTORY_CSV = Path(__file__).parent / "data" / "nass_long_history.csv"
 CPI_CSV = Path(__file__).parent / "data" / "cpi_u.csv"  # BLS CPI-U, all items, 1982-84 = 100
 COUNTY_COLUMNS = {"corn": "yield_corn_bu_ac", "soybeans": "yield_soy_bu_ac"}
 MIN_TREND_POINTS = 5
+# The farmer's own yields set the field's level against the county, the way crop insurance builds
+# an actual production history (USDA RMA APH): the latest 10 years count, and with fewer than 4
+# the missing years are filled at the county level. (APH discounts the fill-in years; this
+# does not.)
+OWN_YIELD_MAX_YEARS = 10
+OWN_YIELD_MIN_YEARS = 4
 
 
 @dataclass(frozen=True)
@@ -63,13 +77,16 @@ class Year:
 class CropBasis:
     unit: str  # bu | ton (per acre)
     expected_yield: float
-    yield_level: str  # county | state | reference
+    yield_level: str  # county | state | reference | field (own yields) | field_soil
     yield_verified: bool
     price: float
     price_level: str
     price_years: int
     observed_years: int
     notes: tuple[str, ...] = field(default=())
+    own_ratio: float = 1.0  # the field's yield level against the county/state/reference level
+    own_points: tuple[tuple[int, float, float], ...] = ()  # (year, own yield, reference yield)
+    soil_level: SoilLevel | None = None  # set when the soil index moved the expected yield
 
 
 def _trend(points: dict[int, float]):
@@ -107,6 +124,17 @@ def price_levels(history: dict[int, float]) -> dict[int, float]:
     real = {y: p / cpi[y] for y, p in history.items() if y in cpi}
     mean = sum(real.values()) / len(real)
     return {y: v / mean for y, v in real.items()}
+
+
+def price_changes(history: dict[int, float]) -> dict[int, float]:
+    """{year: constant-dollar price over the previous year's}, scaled to mean 1."""
+    cpi = _cpi()
+    real = {y: p / cpi[y] for y, p in history.items() if y in cpi}
+    change = {y: real[y] / real[y - 1] for y in real if y - 1 in real}
+    if not change:
+        return {}
+    mean = sum(change.values()) / len(change)
+    return {y: v / mean for y, v in change.items()}
 
 
 def _series(rows, kind: str, crop: str, region: str) -> tuple[dict[int, float], str, str]:
@@ -188,12 +216,18 @@ class YearSampler:
         self.unavailable: dict[str, str] = {}
         prices: dict[str, dict[int, float]] = {}
         anomalies: dict[str, dict[int, float]] = {}
+        levels: dict[int, list[float]] = {}
         for crop_id in crops:
             quote = advisor.reference.price(crop_id, context.region)
             if quote is None:
                 self.unavailable[crop_id] = "no_price"
                 continue
-            unit = "bu" if quote.unit.startswith("bu") else "ton"
+            unit = unit_kind(quote.unit)
+            # the farmer's own expected price replaces the planning price
+            planning, price_level = quote.price_usd, quote.level
+            own_price = ((context.field.get("economics") or {}).get("prices") or {}).get(crop_id)
+            if own_price:
+                planning, price_level = float(own_price), "farmer"
             notes = []
 
             observed: dict[int, float] = {}
@@ -203,34 +237,56 @@ class YearSampler:
                 observed = {
                     y: float(s.scalars[column])
                     for y, s in seasons.items()
-                    if s.scalars.get(column) is not None
+                    if (s.scalars.get(column) or 0) > 0  # NASS zero is "not reported", not a yield
                 }
                 level = "county"
             if not observed:
                 observed, y_unit, geography = _series(rows, "yield", crop_id, context.region)
                 level = "state"
-                if observed and (geography != context.region or not y_unit.startswith(unit)):
+                if observed and (geography != context.region or unit_kind(y_unit) != unit):
                     observed = {}  # another state's yield level is not this field's
             verified = True
             if observed:
                 trend = _trend(observed)
                 last = max(observed)
-                expected = trend(min(now or last, last))
+                expected = trend(min(now or last + 1, last + 1))
                 anomalies[crop_id] = {y: v / trend(y) for y, v in observed.items() if trend(y) > 0}
             else:
                 ref = advisor.reference.yield_reference(crop_id, context.region)
-                if ref is None or not ref.unit.startswith(unit):
+                if ref is None or unit_kind(ref.unit) != unit:
                     self.unavailable[crop_id] = "no_yield"
                     continue
                 expected, level, verified = ref.mid, "reference", ref.verified
                 notes.append("no_yield_history")
                 anomalies[crop_id] = {}
 
+            own = (context.field.get("ownYields") or {}).get(crop_id) or {}
+            points = []
+            for year in sorted(own, reverse=True)[:OWN_YIELD_MAX_YEARS]:
+                base = observed.get(year) or (trend(year) if observed else expected)
+                if own[year] > 0 and base > 0:
+                    points.append((year, float(own[year]), base))
+            ratio = 1.0
+            if points:
+                filled = max(0, OWN_YIELD_MIN_YEARS - len(points))
+                ratio = (sum(y / b for _, y, b in points) + filled) / (len(points) + filled)
+                expected, level = expected * ratio, "field"
+            soil = None
+            if not points and level == "county":
+                # no yields from the farmer: the soil index places the field within the county
+                soil = soil_level(
+                    crop_id, context.field.get("soil"), context.field.get("countyFips")
+                )
+                if soil is not None:
+                    expected, level = expected * soil.ratio, "field_soil"
+
             history, p_unit, geography = _series(rows, "price", crop_id, context.region)
             if history and p_unit.endswith(unit):
                 prices[crop_id] = {
-                    y: level * quote.price_usd for y, level in price_levels(history).items()
+                    y: change * planning for y, change in price_changes(history).items()
                 }
+                for year, value in price_levels(history).items():
+                    levels.setdefault(year, []).append(value)
                 if geography != context.region:
                     notes.append(f"price_history_from_{geography}")
             else:
@@ -241,12 +297,18 @@ class YearSampler:
                 expected_yield=expected,
                 yield_level=level,
                 yield_verified=verified,
-                price=quote.price_usd,
-                price_level=quote.level,
+                price=planning,
+                price_level=price_level,
                 price_years=len(prices[crop_id]),
                 observed_years=len(anomalies[crop_id]),
                 notes=tuple(notes),
+                own_ratio=ratio,
+                own_points=tuple(sorted(points)),
+                soil_level=soil,
             )
+
+        # constant-dollar price level of each year (mean over the priced crops), a carry-over signal
+        self.price_level = {year: sum(v) / len(v) for year, v in levels.items()}
 
         # Years that can be drawn: those with weather at the field. Without any season summary
         # the price years are drawn instead (yields then vary only where a state series exists).

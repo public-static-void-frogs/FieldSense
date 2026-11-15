@@ -23,6 +23,7 @@ columns start in 1990), the Drought Monitor 2000.
 """
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -115,12 +116,21 @@ def main() -> None:
     parser.add_argument("--work", required=True, type=Path)
     parser.add_argument("--usdm", type=Path, nargs="+", help="default <work>/usdm/weekly_*.parquet")
     parser.add_argument("--years", type=int, nargs="+", required=True)
+    parser.add_argument("--memory", default="3GB", help="DuckDB memory limit of this process")
+    parser.add_argument("--threads", type=int, default=2)
+    parser.add_argument("--batch", type=int, default=3000, help="fields per summary query")
     args = parser.parse_args()
     usdm = args.usdm or sorted((args.work / "usdm").glob("weekly_*.parquet"))
     rma_files = sorted(args.work.glob("rma*/rma_col_county_year_all_crops.parquet"))
     yields = [args.sample / "yields" / "nass_yield.parquet"]
     yields += [p for p in [args.work / "yields" / "nass_yield.parquet"] if p.exists()]
     con = duckdb.connect()
+    con.execute(f"SET memory_limit = '{args.memory}'; SET threads = {args.threads}")
+    con.execute("SET preserve_insertion_order = false")
+    # one spill directory per process: jobs on the same chunk run in parallel
+    spill = args.work / "duckdb_tmp" / str(os.getpid())
+    spill.mkdir(parents=True, exist_ok=True)
+    con.execute(f"SET temp_directory = '{spill}'")
     cdl_columns = {
         row[0]
         for row in con.execute(
@@ -136,7 +146,13 @@ def main() -> None:
         out.mkdir(parents=True, exist_ok=True)
         for old in out.glob("*.parquet"):
             old.unlink()
-        con.execute(f"CREATE OR REPLACE TABLE summary AS {summary_query(str(daily), None)}")
+        # in batches of fields: the weekly lists of a whole 30,000-field chunk do not fit in memory
+        ids = [r[0] for r in con.execute(f"SELECT DISTINCT CSBID FROM '{daily}'").fetchall()]
+        con.execute("DROP TABLE IF EXISTS summary")
+        for start in range(0, len(ids), args.batch):
+            query = summary_query(str(daily), ids[start : start + args.batch])
+            verb = "INSERT INTO summary" if start else "CREATE TABLE summary AS"
+            con.execute(f"{verb} {query}")
         counties = [
             r[0] for r in con.execute("SELECT DISTINCT county_fips FROM summary").fetchall()
         ]
