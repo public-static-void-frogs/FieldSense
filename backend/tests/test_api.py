@@ -50,12 +50,14 @@ class ApiTests(unittest.TestCase):
             "/fields/catalog",
             "/notifications",
             "/planning/events",
-            "/help/sources",
         ]:
             self.assertEqual(self.get(route), [])
         team = self.get("/help/team")
         self.assertEqual([m["id"] for m in team], ["oleh", "kate", "polina", "volodymyr", "roman"])
         self.assertTrue(all(m["linkedin"].startswith("https://www.linkedin.com/in/") for m in team))
+        sources = self.get("/help/sources")
+        self.assertEqual(len(sources), 14)
+        self.assertTrue(all(m["url"].startswith("https://") for m in sources))
         self.assertEqual(self.get("/planning/responses"), {})
         self.assertEqual(self.get("/maps/geojson")["features"], [])
         self.assertEqual(self.get("/overview/charts"), dict(trends=[], cropAreas=[]))

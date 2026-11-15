@@ -3,12 +3,13 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Card, Collapse, Table, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { helpQueries } from '../api/help/help.queries.ts';
+import type { DataSource } from '../types/help/help.types.ts';
 import { ProjectSection } from '../features/help/components/ProjectSection';
 import { TeamSection } from '../features/help/components/TeamSection';
 
 export function HelpPage() {
   const { t } = useTranslation();
-  const { data: demoSources } = useSuspenseQuery(helpQueries.sources());
+  const { data: dataSources } = useSuspenseQuery(helpQueries.sources());
 
   return (
     <>
@@ -66,18 +67,24 @@ export function HelpPage() {
           <Card title={t('Data sources')}>
             <Typography.Paragraph type="secondary">
               {t(
-                'Example sources for the demo. These datasets are placeholders and are not connected.',
+                'NASA Earth observations and partner datasets used by FieldSense. Each name links to the official data product page.',
               )}
             </Typography.Paragraph>
             <Table
               rowKey="key"
-              dataSource={demoSources}
+              dataSource={dataSources}
               pagination={false}
-              scroll={{ x: 620 }}
+              scroll={{ x: 480 }}
               columns={[
-                { title: t('Source'), dataIndex: 'name', width: 240 },
-                { title: t('Data included'), dataIndex: 'data' },
-                { title: t('Format'), dataIndex: 'format', width: 110 },
+                {
+                  title: t('Data product'),
+                  dataIndex: 'name',
+                  render: (name: string, source: DataSource) => (
+                    <Typography.Link href={source.url} target="_blank" rel="noopener noreferrer">
+                      {name}
+                    </Typography.Link>
+                  ),
+                },
               ]}
             />
           </Card>

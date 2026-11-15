@@ -31,11 +31,10 @@ class TeamMember(BaseModel):
     linkedin: str
 
 
-class DemoSource(BaseModel):
+class DataSource(BaseModel):
     key: str
     name: str
-    data: str
-    format: str
+    url: str
 
 
 class Notification(BaseModel):

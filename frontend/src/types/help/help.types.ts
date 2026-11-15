@@ -5,9 +5,8 @@ export interface TeamMember {
   alt: string;
   linkedin: string;
 }
-export interface DemoSource {
+export interface DataSource {
   key: string;
   name: string;
-  data: string;
-  format: string;
+  url: string;
 }

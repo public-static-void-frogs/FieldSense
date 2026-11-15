@@ -2288,7 +2288,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/DemoSource"
+                    "$ref": "#/components/schemas/DataSource"
                   },
                   "type": "array",
                   "title": "Response Sources Api V1 Help Sources Get"
@@ -4531,6 +4531,29 @@
         ],
         "title": "CurrentWeather"
       },
+      "DataSource": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "url"
+        ],
+        "title": "DataSource"
+      },
       "DayRange": {
         "properties": {
           "low": {
@@ -4574,34 +4597,6 @@
           "high"
         ],
         "title": "DayRange"
-      },
-      "DemoSource": {
-        "properties": {
-          "key": {
-            "type": "string",
-            "title": "Key"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "data": {
-            "type": "string",
-            "title": "Data"
-          },
-          "format": {
-            "type": "string",
-            "title": "Format"
-          }
-        },
-        "type": "object",
-        "required": [
-          "key",
-          "name",
-          "data",
-          "format"
-        ],
-        "title": "DemoSource"
       },
       "DetectedField": {
         "properties": {

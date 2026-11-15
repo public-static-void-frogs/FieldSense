@@ -186,7 +186,7 @@ def team(store: Store):
     return service.team()
 
 
-@router.get("/help/sources", response_model=list[DemoSource], tags=["help"])
+@router.get("/help/sources", response_model=list[DataSource], tags=["help"])
 def sources(store: Store):
     return []
 
