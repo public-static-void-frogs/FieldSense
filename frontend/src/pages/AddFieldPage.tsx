@@ -1,13 +1,20 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { Button, Card, Result, Space, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
-import { useLoaderData } from 'react-router-dom';
+import { Navigate, useLoaderData } from 'react-router-dom';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
 import { RouterButton } from '../components/common/RouterButton';
 import { useCatalogSelection } from '../features/maps/hooks/useCatalogSelection.ts';
+import { useDemoMode } from '../features/demo/hooks/useDemoMode.ts';
 
 export function AddFieldPage() {
+  const demo = useDemoMode();
+
+  return demo ? <Navigate to="/map" replace /> : <AddFieldForm />;
+}
+
+function AddFieldForm() {
   const { t } = useTranslation();
   const { fieldId } = useLoaderData<FieldRouteData>();
   const { data: field } = useSuspenseQuery(fieldQueries.catalogById(fieldId));

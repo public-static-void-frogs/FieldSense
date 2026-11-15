@@ -14,23 +14,27 @@ import { FieldM2Insights } from '../features/fields/components/FieldM2Insights';
 import { FieldM3Insights } from '../features/fields/components/FieldM3Insights';
 import { FieldProperties } from '../features/fields/components/FieldProperties';
 import { FieldRecommendation } from '../features/fields/components/FieldRecommendation';
+import { LandHistory } from '../features/fields/components/LandHistory.tsx';
 import { FieldStatus } from '../features/fields/components/FieldStatus';
 import { useFieldRemoval } from '../features/fields/hooks/useFieldRemoval.ts';
 import { FieldMap } from '../features/maps/components/FieldMap';
 import { useFieldLocation } from '../features/maps/hooks/useFieldLocation.ts';
 import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
+import { useDemoMode } from '../features/demo/hooks/useDemoMode.ts';
 
 const sections = {
   map: { id: 'field-location-map', label: 'Location map' },
   properties: { id: 'field-properties', label: 'Field properties' },
   recommendations: { id: 'crop-recommendations', label: 'Crop strategies for next season' },
   history: { id: 'crop-history', label: 'Crop history' },
+  records: { id: 'land-history', label: 'Land history' },
   timing: { id: 'crop-timing-and-climate-risk', label: 'Crop timing and climate risk' },
   evidence: { id: 'neighbour-evidence', label: 'Neighbour evidence' },
 } as const;
 
 export function FieldDetailsPage() {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const navigate = useNavigate();
   const { search } = useLocation();
   const { fieldId } = useLoaderData<FieldRouteData>();
@@ -47,7 +51,7 @@ export function FieldDetailsPage() {
   return (
     <>
       <PageHeading
-        title={field.crop || field.name}
+        title={demo ? field.name : field.crop || field.name}
         eyebrow=""
         titlePrefix={
           <>
@@ -71,28 +75,30 @@ export function FieldDetailsPage() {
             >
               {t('Crop recommendation')}
             </RouterButton>
-            <Dropdown
-              trigger={['click']}
-              menu={{
-                items: [
-                  {
-                    key: 'map',
-                    icon: <MapPin size={16} />,
-                    label: t('Explore farm map'),
-                    onClick: () => navigate('/map'),
-                  },
-                  {
-                    key: 'remove',
-                    danger: true,
-                    icon: <Trash2 size={16} />,
-                    label: t('Remove field'),
-                    onClick: () => setConfirmRemove(true),
-                  },
-                ],
-              }}
-            >
-              <Button icon={<Pencil size={17} />}>{t('Edit')}</Button>
-            </Dropdown>
+            {!demo && (
+              <Dropdown
+                trigger={['click']}
+                menu={{
+                  items: [
+                    {
+                      key: 'map',
+                      icon: <MapPin size={16} />,
+                      label: t('Explore farm map'),
+                      onClick: () => navigate('/map'),
+                    },
+                    {
+                      key: 'remove',
+                      danger: true,
+                      icon: <Trash2 size={16} />,
+                      label: t('Remove field'),
+                      onClick: () => setConfirmRemove(true),
+                    },
+                  ],
+                }}
+              >
+                <Button icon={<Pencil size={17} />}>{t('Edit')}</Button>
+              </Dropdown>
+            )}
           </Space>
         }
       />
@@ -101,6 +107,7 @@ export function FieldDetailsPage() {
         <ul>
           {Object.values(sections)
             .filter((section) => section !== sections.properties || propertyData)
+            .filter((section) => demo || section !== sections.records)
             .map(({ id, label }) => (
               <li key={id}>
                 <Link to={{ search, hash: `#${id}` }}>{t(label)}</Link>
@@ -135,6 +142,11 @@ export function FieldDetailsPage() {
         <div className="field-detail-anchor" id={sections.history.id}>
           <FieldCropHistory key={field.id} field={field} />
         </div>
+        {demo && (
+          <div className="field-detail-anchor" id={sections.records.id}>
+            <LandHistory field={field} />
+          </div>
+        )}
         <div className="field-detail-anchor" id={sections.timing.id}>
           <FieldM3Insights field={field} />
         </div>

@@ -13,7 +13,11 @@ export function CredentialFields({ register = false }: CredentialFieldsProps) {
         name="email"
         rules={[
           { required: true, message: t('Enter your email address.') },
-          { type: 'email', max: 254, message: t('Enter a valid email address.') },
+          {
+            type: 'email',
+            max: 254,
+            message: t('Enter a valid email address.'),
+          },
         ]}
       >
         <Input type="email" autoComplete="username" autoCapitalize="none" spellCheck={false} />

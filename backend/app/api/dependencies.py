@@ -3,7 +3,7 @@ from uuid import UUID
 
 from fastapi import Depends, Path
 
-from app.api.auth import CurrentUser, Database
+from app.api.auth import CurrentUser, Database, writable_user
 from app.repositories.fields import FieldRepository
 from app.repositories.planning import EventResponses
 
@@ -17,6 +17,7 @@ def event_responses(database: Database, user: CurrentUser) -> EventResponses:
 
 
 Store = Annotated[FieldRepository, Depends(repository)]
+WriteAccess = Depends(writable_user)
 Responses = Annotated[EventResponses, Depends(event_responses)]
 FieldId = UUID
 ParcelId = Annotated[int, Path(gt=0)]

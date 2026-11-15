@@ -5,9 +5,11 @@ import { fieldQueries } from '../api/fields/fields.queries.ts';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { CropFieldCards } from '../features/fields/components/CropFieldCards.tsx';
+import { useDemoMode } from '../features/demo/hooks/useDemoMode.ts';
 
 export function FieldsPage() {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const { data: fields } = useSuspenseQuery(fieldQueries.list());
 
   return (
@@ -16,9 +18,11 @@ export function FieldsPage() {
         eyebrow=""
         title={t('Manage your fields')}
         actions={
-          <RouterButton type="primary" icon={<Plus size={19} />} to="/map/add">
-            {t('Add')}
-          </RouterButton>
+          !demo && (
+            <RouterButton type="primary" icon={<Plus size={19} />} to="/map/add">
+              {t('Add')}
+            </RouterButton>
+          )
         }
       />
       <CropFieldCards fields={fields} />

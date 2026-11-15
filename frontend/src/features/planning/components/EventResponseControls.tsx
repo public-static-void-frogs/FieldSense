@@ -1,6 +1,7 @@
 import { Button, Space, Tag } from 'antd';
 import { Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useDemoMode } from '../../demo/hooks/useDemoMode.ts';
 
 import { useStrategyResponse } from '../hooks/useStrategyResponse.ts';
 import { decisionPresentation } from '../utils/eventPresentation.ts';
@@ -13,20 +14,20 @@ type EventResponseControlsProps = { fieldId: string };
  */
 export function EventResponseControls({ fieldId }: EventResponseControlsProps) {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const { field, events, decision, counts, isRespondingToStrategy, respond } =
     useStrategyResponse(fieldId);
   if (!field || !events.length) {
     return null;
   }
-  const presentation = counts.proposed
-    ? decisionPresentation.proposed
-    : decisionPresentation[decision === 'proposed' ? 'reviewed' : decision];
+  const reviewed = decision === 'proposed' ? 'reviewed' : decision;
+  const presentation = decisionPresentation[counts.proposed ? 'proposed' : reviewed];
   const remaining = counts.proposed < events.length;
 
   return (
     <Space size={8} wrap className="event-response-controls">
       <Tag color={presentation.color}>{t(presentation.label, { value0: counts.proposed })}</Tag>
-      {counts.proposed > 0 && (
+      {!demo && counts.proposed > 0 && (
         <Space.Compact>
           <Button
             size="small"

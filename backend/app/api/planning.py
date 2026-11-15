@@ -3,7 +3,7 @@ from uuid import UUID
 from fastapi import APIRouter, Request
 
 from app.api.auth import CurrentUser
-from app.api.dependencies import FieldId, Responses, Store
+from app.api.dependencies import FieldId, Responses, Store, WriteAccess
 from app.schemas.planning import (
     EventResponse,
     FieldStrategy,
@@ -47,7 +47,11 @@ def strategy(field_id: FieldId, store: Store, request: Request, user: CurrentUse
     return service.strategy(store, field_id, request.app.state.strategy, user.settings)
 
 
-@router.put("/fields/{field_id}/strategy/response", response_model=dict[str, EventResponse])
+@router.put(
+    "/fields/{field_id}/strategy/response",
+    response_model=dict[str, EventResponse],
+    dependencies=[WriteAccess],
+)
 def respond(
     field_id: FieldId,
     input: StrategyResponse,
@@ -74,6 +78,7 @@ def respond(
 @router.put(
     "/fields/{field_id}/events/{event_id}/response",
     response_model=dict[str, EventResponse],
+    dependencies=[WriteAccess],
     responses={404: {"description": "Field or event not found"}},
 )
 def respond_to_event(

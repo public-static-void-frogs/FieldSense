@@ -136,7 +136,7 @@ def weather_forecast_insight(
     field_id: UUID | None = None,
 ):
     config = request.app.state.config
-    if not config.gemini_enabled or not config.gemini_api_key.strip():
+    if user.is_demo or not config.gemini_enabled or not config.gemini_api_key.strip():
         raise HTTPException(503, "Weather summaries are unavailable")
     series = weather_forecast(request, user, store, field_id)
     forecast = forecast_insight_input(series, day.isoformat(), locale)

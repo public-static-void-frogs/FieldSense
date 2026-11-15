@@ -44,7 +44,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
         title="Field Shift NASA API",
         version="1.0.0",
-        description="Authenticated farm API with SQL-backed accounts, shared fields, per-user field selections and live Open-Meteo weather. No demo field data is seeded.",
+        description="Authenticated farm API with SQL-backed accounts, shared fields, per-user field selections and live Open-Meteo weather. Signed-out visitors can browse the read-only demo.",
     )
     app.state.config = config
     app.state.engine = engine

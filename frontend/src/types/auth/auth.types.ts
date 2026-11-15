@@ -2,6 +2,7 @@ export interface User {
   id: string;
   fullName: string;
   email: string;
+  isDemo?: boolean;
 }
 
 export interface UserSettings {

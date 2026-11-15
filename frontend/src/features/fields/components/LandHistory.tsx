@@ -16,6 +16,7 @@ import {
 } from 'antd';
 import { History, Search } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { CropIcon } from '../../../components/common/CropIcon';
 import { fieldQueries } from '../../../api/fields/fields.queries.ts';
 import type { Field } from '../../../types/fields/field.types.ts';
 import type { CropSeason, LandEventCategory } from '../../../types/fields/history.types.ts';
@@ -44,7 +45,16 @@ export function LandHistory({ field }: LandHistoryProps) {
         </Space>
       ),
     },
-    { title: t('Crop'), dataIndex: 'crop' },
+    {
+      title: t('Crop'),
+      dataIndex: 'crop',
+      render: (crop: string) => (
+        <Space>
+          <CropIcon crop={crop} size={20} />
+          {crop}
+        </Space>
+      ),
+    },
     { title: t('Planted'), dataIndex: 'planted' },
     { title: t('Harvested'), dataIndex: 'harvested' },
     { title: t('Yield'), dataIndex: 'yield' },
@@ -58,6 +68,7 @@ export function LandHistory({ field }: LandHistoryProps) {
   const { data: history } = useSuspenseQuery(fieldQueries.history(field.id));
   const events = history?.events ?? [];
   const seasons = history?.seasons ?? [];
+  const years = [...new Set(events.map((event) => event.date.slice(0, 4)))].sort().reverse();
   const { criteria, update, reset: resetFilters, visible } = useLandHistoryFilters(events);
   const { category, year, query } = criteria;
 
@@ -68,7 +79,12 @@ export function LandHistory({ field }: LandHistoryProps) {
           <History size={25} />
           {t('Land history')}{' '}
         </Typography.Title>
-        <Tag>{t('{{value0}} records · 2023–2026', { value0: events.length })}</Tag>
+        <Tag>
+          {t('Showing {{value0}} of {{value1}} records', {
+            value0: visible.length,
+            value1: events.length,
+          })}
+        </Tag>
       </Flex>
       <Typography.Paragraph type="secondary">
         {t(
@@ -106,7 +122,7 @@ export function LandHistory({ field }: LandHistoryProps) {
                       aria-label={t('Filter history by year')}
                       value={year}
                       onChange={(year) => update({ year })}
-                      options={['All years', '2026', '2025', '2024', '2023'].map((value) => ({
+                      options={['All years', ...years].map((value) => ({
                         value,
                         label: t(value),
                       }))}
@@ -116,12 +132,6 @@ export function LandHistory({ field }: LandHistoryProps) {
                     )}
                   </Flex>
                   <Flex justify="space-between" wrap gap={8} className="section-gap">
-                    <Typography.Text type="secondary">
-                      {t('Showing {{value0}} of {{value1}} records', {
-                        value0: visible.length,
-                        value1: events.length,
-                      })}
-                    </Typography.Text>
                     <Typography.Text type="secondary">
                       {t('Newest first · Scroll to explore earlier seasons')}
                     </Typography.Text>

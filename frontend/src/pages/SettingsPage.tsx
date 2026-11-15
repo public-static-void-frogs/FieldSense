@@ -8,9 +8,11 @@ import { useSettingsForm } from '../features/settings/hooks/useSettingsForm.ts';
 import type { SettingsSection } from '../features/settings/utils/settingsForm.ts';
 import { LocationPicker } from '../features/maps/components/LocationPicker.tsx';
 import '../styles/settings.css';
+import { useDemoMode } from '../features/demo/hooks/useDemoMode.ts';
 
 export function SettingsPage() {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const { data: preferences } = useSuspenseQuery(farmQueries.profile());
   const settings = useSettingsForm(preferences);
   const { logout, pending: logoutPending } = useLogout();
@@ -24,7 +26,7 @@ export function SettingsPage() {
         layout="vertical"
         requiredMark={false}
         form={settings.form}
-        disabled={settings.pending}
+        disabled={demo || settings.pending}
         onValuesChange={settings.onValuesChange}
         initialValues={settings.initialValues}
       >
@@ -32,11 +34,13 @@ export function SettingsPage() {
           <Card
             title={t('Account information')}
             extra={
-              <SectionActions
-                section="account"
-                label={t('Account information')}
-                settings={settings}
-              />
+              !demo && (
+                <SectionActions
+                  section="account"
+                  label={t('Account information')}
+                  settings={settings}
+                />
+              )
             }
           >
             <div className="settings-profile-photo">
@@ -47,16 +51,19 @@ export function SettingsPage() {
                   {t('Change photo')}
                 </Button>
               </div>
-              <Button
-                className="settings-logout"
-                icon={<LogOut size={18} />}
-                onClick={() => {
-                  void logout();
-                }}
-                loading={logoutPending}
-              >
-                {t('Log out')}
-              </Button>
+              {!demo && (
+                <Button
+                  className="settings-logout"
+                  disabled={false}
+                  icon={<LogOut size={18} />}
+                  onClick={() => {
+                    void logout();
+                  }}
+                  loading={logoutPending}
+                >
+                  {t('Log out')}
+                </Button>
+              )}
             </div>
             <Form.Item
               label={t('Full name')}
@@ -89,11 +96,13 @@ export function SettingsPage() {
           <Card
             title={t('Application preferences')}
             extra={
-              <SectionActions
-                section="preferences"
-                label={t('Application preferences')}
-                settings={settings}
-              />
+              !demo && (
+                <SectionActions
+                  section="preferences"
+                  label={t('Application preferences')}
+                  settings={settings}
+                />
+              )
             }
           >
             <Form.Item label={t('Measurement units')} name="units">
@@ -141,7 +150,9 @@ export function SettingsPage() {
           <Card
             title={t('Farm information')}
             extra={
-              <SectionActions section="farm" label={t('Farm information')} settings={settings} />
+              !demo && (
+                <SectionActions section="farm" label={t('Farm information')} settings={settings} />
+              )
             }
           >
             <div className="settings-location-grid">
@@ -168,11 +179,13 @@ export function SettingsPage() {
             title={t('Current location')}
             className="settings-location-card"
             extra={
-              <SectionActions
-                section="location"
-                label={t('Current location')}
-                settings={settings}
-              />
+              !demo && (
+                <SectionActions
+                  section="location"
+                  label={t('Current location')}
+                  settings={settings}
+                />
+              )
             }
           >
             <Form.Item name="location" hidden>
@@ -187,7 +200,7 @@ export function SettingsPage() {
             <LocationPicker
               value={settings.coordinates}
               onChange={settings.setLocation}
-              disabled={settings.pending}
+              disabled={demo || settings.pending}
               autoLocate={false}
             />
           </Card>

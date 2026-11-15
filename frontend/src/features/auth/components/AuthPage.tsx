@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { FarmlandBackdrop } from '../../../components/common/FarmlandBackdrop';
 import { LegalLinks } from '../../legal/components/LegalLinks.tsx';
 import { LoginForm } from './LoginForm.tsx';
+import { returnPath } from '../utils/auth.ts';
 import { RegistrationForm } from './RegistrationForm.tsx';
 import '../../legal/components/legal.css';
 import '../../../styles/login.css';
@@ -35,6 +36,9 @@ export function AuthPage({ register = false }: AuthPageProps) {
           <Link to={`${register ? '/login' : '/register'}${search}`}>
             {register ? t('Already have an account? Log in') : t('Create an account')}
           </Link>
+        </p>
+        <p className="login-demo-note">
+          <Link to={returnPath(search)}>{t('Try the demo')}</Link>
         </p>
         <LegalLinks />
       </section>

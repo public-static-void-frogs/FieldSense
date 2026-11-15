@@ -6,6 +6,7 @@ import {
   CircleHelp,
   CloudSun,
   LayoutDashboard,
+  LogIn,
   Map,
   PanelLeftClose,
   PanelLeftOpen,
@@ -16,6 +17,8 @@ import { useTranslation } from 'react-i18next';
 import { Link, NavLink, Outlet } from 'react-router-dom';
 import { farmQueries } from '../../../api/farm/farm.queries.ts';
 import { RouterButton } from '../../../components/common/RouterButton';
+import { useDemoMode } from '../../demo/hooks/useDemoMode.ts';
+import { useDemoPreload } from '../../demo/hooks/useDemoPreload.ts';
 import { useAppLayout } from '../hooks/useAppLayout.ts';
 import { getWorkspaceClassName } from '../utils/workspace.ts';
 
@@ -24,6 +27,8 @@ const { Sider, Content } = Layout;
 export function AppLayout() {
   const { handle, active, collapsed, setCollapsed } = useAppLayout();
   const { t, i18n } = useTranslation();
+  const demo = useDemoMode();
+  useDemoPreload(demo);
   const { data: preferences } = useSuspenseQuery(farmQueries.profile());
   useEffect(() => {
     if (preferences.language !== i18n.resolvedLanguage) {
@@ -101,6 +106,15 @@ export function AppLayout() {
             mode="inline"
             selectedKeys={[active]}
             items={[
+              ...(demo
+                ? [
+                    {
+                      key: '/login',
+                      label: <Link to="/login">{t('Log in')}</Link>,
+                      icon: <LogIn size={21} />,
+                    },
+                  ]
+                : []),
               {
                 key: '/notifications',
                 label: <NavLink to="/notifications">{t('Notifications')}</NavLink>,

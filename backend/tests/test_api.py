@@ -371,10 +371,10 @@ class ApiTests(unittest.TestCase):
 
     def test_authentication_and_openapi_contract(self):
         with TestClient(self.app) as anonymous:
-            for path in ("/fields", "/fields/catalog", "/maps/geojson"):
-                self.assertEqual(anonymous.get(BASE + path).status_code, 401)
+            for path in ("/fields", "/fields/catalog", "/maps/summary"):
+                self.assertEqual(anonymous.get(BASE + path).status_code, 200)
             fid = str(uuid4())
-            self.assertEqual(anonymous.put(f"{BASE}/fields/{fid}/selection").status_code, 401)
+            self.assertEqual(anonymous.put(f"{BASE}/fields/{fid}/selection").status_code, 403)
         spec = self.get_openapi()
         self.assertIn(BASE + "/fields/catalog", spec["paths"])
         self.assertIn(BASE + "/fields/{field_id}/selection", spec["paths"])

@@ -5,7 +5,13 @@ This README summarises the backend services in `backend/app/services/`: what eac
 which data it reads. For setup see `backend/README.md`; for the chat assistant see
 `backend/docs/assistant.md`.
 
-## SI agent tools
+## Product demo
+
+Open the app while signed out to browse the demo's saved fields. Use the Field map to select
+a section and preview crop analysis. See
+[demo access](backend/docs/authentication.md#demo-access).
+
+## AI agent tools
 
 The chat assistant does not get field data in its prompt. It calls these tools when it needs data
 (`assistant_tools.py`; see `backend/docs/assistant.md`):

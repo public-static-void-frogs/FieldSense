@@ -6,7 +6,7 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, Request
 
 from app.api.auth import CurrentUser
-from app.api.dependencies import FieldId, ParcelId, Store
+from app.api.dependencies import FieldId, ParcelId, Store, WriteAccess
 from app.schemas.crop_history import CropHistory, CropLayer
 from app.schemas.field_insights import M2Insights, M3Insights, SoilDepletion
 from app.schemas.fields import (
@@ -59,6 +59,7 @@ def catalog_field(field_id: FieldId, store: Store):
     "/fields",
     response_model=Field,
     status_code=201,
+    dependencies=[WriteAccess],
     responses={
         409: {"description": "Parcel ID already exists in the catalog"},
     },
@@ -68,7 +69,7 @@ def create_field(input: CreateField, store: Store):
     return store.create(input)
 
 
-@router.post("/fields/crop-areas", response_model=list[Field])
+@router.post("/fields/crop-areas", response_model=list[Field], dependencies=[WriteAccess])
 def add_crop_areas(input: SaveCropAreas, store: Store):
     """Merge selected polygons into the caller's saved crop areas."""
     from app.services.saved_crop_areas import save_crop_areas
@@ -76,7 +77,7 @@ def add_crop_areas(input: SaveCropAreas, store: Store):
     return save_crop_areas(store, input.areas)
 
 
-@router.put("/fields/{field_id}/selection", response_model=Field)
+@router.put("/fields/{field_id}/selection", response_model=Field, dependencies=[WriteAccess])
 def select_field(field_id: FieldId, store: Store):
     """Select a catalog field for the caller; repeated selections are idempotent."""
     return store.select(field_id)
@@ -97,7 +98,7 @@ def field(field_id: FieldId, store: Store):
     return store.require_field(field_id)
 
 
-@router.delete("/fields/{field_id}", response_model=UUID)
+@router.delete("/fields/{field_id}", response_model=UUID, dependencies=[WriteAccess])
 def delete_field(field_id: FieldId, store: Store):
     """Remove the caller's selection while preserving the shared catalog field."""
     return store.remove(field_id)
