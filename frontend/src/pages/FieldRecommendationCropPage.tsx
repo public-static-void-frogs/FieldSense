@@ -6,6 +6,7 @@ import type { RecommendationCropRouteData } from '../app/route-loaders.ts';
 import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
+import { FieldStrategySection } from '../features/planning/components/FieldStrategySection';
 import { CandidateDetails } from '../features/rotation/components/CandidateDetails';
 import { useRotationAdvice } from '../features/rotation/hooks/useRotationAdvice.ts';
 import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
@@ -73,9 +74,12 @@ export function FieldRecommendationCropPage() {
           </>
         }
       />
-      <Card>
-        <CandidateDetails advice={advice} candidate={candidate} />
-      </Card>
+      <div className="rotation-stack">
+        <Card>
+          <CandidateDetails advice={advice} candidate={candidate} />
+        </Card>
+        <FieldStrategySection fieldId={fieldId} cropLabel={candidate.label} />
+      </div>
     </div>
   );
 }
