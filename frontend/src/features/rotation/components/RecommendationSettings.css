@@ -1,0 +1,22 @@
+.rotation-planner-setting {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.rotation-planner-setting .ant-typography:last-child {
+  margin-bottom: 0;
+}
+
+.rotation-planner-setting-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  margin-bottom: 4px;
+}
+
+.rotation-planner-setting .ant-switch {
+  flex: none;
+}

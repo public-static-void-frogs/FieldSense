@@ -14,8 +14,10 @@ import { InformationGaps } from '../features/rotation/components/InformationGaps
 import { OffSeasonCard } from '../features/rotation/components/OffSeasonCard';
 import { EconomicsCard } from '../features/rotation/components/EconomicsCard';
 import { CustomMetricsBanner } from '../features/rotation/components/CustomMetricsBanner';
+import { LearnedPlannerBanner } from '../features/rotation/components/LearnedPlannerBanner';
 import { PlanOverview } from '../features/rotation/components/PlanOverview';
 import { RecommendationCalculator } from '../features/rotation/components/RecommendationCalculator';
+import { RecommendationSettings } from '../features/rotation/components/RecommendationSettings';
 import { SeasonResultsCard } from '../features/rotation/components/SeasonResultsCard';
 import { SoilSurveyCard } from '../features/rotation/components/SoilSurveyCard';
 import { useRotationAdvice } from '../features/rotation/hooks/useRotationAdvice.ts';
@@ -68,12 +70,15 @@ export function FieldRecommendationPage() {
 
   return (
     <div className="rotation-recommendation-page">
-      <CustomMetricsBanner
-        key={fieldId}
-        fieldId={fieldId}
-        onView={advice ? viewInputs : undefined}
-        onClear={() => setInputsRevision((revision) => revision + 1)}
-      />
+      <div className="rotation-recommendation-banners">
+        <CustomMetricsBanner
+          key={fieldId}
+          fieldId={fieldId}
+          onView={advice ? viewInputs : undefined}
+          onClear={() => setInputsRevision((revision) => revision + 1)}
+        />
+        {!isUpdating && plan?.method === 'learned_policy' && <LearnedPlannerBanner />}
+      </div>
       <div className="rotation-page-content">
         <PageHeading
           title={
@@ -137,12 +142,10 @@ export function FieldRecommendationPage() {
                 advice={advice}
                 selectedCrop={selectedCrop}
                 selectedSeasons={selectedSeasons}
-                selectedPlanner={selectedPlanner}
                 priorities={priorities}
                 isUpdating={isUpdating}
                 onCropChange={setCrop}
                 onSeasonsChange={setSeasons}
-                onPlannerChange={setPlanner}
                 onPriorityToggle={togglePriority}
               />
               <div className="rotation-stack" aria-busy={isUpdating}>
@@ -176,6 +179,11 @@ export function FieldRecommendationPage() {
                   </Card>
                 )}
               </div>
+              <RecommendationSettings
+                planner={selectedPlanner}
+                plannerStatus={advice.plan?.planner}
+                onPlannerChange={setPlanner}
+              />
             </>
           )}
         </div>

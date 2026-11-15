@@ -1,14 +1,5 @@
 import { Card, Skeleton, Typography } from 'antd';
-import {
-  BrainCircuit,
-  Calculator,
-  Check,
-  CircleDollarSign,
-  Droplets,
-  Mountain,
-  RotateCcw,
-  Sprout,
-} from 'lucide-react';
+import { Check, CircleDollarSign, Droplets, Mountain, RotateCcw, Sprout } from 'lucide-react';
 import {
   type CSSProperties,
   type ReactNode,
@@ -20,12 +11,8 @@ import {
 } from 'react';
 import { useTranslation } from 'react-i18next';
 import { CropIcon } from '../../../components/common/CropIcon';
-import type {
-  RotationAdvice,
-  RotationPlanner,
-  RotationPriority,
-} from '../../../types/rotation/rotation.types.ts';
-import { plannerOptions, priorityOptions, sourceKindLabels } from '../constants/rotationLabels.ts';
+import type { RotationAdvice, RotationPriority } from '../../../types/rotation/rotation.types.ts';
+import { priorityOptions, sourceKindLabels } from '../constants/rotationLabels.ts';
 import { DEFAULT_PLAN_SEASONS, SEASON_CHOICES } from '../utils/planPresentation.ts';
 import { AdviceVerdict } from './AdviceVerdict';
 import { CandidateList } from './CandidateList';
@@ -39,18 +26,14 @@ const goalIcons = {
   pest_break: RotateCcw,
 };
 
-const plannerIcons = { exact: Calculator, learned: BrainCircuit };
-
 type RecommendationCalculatorProps = {
   advice: RotationAdvice;
   selectedCrop: string | undefined;
   selectedSeasons: number | undefined;
-  selectedPlanner: RotationPlanner;
   priorities: RotationPriority[];
   isUpdating: boolean;
   onCropChange: (crop: string) => void;
   onSeasonsChange: (seasons: number) => void;
-  onPlannerChange: (planner: RotationPlanner) => void;
   onPriorityToggle: (priority: RotationPriority, selected: boolean) => void;
 };
 
@@ -58,20 +41,14 @@ export function RecommendationCalculator({
   advice,
   selectedCrop,
   selectedSeasons,
-  selectedPlanner,
   priorities,
   isUpdating,
   onCropChange,
   onSeasonsChange,
-  onPlannerChange,
   onPriorityToggle,
 }: RecommendationCalculatorProps) {
   const { t } = useTranslation();
   const cropGroup = useId();
-  const plannerGroup = useId();
-  const plannerTitle = t('How to build the plan');
-  // Offered only when the server has a trained policy to plan with.
-  const offerPlanner = advice.plan?.planner?.learnedAvailable === true;
   const cropTitle = t('Choose the crop you plan to grow');
   const goalTitle = t('Select your goals for this season');
   const seasonsTitle = t('Seasons to plan');
@@ -137,41 +114,7 @@ export function RecommendationCalculator({
           onChange={onSeasonsChange}
         />
       </CalculatorStep>
-      {offerPlanner && (
-        <CalculatorStep number={4} title={plannerTitle}>
-          <fieldset
-            className="rotation-option-grid rotation-planner-grid"
-            aria-label={plannerTitle}
-          >
-            {plannerOptions.map((option) => {
-              const Icon = plannerIcons[option.value];
-
-              return (
-                <label className="rotation-option" key={option.value}>
-                  <input
-                    type="radio"
-                    name={plannerGroup}
-                    value={option.value}
-                    checked={selectedPlanner === option.value}
-                    onChange={() => onPlannerChange(option.value)}
-                  />
-                  <Icon className="rotation-goal-icon" size={28} aria-hidden="true" />
-                  <span>
-                    <strong>{t(option.label)}</strong>
-                    <br />
-                    {t(option.description)}
-                  </span>
-                  <Check className="rotation-option-check" size={16} aria-hidden="true" />
-                </label>
-              );
-            })}
-          </fieldset>
-          <Typography.Text type="secondary" className="rotation-calculator-note">
-            {t('Both use the same yields, prices, costs and rotation rules of this field.')}
-          </Typography.Text>
-        </CalculatorStep>
-      )}
-      <CalculatorStep number={offerPlanner ? 5 : 4} title={t('Crop leaderboard')}>
+      <CalculatorStep number={4} title={t('Crop leaderboard')}>
         <div aria-busy={isUpdating}>
           {isUpdating ? (
             <Skeleton active title={false} paragraph={{ rows: 4 }} />

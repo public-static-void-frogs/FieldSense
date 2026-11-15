@@ -211,11 +211,17 @@ class RotationAdviceTests(unittest.TestCase):
         torch.manual_seed(0)
         with tempfile.TemporaryDirectory() as root:
             saved = Path(root) / "policy.pt"
-            LearnedPolicy(PolicyNet(observation_size(), 16)).save(saved)
             self.app.state.rotation = RotationAdvice(None, soil_lookup=False, policy_path=saved)
+            self.assertEqual(
+                self.advice(field_id, planner="learned").json()["plan"]["planner"],
+                body["plan"]["planner"],
+            )
+            LearnedPolicy(PolicyNet(observation_size(), 16)).save(saved)
             exact = self.advice(field_id).json()["plan"]
             learned = self.advice(field_id, planner="learned").json()["plan"]
-        self.assertEqual((exact["method"], exact["planner"]["used"]), (body["plan"]["method"], "exact"))
+        self.assertEqual(
+            (exact["method"], exact["planner"]["used"]), (body["plan"]["method"], "exact")
+        )
         self.assertTrue(exact["planner"]["learnedAvailable"])
         self.assertEqual(learned["method"], "learned_policy")
         self.assertEqual(learned["planner"]["used"], "learned")

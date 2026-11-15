@@ -10,7 +10,9 @@ import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { FieldStrategySection } from '../features/planning/components/FieldStrategySection';
 import { CandidateDetails } from '../features/rotation/components/CandidateDetails';
+import { LearnedPlannerBanner } from '../features/rotation/components/LearnedPlannerBanner';
 import { PlanForecast } from '../features/rotation/components/PlanForecast';
+import { RecommendationSettings } from '../features/rotation/components/RecommendationSettings';
 import { useRotationAdvice } from '../features/rotation/hooks/useRotationAdvice.ts';
 import { planCrop, pricedPlan } from '../features/rotation/utils/planPresentation.ts';
 import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
@@ -20,7 +22,8 @@ export function FieldRecommendationCropPage() {
   const { t } = useTranslation();
   const { fieldId, cropId } = useLoaderData<RecommendationCropRouteData>();
   const { search } = useLocation();
-  const { advice, isLoading, error, retry } = useRotationAdvice(fieldId);
+  const { advice, isLoading, isUpdating, error, retry, selectedPlanner, setPlanner } =
+    useRotationAdvice(fieldId);
   const { data: field } = useSuspenseQuery(fieldQueries.byId(fieldId));
   const candidate = advice?.candidates.find(({ crop }) => crop === cropId);
   const recommendation = { pathname: recommendationPath(fieldId), search };
@@ -66,6 +69,11 @@ export function FieldRecommendationCropPage() {
 
   return (
     <div className="rotation-page rotation-strategy-page">
+      {!isUpdating && plan?.method === 'learned_policy' && (
+        <div className="rotation-recommendation-banners">
+          <LearnedPlannerBanner />
+        </div>
+      )}
       <PageHeading
         title={
           <>
@@ -95,15 +103,22 @@ export function FieldRecommendationCropPage() {
         }
       />
       <div className="rotation-stack">
-        {plan && entry && (
-          <Card>
-            <PlanForecast advice={advice} plan={plan} entry={entry} />
+        <div className="rotation-stack" aria-busy={isUpdating}>
+          {plan && entry && (
+            <Card>
+              <PlanForecast advice={advice} plan={plan} entry={entry} />
+            </Card>
+          )}
+          <Card title={t('Crop details')}>
+            <CandidateDetails advice={advice} candidate={candidate} />
           </Card>
-        )}
-        <Card title={t('Crop details')}>
-          <CandidateDetails advice={advice} candidate={candidate} />
-        </Card>
+        </div>
         <FieldStrategySection fieldId={fieldId} cropLabel={candidate.label} />
+        <RecommendationSettings
+          planner={selectedPlanner}
+          plannerStatus={advice.plan?.planner}
+          onPlannerChange={setPlanner}
+        />
       </div>
     </div>
   );

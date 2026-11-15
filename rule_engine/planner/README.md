@@ -107,8 +107,9 @@ order it was trained with, and `learned.load_policy` refuses a file whose order 
 `GET /fields/{id}/rotation-advice?planner=learned` builds the plan with the policy;
 `planner=exact` (the default) keeps the exact calculation.
 
-- The backend reads the policy once from `ROTATION_POLICY_PATH` (default
+- The backend loads the policy from `ROTATION_POLICY_PATH` (default
   `data/local/planner/policy/policy.pt`, which is not in git: copy the file to the server).
+  If the file is initially missing, the next recommendation after it appears loads it.
 - `plan.method` is `learned_policy` or `dynamic_programming_fixed_sequence`.
 - `plan.planner` reports what was asked for, what was used, and whether a policy is loaded
   (`learnedAvailable`, with the reason code in `learnedUnavailable` when it is not).

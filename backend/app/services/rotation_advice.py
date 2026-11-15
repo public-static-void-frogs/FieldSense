@@ -86,7 +86,7 @@ class RotationAdvice:
         self._soil_cache: OrderedDict[str, dict | None] = OrderedDict()
         self._history_db = None
         self._cells = None
-        self._policy = None  # (LearnedPolicy or None, why it is missing), read once
+        self._policy = None  # (LearnedPolicy or None, why it is missing)
 
     # -- engine and data files ---------------------------------------------------------
 
@@ -111,10 +111,14 @@ class RotationAdvice:
     def learned_policy(self):
         """(policy, None) read from `policy_path`, or (None, the reason code)."""
         advisor = self.advisor  # puts the rule engine on the import path
-        with self._lock:
-            if self._policy is None:
-                from rule_engine.planner.learned import load_policy
+        from rule_engine.planner.learned import NO_FILE, load_policy
 
+        with self._lock:
+            if self._policy is None or (
+                self._policy[1] == NO_FILE
+                and self.policy_path is not None
+                and self.policy_path.is_file()
+            ):
                 self._policy = load_policy(self.policy_path)
             del advisor
             return self._policy

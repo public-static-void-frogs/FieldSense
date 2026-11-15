@@ -1,4 +1,4 @@
-import type { RotationPlanner, RotationPriority } from '../../../types/rotation/rotation.types.ts';
+import type { RotationPriority } from '../../../types/rotation/rotation.types.ts';
 
 // Engine codes -> English catalog keys. Unknown codes are shown as they arrive.
 
@@ -201,19 +201,6 @@ export const notModelledLabels: Record<string, string> = {
   no_yield: 'No yield estimate',
   not_marketed: 'Not sold as a crop',
 };
-
-export const plannerOptions: { value: RotationPlanner; label: string; description: string }[] = [
-  {
-    value: 'exact',
-    label: 'Exact calculation',
-    description: 'Compares every possible rotation and keeps the best one.',
-  },
-  {
-    value: 'learned',
-    label: 'Learned planner',
-    description: 'A model trained on fields across the USA picks the crop for each season.',
-  },
-];
 
 export const autumnActionLabels: Record<string, string> = {
   none: 'Nothing to sow',
