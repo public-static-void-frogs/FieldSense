@@ -12,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 MAX_TOOL_ROUNDS = 4  # rounds that may call tools; one more round then answers without tools
 MAX_CALLS_PER_ROUND = 4
+MAX_OUTPUT_TOKENS = 1000
 
 # Added by code, not the prompt file, so editing the txt cannot remove the injection guard.
 SESSION_HEADER = (
@@ -88,7 +89,7 @@ async def stream_chat(
         calls, parts, finish, has_text = [], [], None, False
         try:
             async for kind, value in gemini_round(
-                config, system_prompt, contents, tools, max_output_tokens=600
+                config, system_prompt, contents, tools, max_output_tokens=MAX_OUTPUT_TOKENS
             ):
                 if kind == "text":
                     has_text = has_text or bool(value.strip())
@@ -101,7 +102,9 @@ async def stream_chat(
             logger.warning("Assistant model call failed: %s", error)
             return
         if not calls:
-            if has_text and finish == "STOP":
+            # An answer cut off by the token limit is still an answer; failing it as
+            # "interrupted" would make the user retry the same question for nothing.
+            if has_text and finish in ("STOP", "MAX_TOKENS"):
                 yield _line(done=True)
             else:
                 logger.warning("Assistant answer ended without text (finish=%s)", finish)
