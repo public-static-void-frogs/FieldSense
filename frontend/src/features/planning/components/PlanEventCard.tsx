@@ -10,9 +10,9 @@ import type { PlannedEvent } from '../../../types/planning/planning.types.ts';
 import { isUnmodifiedPrimaryClick } from '../../../utils/mouse.ts';
 import { categoryBackgrounds, categoryColors } from '../constants/planning.constants.ts';
 import { getEventUrgencyColor } from '../utils/eventPresentation.ts';
-import { getEventDecision } from '../utils/eventResponses.ts';
 import { getEventStatus } from '../utils/planningDates.ts';
 import { actionDetailsPath } from '../utils/planningRoutes.ts';
+import { EventDecisionControls } from './EventDecisionControls';
 
 type PlanEventCardProps = {
   event: PlannedEvent;
@@ -22,10 +22,8 @@ type PlanEventCardProps = {
 
 export function PlanEventCard({ event, highlighted = false, onSelect }: PlanEventCardProps) {
   const { t } = useTranslation();
-  const { data: eventResponses } = useSuspenseQuery(planningQueries.responses());
   const { data: planningContext } = useSuspenseQuery(planningQueries.context());
   const planningToday = planningContext.today;
-  const decision = getEventDecision(event, eventResponses);
 
   return (
     <Card
@@ -46,12 +44,9 @@ export function PlanEventCard({ event, highlighted = false, onSelect }: PlanEven
             : t(getEventStatus(event.date, planningToday))}
         </Tag>
       </Flex>
-      <Tag
-        color={decision === 'accepted' ? 'success' : 'processing'}
-        className="plan-event-response-tag"
-      >
-        {decision === 'accepted' ? t('Accepted') : t('Proposed')}
-      </Tag>
+      <div className="plan-event-response-actions">
+        <EventDecisionControls event={event} />
+      </div>
       <Typography.Title level={5}>{event.title}</Typography.Title>
       <Typography.Text strong className="plan-event-field">
         {event.fieldName}

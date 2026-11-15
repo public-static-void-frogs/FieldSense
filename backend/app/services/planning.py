@@ -9,6 +9,8 @@ import json
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
+from app.core.errors import ResourceNotFound
+
 
 def context(user):
     return dict(today=datetime.now(ZoneInfo(user.settings.time_zone)).date().isoformat())
@@ -36,10 +38,25 @@ def fingerprint(event) -> str:
     return json.dumps([str(part) for part in parts], ensure_ascii=False, separators=(",", ":"))
 
 
-def respond(store, responses, field_id, status, calendar, preferences):
-    """Record one decision for every calendar event of the field."""
+def respond(store, responses, field_id, status, calendar, preferences, only_proposed=False):
+    """Record one decision for every calendar event of the field.
+
+    With ``only_proposed`` the events that were already accepted or declined keep their decision.
+    """
     field = store.require_field(field_id)
     events = calendar.for_field(field, preferences)
     return responses.replace_for_field(
-        str(field_id), status, {str(event["id"]): fingerprint(event) for event in events}
+        str(field_id),
+        status,
+        {str(event["id"]): fingerprint(event) for event in events},
+        only_proposed,
     )
+
+
+def respond_to_event(store, responses, field_id, event_id, status, calendar, preferences):
+    """Record one decision for a single calendar event of the field."""
+    field = store.require_field(field_id)
+    events = {str(e["id"]): fingerprint(e) for e in calendar.for_field(field, preferences)}
+    if str(event_id) not in events:
+        raise ResourceNotFound("Event not found")
+    return responses.set_one(str(field_id), str(event_id), status, events)

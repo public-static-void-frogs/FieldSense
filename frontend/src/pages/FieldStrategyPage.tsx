@@ -21,6 +21,7 @@ import { planningQueries } from '../api/planning/planning.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
+import { EventDecisionControls } from '../features/planning/components/EventDecisionControls';
 import { EventResponseControls } from '../features/planning/components/EventResponseControls';
 import { useStrategyReview } from '../features/planning/hooks/useStrategyReview.ts';
 import { countEventDecisions } from '../features/planning/utils/eventPresentation.ts';
@@ -177,10 +178,7 @@ export function FieldStrategyPage() {
           </div>
         </div>
 
-        <section
-          aria-label={t('Strategy fit comparison')}
-          className="strategy-forecast-grid"
-        >
+        <section aria-label={t('Strategy fit comparison')} className="strategy-forecast-grid">
           {forecastMetrics.map((metric, index) => {
             const values = comparison[index];
             const delta = values.projected - values.current;
@@ -321,7 +319,7 @@ export function FieldStrategyPage() {
             rowKey="id"
             dataSource={events}
             pagination={false}
-            scroll={{ x: 560 }}
+            scroll={{ x: 760 }}
             columns={[
               {
                 title: t('Date'),
@@ -340,6 +338,12 @@ export function FieldStrategyPage() {
                     </Typography.Paragraph>
                   </div>
                 ),
+              },
+              {
+                title: t('Status'),
+                key: 'response',
+                width: 250,
+                render: (_, event) => <EventDecisionControls event={event} />,
               },
             ]}
           />

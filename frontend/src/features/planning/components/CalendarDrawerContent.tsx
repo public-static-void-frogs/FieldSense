@@ -5,6 +5,7 @@ import type { PlannedEvent } from '../../../types/planning/planning.types.ts';
 
 import { priorityColors } from '../utils/eventPresentation.ts';
 import { formatPlanDate, getEventStatus } from '../utils/planningDates.ts';
+import { EventDecisionControls } from './EventDecisionControls';
 import { EventResponseControls } from './EventResponseControls';
 import { PlanEventCard } from './PlanEventCard';
 
@@ -63,7 +64,11 @@ function CalendarActionDetails({ event, field, planningToday }: CalendarActionDe
   return (
     <>
       <div className="event-response-panel">
-        <Typography.Text strong>{t('Field strategy · all proposed events')}</Typography.Text>
+        <Typography.Text strong>{t('This action')}</Typography.Text>
+        <EventDecisionControls event={event} />
+        <Typography.Text strong className="event-response-panel-group">
+          {t('Field strategy · all proposed events')}
+        </Typography.Text>
         <EventResponseControls fieldId={event.fieldId} />
       </div>
       <Flex gap={8} wrap className="section-gap">

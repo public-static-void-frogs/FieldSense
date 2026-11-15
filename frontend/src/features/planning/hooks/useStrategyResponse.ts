@@ -5,7 +5,7 @@ import { fieldQueries } from '../../../api/fields/fields.queries.ts';
 import { planningMutations } from '../../../api/planning/planning.mutations.ts';
 import { planningQueries } from '../../../api/planning/planning.queries.ts';
 import type { EventDecision } from '../../../types/planning/planning.types.ts';
-import { getStrategyDecision } from '../utils/eventPresentation.ts';
+import { countEventDecisions, getStrategyDecision } from '../utils/eventPresentation.ts';
 
 export function useStrategyResponse(fieldId: string) {
   const { t } = useTranslation();
@@ -19,11 +19,12 @@ export function useStrategyResponse(fieldId: string) {
   const { message } = App.useApp();
   const field = fields.find((item) => item.id === fieldId);
   const decision = getStrategyDecision(events, eventResponses);
+  const counts = countEventDecisions(events, eventResponses);
   function respond(status: EventDecision) {
     return respondToStrategy({ fieldId, status }).catch(() =>
       message.error(t('Unable to save changes')),
     );
   }
 
-  return { field, events, decision, isRespondingToStrategy, respond };
+  return { field, events, decision, counts, isRespondingToStrategy, respond };
 }
