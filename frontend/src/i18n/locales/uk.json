@@ -1633,5 +1633,20 @@
   "In a season when it happens, county yields of this crop were about {{loss}} lower, so it is expected to cost about {{expected}} of the yield per season.": "У сезон, коли це трапляється, урожайність цієї культури в окрузі була приблизно на {{loss}} нижчою, тож очікувана втрата становить близько {{expected}} урожаю за сезон.",
   "County yields of this crop show no loss in the seasons when it happens.": "Урожайність цієї культури в окрузі не показує втрат у сезони, коли це трапляється.",
   "How much yield it costs is not measured for this crop, so the level reflects only how often it happens.": "Втрати врожаю для цієї культури не виміряно, тому рівень відображає лише те, як часто це трапляється.",
-  "A heat or drought rule was skipped because most of this crop in the county is irrigated.": "Правило щодо спеки або посухи пропущено, бо більшість посівів цієї культури в окрузі зрошується."
+  "A heat or drought rule was skipped because most of this crop in the county is irrigated.": "Правило щодо спеки або посухи пропущено, бо більшість посівів цієї культури в окрузі зрошується.",
+  "Not sold as a crop": "Не продається як культура",
+  "Exact calculation": "Точний розрахунок",
+  "Compares every possible rotation and keeps the best one.": "Порівнює всі можливі сівозміни й залишає найкращу.",
+  "Learned planner": "Навчений планувальник",
+  "A model trained on fields across the USA picks the crop for each season.": "Модель, навчена на полях з усіх США, обирає культуру на кожен сезон.",
+  "How to build the plan": "Як будувати план",
+  "Both use the same yields, prices, costs and rotation rules of this field.": "Обидва використовують ті самі врожайності, ціни, витрати й правила сівозміни для цього поля.",
+  "These plans were chosen by the learned planner. Each plan breakdown shows how it compares with the exact calculation.": "Ці плани обрав навчений планувальник. У деталях кожного плану показано, як він співвідноситься з точним розрахунком.",
+  "The learned planner is not available on this server, so the exact calculation was used.": "Навчений планувальник недоступний на цьому сервері, тому використано точний розрахунок.",
+  "Against the exact calculation": "Порівняно з точним розрахунком",
+  "Same result": "Той самий результат",
+  "{{amount}} per acre lower over the plan": "На {{amount}} з акра менше за весь план",
+  "A crop has no yield records in this state, so the yield of neighbouring states is used.": "Для культури немає даних про врожайність у цьому штаті, тому використано врожайність сусідніх штатів.",
+  "A crop has no yield records in this region, so the national yield is used.": "Для культури немає даних про врожайність у цьому регіоні, тому використано середню по країні.",
+  "A crop has no price outlook, so its latest national price is used.": "Для культури немає прогнозу ціни, тому використано останню ціну по країні."
 }

@@ -52,6 +52,20 @@ export function PlanOverview({ advice, plan }: PlanOverviewProps) {
           'Each option is the best plan that starts with that crop. Money is per acre: sales less production cost, land rent not included.',
         )}
       </Typography.Paragraph>
+      {plan.method === 'learned_policy' && (
+        <Typography.Paragraph type="secondary">
+          {t(
+            'These plans were chosen by the learned planner. Each plan breakdown shows how it compares with the exact calculation.',
+          )}
+        </Typography.Paragraph>
+      )}
+      {plan.planner && plan.planner.used !== plan.planner.requested && (
+        <Typography.Paragraph type="secondary">
+          {t(
+            'The learned planner is not available on this server, so the exact calculation was used.',
+          )}
+        </Typography.Paragraph>
+      )}
       <ol className="rotation-plan-top" role="list">
         {top.map((entry) => (
           <PlanCard
@@ -237,6 +251,18 @@ function PlanCard({ advice, plan, entry, candidate }: PlanEntryProps) {
                     : t('{{amount}}, loss in {{share}}', {
                         amount: formatSignedUsd(wholePlan.p50UsdPerAcre, language),
                         share: formatPercent(wholePlan.lossProbability, language),
+                      })}
+                </dd>
+              </div>
+            )}
+            {typeof entry.belowOptimumUsdPerAcre === 'number' && (
+              <div>
+                <dt>{t('Against the exact calculation')}</dt>
+                <dd>
+                  {entry.belowOptimumUsdPerAcre < 0.5
+                    ? t('Same result')
+                    : t('{{amount}} per acre lower over the plan', {
+                        amount: formatSignedUsd(entry.belowOptimumUsdPerAcre, language),
                       })}
                 </dd>
               </div>

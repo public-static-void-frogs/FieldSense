@@ -6,13 +6,14 @@ import { rotationApi } from './rotation.api.ts';
 export const rotationQueryKeys = {
   /** Everything the advice for a field is built from: the advice and the farmer's inputs. */
   field: (fieldId: string) => [...fieldQueryKeys.byId(fieldId), 'rotation'] as const,
-  advice: ({ fieldId, crop, priorities, seasons }: RotationAdviceRequest) =>
+  advice: ({ fieldId, crop, priorities, seasons, planner }: RotationAdviceRequest) =>
     [
       ...rotationQueryKeys.field(fieldId),
       'advice',
       crop ?? null,
       [...priorities].sort(),
       seasons ?? null,
+      planner ?? 'exact',
     ] as const,
   seasonResults: (fieldId: string) =>
     [...rotationQueryKeys.field(fieldId), 'season-results'] as const,

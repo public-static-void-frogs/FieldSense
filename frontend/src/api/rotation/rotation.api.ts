@@ -9,7 +9,13 @@ import type {
 } from '../../types/rotation/rotation.types.ts';
 import { request } from '../core/http.ts';
 
-export function rotationAdvicePath({ fieldId, crop, priorities, seasons }: RotationAdviceRequest) {
+export function rotationAdvicePath({
+  fieldId,
+  crop,
+  priorities,
+  seasons,
+  planner,
+}: RotationAdviceRequest) {
   const query = new URLSearchParams();
   if (crop) {
     query.set('crop', crop);
@@ -19,6 +25,9 @@ export function rotationAdvicePath({ fieldId, crop, priorities, seasons }: Rotat
   }
   if (seasons) {
     query.set('seasons', String(seasons));
+  }
+  if (planner === 'learned') {
+    query.set('planner', planner);
   }
   const suffix = query.size ? `?${query}` : '';
 

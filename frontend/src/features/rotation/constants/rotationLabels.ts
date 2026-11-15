@@ -1,4 +1,4 @@
-import type { RotationPriority } from '../../../types/rotation/rotation.types.ts';
+import type { RotationPlanner, RotationPriority } from '../../../types/rotation/rotation.types.ts';
 
 // Engine codes -> English catalog keys. Unknown codes are shown as they arrive.
 
@@ -189,13 +189,31 @@ export const planGapLabels: Record<string, string> = {
   yield_not_observed_every_year:
     'Some yields are modelled from weather because no record exists for that year.',
   crop_left_out_of_plan: 'A crop was left out of the plan because it could not be priced.',
+  yield_from_region:
+    'A crop has no yield records in this state, so the yield of neighbouring states is used.',
+  yield_from_national: 'A crop has no yield records in this region, so the national yield is used.',
+  planning_price_from_history: 'A crop has no price outlook, so its latest national price is used.',
 };
 
 export const notModelledLabels: Record<string, string> = {
   no_cost_budget: 'No cost budget',
   no_price: 'No price',
   no_yield: 'No yield estimate',
+  not_marketed: 'Not sold as a crop',
 };
+
+export const plannerOptions: { value: RotationPlanner; label: string; description: string }[] = [
+  {
+    value: 'exact',
+    label: 'Exact calculation',
+    description: 'Compares every possible rotation and keeps the best one.',
+  },
+  {
+    value: 'learned',
+    label: 'Learned planner',
+    description: 'A model trained on fields across the USA picks the crop for each season.',
+  },
+];
 
 export const autumnActionLabels: Record<string, string> = {
   none: 'Nothing to sow',

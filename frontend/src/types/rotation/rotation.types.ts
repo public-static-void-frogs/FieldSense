@@ -303,6 +303,8 @@ export type RotationPlanCrop = {
   tier: 'top' | 'alternative';
   demoted: 'autumn_establishment_unlikely' | null;
   planObjectiveUsdPerAcre: number;
+  /** Learned plans only: how far the plan is below the exact best plan starting with this crop. */
+  belowOptimumUsdPerAcre?: number | null;
   planNetUsdPerAcre: number;
   autumn: {
     action: RotationAutumnAction;
@@ -324,8 +326,18 @@ export type RotationOwnYieldLevel = {
   points: { year: number; yieldPerAcre: number; referenceYieldPerAcre: number }[];
 };
 
+/** How a plan is built: every rotation compared, or a trained policy choosing each season. */
+export type RotationPlanner = 'exact' | 'learned';
+
 export type RotationPlan = {
   status: 'ok' | 'no_modellable_crop';
+  method?: 'dynamic_programming_fixed_sequence' | 'learned_policy' | null;
+  planner?: {
+    requested: RotationPlanner;
+    used: RotationPlanner;
+    learnedAvailable: boolean;
+    learnedUnavailable: string | null;
+  } | null;
   seasons: number;
   firstSeason: number | null;
   years: {
@@ -486,4 +498,5 @@ export type RotationAdviceRequest = {
   crop?: string;
   priorities: RotationPriority[];
   seasons?: number;
+  planner?: RotationPlanner;
 };

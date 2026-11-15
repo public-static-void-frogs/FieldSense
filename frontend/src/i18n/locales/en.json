@@ -1633,5 +1633,20 @@
   "In a season when it happens, county yields of this crop were about {{loss}} lower, so it is expected to cost about {{expected}} of the yield per season.": "In a season when it happens, county yields of this crop were about {{loss}} lower, so it is expected to cost about {{expected}} of the yield per season.",
   "County yields of this crop show no loss in the seasons when it happens.": "County yields of this crop show no loss in the seasons when it happens.",
   "How much yield it costs is not measured for this crop, so the level reflects only how often it happens.": "How much yield it costs is not measured for this crop, so the level reflects only how often it happens.",
-  "A heat or drought rule was skipped because most of this crop in the county is irrigated.": "A heat or drought rule was skipped because most of this crop in the county is irrigated."
+  "A heat or drought rule was skipped because most of this crop in the county is irrigated.": "A heat or drought rule was skipped because most of this crop in the county is irrigated.",
+  "Not sold as a crop": "Not sold as a crop",
+  "Exact calculation": "Exact calculation",
+  "Compares every possible rotation and keeps the best one.": "Compares every possible rotation and keeps the best one.",
+  "Learned planner": "Learned planner",
+  "A model trained on fields across the USA picks the crop for each season.": "A model trained on fields across the USA picks the crop for each season.",
+  "How to build the plan": "How to build the plan",
+  "Both use the same yields, prices, costs and rotation rules of this field.": "Both use the same yields, prices, costs and rotation rules of this field.",
+  "These plans were chosen by the learned planner. Each plan breakdown shows how it compares with the exact calculation.": "These plans were chosen by the learned planner. Each plan breakdown shows how it compares with the exact calculation.",
+  "The learned planner is not available on this server, so the exact calculation was used.": "The learned planner is not available on this server, so the exact calculation was used.",
+  "Against the exact calculation": "Against the exact calculation",
+  "Same result": "Same result",
+  "{{amount}} per acre lower over the plan": "{{amount}} per acre lower over the plan",
+  "A crop has no yield records in this state, so the yield of neighbouring states is used.": "A crop has no yield records in this state, so the yield of neighbouring states is used.",
+  "A crop has no yield records in this region, so the national yield is used.": "A crop has no yield records in this region, so the national yield is used.",
+  "A crop has no price outlook, so its latest national price is used.": "A crop has no price outlook, so its latest national price is used."
 }
