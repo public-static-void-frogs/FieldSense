@@ -64,6 +64,16 @@ OUTPUT FILES (--out) AND HOW TO READ THEM
                           verdict: "supported (all checks pass)" = interval excludes 0, placebo p < 0.1, negative control passes, matched SMD < 0.1;
                           "supported by the DML model; matched baseline not fully balanced"; "interval excludes 0, but placebo or negative control fails";
                           "no detectable drought-specific effect"; "arm gap only" (yield proxy: drought effect not identified); "abstain" + abstain_reason.
+                          EVIDENCE TIERS (graceful degradation; thin data gives a weaker, labelled answer instead of no answer). evidence_tier / confidence /
+                          tier_note say which one a row got; headline_effect, headline_lo, headline_hi, headline_basis are the single number to show:
+                            full             both season types >= --min-arm fields per arm and >= --min-units squares, overlap ok.   confidence high / medium
+                            limited          both season types >= --soft-arm (20) and --soft-units (2): same estimators, small sample, wide intervals. low
+                            one season type  only drought OR normal seasons are big enough: effect for that season type, gamma NOT identified.        low
+                            pooled           >= --pooled-arm (10) fields per arm over ALL seasons: one pooled effect, no drought split.            low
+                            descriptive      >= 1 field-year per arm: within-square-year arm gap (raw gap if none), n shown, NOT a causal estimate.  very low
+                            abstain          an arm has no field-year at all, or --strict (old behaviour).
+                          With < 60 rows or < 4 squares the ML adjustment is dropped (method = "FE regression, no ML adjustment"); with < 3 squares carrying
+                          the variation no interval is given (lo / hi empty). Show tier and confidence next to every number.
                           adjusted_for = which other rotation-history indicators were held fixed (T2 and T3 are nested: when holding both fixed
                           breaks overlap, the weaker adjustment is used and adjustment_note says so - then their effects are not separable).
                           few_clusters = fewer than 10 squares: trust the bootstrap interval, not the standard error.
@@ -71,8 +81,10 @@ OUTPUT FILES (--out) AND HOW TO READ THEM
                           cannot show a rotation difference in drought).
   balance.csv             standardised mean difference per covariate before / after matching. field_year_table.parquet = the analysis table.
   field_effects.parquet   CausalSoil what-if per field x treatment x outcome: effect_drought = conditional drought-season effect of the treated arm at
-                          this field's own covariates, lo95 / hi95, n_comparable_treated / control within 30 km, status "ok" or "insufficient evidence"
-                          (do not show an effect when status is not ok). scenario_d2_weeks = the drought intensity assumed.
+                          this field's own covariates, lo95 / hi95, n_comparable_treated / control within 30 km (_30km columns) and within the radius
+                          actually used (_used, radius_used_km: widened 30 -> 60 -> 120 km while a neighbourhood has < 30 per arm), status "ok" (>= 30 per arm
+                          within 30 km), "limited evidence" (>= 10 per arm within a widened radius: show with a caveat) or "insufficient evidence" (indicative
+                          only). scenario_d2_weeks = the drought intensity assumed. Field-level estimates exist only for tiers full / limited.
   county_check_<crop>.csv aggregate check: county yield anomaly vs share of continuous-crop area x county drought share (sign should match).
   report.md               the same in prose with the limits.
 
@@ -520,17 +532,29 @@ class Pair:
         self.cache[key] = (Xd, td, rt)
         return self.cache[key]
 
-    def dml(self, d, y):
+    def dml(self, d, y, simple=None, min_n=30):
+        """Partially linear DML. simple=True (default when < 4 squares or < 60 rows): no ML adjustment, plain FE regression - cross-fitting on a few
+        squares would overfit. Returns None when fewer than min_n rows have the outcome."""
         d = d[d[y].notna()]
-        if len(d) < 30:
+        if len(d) < min_n:
             return None
-        Xd, td, rt = self.nuisance_t(d.index.to_numpy(), d)
-        yd = (d[y] - d.groupby("fe")[y].transform("mean")).to_numpy()
-        ry = yd - crossfit(Xd, yd, d["cl"].to_numpy(), self.a, 2)
         cl = d["cl"].to_numpy()
+        n_cl = int(len(np.unique(cl)))
+        if simple is None:
+            simple = n_cl < 4 or len(d) < 60
+        if simple:
+            td = (d["T"] - d.groupby("fe")["T"].transform("mean")).to_numpy()
+            rt, ry = td, (d[y] - d.groupby("fe")[y].transform("mean")).to_numpy()
+        else:
+            Xd, td, rt = self.nuisance_t(d.index.to_numpy(), d)
+            yd = (d[y] - d.groupby("fe")[y].transform("mean")).to_numpy()
+            ry = yd - crossfit(Xd, yd, cl, self.a, 2)
         th, se = theta_cr(rt, ry, cl, self.n_cl)
+        if n_cl < 2:
+            se = np.nan
         a_c, b_c = cluster_sums(rt, ry, cl, self.n_cl)
-        return dict(theta=th, se=se, n=len(d), a_c=a_c, b_c=b_c, n_clusters=int(len(np.unique(cl))))
+        return dict(theta=th, se=se, n=len(d), a_c=a_c, b_c=b_c, n_clusters=n_cl,
+                    method="FE regression, no ML adjustment (small sample)" if simple else "DML")
 
 
 def boot_cis(res_d, res_n, reps, rng):
@@ -665,98 +689,215 @@ def overlap_diag(pair, d):
     return out
 
 
+TIER_RANK = {"full": 0, "limited": 1, "one season type": 2, "pooled": 3, "descriptive": 4}
+CONFIDENCE = {"full": "medium", "limited": "low", "one season type": "low", "pooled": "low", "descriptive": "very low"}
+
+
+def _arms(s):
+    return (int((s["T"] == 1).sum()), int((s["T"] == 0).sum()))
+
+
+def units_both(s):
+    """squares that have both arms inside one square-year"""
+    if s.empty:
+        return 0
+    both = s.groupby("fe")["T"].transform(lambda x: x.nunique() == 2)
+    return int(s.loc[both, "stratum"].nunique())
+
+
+def raw_gap(d, y):
+    """last resort: difference of the arm means (no fixed effects, no model)"""
+    d = d[d[y].notna()]
+    t, c = d.loc[d["T"] == 1, y], d.loc[d["T"] == 0, y]
+    if len(t) == 0 or len(c) == 0:
+        return None
+    return dict(theta=float(t.mean() - c.mean()), se=np.nan, n=len(d), a_c=None, b_c=None, n_clusters=int(d["stratum"].nunique()), method="raw arm gap")
+
+
+def ci_one(res, reps, rng):
+    """cluster bootstrap (squares) of a single theta; needs >= 3 squares with treatment variation"""
+    if res is None or res.get("a_c") is None or int((res["b_c"] > 0).sum()) < 3:
+        return np.nan, np.nan
+    G = len(res["a_c"])
+    W = rng.multinomial(G, np.ones(G) / G, size=reps).astype(float)
+    with np.errstate(divide="ignore", invalid="ignore"):
+        t = (W @ res["a_c"]) / (W @ res["b_c"])
+    t = t[np.isfinite(t)]
+    return (float(np.percentile(t, 2.5)), float(np.percentile(t, 97.5))) if len(t) > 20 else (np.nan, np.nan)
+
+
+def _few_sq(res):
+    return res is None or res.get("a_c") is None or int((res["b_c"] > 0).sum()) < 3
+
+
+def _reasons(arms, units, shares, a):
+    out = []
+    for k in ("drought", "normal"):
+        if min(arms[k]) < a.min_arm:
+            out.append(f"{k}: arm size {arms[k]} < {a.min_arm}")
+        if units[k] < a.min_units:
+            out.append(f"{k}: only {units[k]} squares with both arms inside a square-year")
+        sh = shares.get(k, np.nan)
+        if np.isfinite(sh) and sh < a.min_overlap:
+            out.append(f"{k}: overlap {sh:.0%} of fields have propensity in 0.05-0.95")
+    return out
+
+
+def _headline(r, expected):
+    for k, lab in (("drought", "effect in drought seasons"), ("normal", "effect in normal seasons"), ("pooled", "effect over all seasons")):
+        v = r.get(f"theta_{k}", np.nan)
+        if v is not None and np.isfinite(v):
+            r.update(headline_basis=("raw arm gap, not adjusted" if r.get("method") == "raw arm gap" else lab), headline_effect=v,
+                     headline_lo=r.get(f"lo_{k}", np.nan), headline_hi=r.get(f"hi_{k}", np.nan), headline_sign_agrees=bool(np.sign(v) == expected))
+            return r
+    r.update(headline_basis="", headline_effect=np.nan, headline_lo=np.nan, headline_hi=np.nan, headline_sign_agrees=None)
+    return r
+
+
 def estimate_pair(d0, crop, tr, xcols, outcomes, a, rng, forest_bank):
-    """All outcomes for one crop x treatment. d0: field-years with the treatment defined."""
+    """All outcomes for one crop x treatment, with GRACEFUL DEGRADATION. The best tier the data support is used (evidence_tier in the output):
+       full             both season types pass the full thresholds (--min-arm, --min-units, overlap): DML, gamma, all checks
+       limited          both season types pass the soft thresholds (--soft-arm, --soft-units): same estimators on a small sample, intervals wide
+       one season type  only drought OR normal seasons have enough fields in both arms: that effect only, gamma not identified
+       pooled           neither season type alone, but all seasons together have >= --pooled-arm fields in each arm: one effect over all seasons
+       descriptive      anything else with at least one field-year in each arm: within-square-year arm gap (or raw gap) with n, no model
+       (abstain only when an arm has no field-year at all, or with --strict)"""
     meta = TREATMENTS[tr]
-    rows = []
     d0 = d0.copy()
     d0["T"] = d0[tr].astype(float)
-    base = dict(crop=crop, treatment=tr, treated=meta["treated"], control=meta["control"], expected_sign=meta["expected"],
-                evidence_label=EVIDENCE_LABEL)
-    pair = Pair(d0, tr, xcols, a)
-    dr, nm = d0[d0["drought"] == 1], d0[d0["drought"] == 0]
-    arms = {k: (int((s["T"] == 1).sum()), int((s["T"] == 0).sum())) for k, s in (("drought", dr), ("normal", nm))}
-    ov = {}
-    keep = pd.Series(False, index=d0.index)
     d0["ps"] = np.nan
-    for k, s in (("drought", dr), ("normal", nm)):
-        if len(s) and s["T"].nunique() == 2:
-            o_ = overlap_diag(Pair(s, tr, xcols, a), s.assign(T=s["T"]))
-            ov[k] = o_
+    dr, nm = d0[d0["drought"] == 1], d0[d0["drought"] == 0]
+    arms = {"drought": _arms(dr), "normal": _arms(nm), "pooled": _arms(d0)}
+    units = {"drought": units_both(dr), "normal": units_both(nm), "pooled": units_both(d0)}
+    base = dict(crop=crop, treatment=tr, treated=meta["treated"], control=meta["control"], expected_sign=meta["expected"], evidence_label=EVIDENCE_LABEL,
+                n_treated_drought=arms["drought"][0], n_control_drought=arms["drought"][1], n_treated_normal=arms["normal"][0],
+                n_control_normal=arms["normal"][1], overlap_share_drought=np.nan, overlap_share_normal=np.nan,
+                squares_both_arms_drought=units["drought"], squares_both_arms_normal=units["normal"], squares_both_arms_pooled=units["pooled"])
+    ok = lambda k, n, u: min(arms[k]) >= n and units[k] >= u
+    full_c = ok("drought", a.min_arm, a.min_units) and ok("normal", a.min_arm, a.min_units)
+    soft_c = ok("drought", a.soft_arm, a.soft_units) and ok("normal", a.soft_arm, a.soft_units)
+    one_ks = [k for k in ("drought", "normal") if ok(k, a.soft_arm, a.soft_units)]
+    tier, note, d, shares = None, "", None, {}
+    if soft_c:
+        keep = pd.Series(False, index=d0.index)
+        for k, sub in (("drought", dr), ("normal", nm)):
+            o_ = overlap_diag(Pair(sub, tr, xcols, a), sub)
             keep.loc[o_["keep"][o_["keep"]].index] = True
             if "ps" in o_:
                 d0.loc[o_["ps"].index, "ps"] = o_["ps"]
+            shares[k] = o_.get("share_in_05_95", np.nan)
+            base[f"overlap_share_{k}"] = shares[k]
+        ov_ok = all(np.isfinite(x) and x >= a.min_overlap for x in shares.values())
+        if full_c and ov_ok:
+            tier, d = "full", d0[keep]
         else:
-            ov[k] = dict(share_fe_both_arms=0.0, units_with_both=0, share_in_05_95=np.nan)
-    reasons = []
-    for k in ("drought", "normal"):
-        if min(arms[k]) < a.min_arm:
-            reasons.append(f"{k}: arm size {arms[k]} < {a.min_arm}")
-        if ov[k]["units_with_both"] < a.min_units:
-            reasons.append(f"{k}: only {ov[k]['units_with_both']} squares with both arms inside a square-year")
-        sh = ov[k].get("share_in_05_95", np.nan)
-        if np.isfinite(sh) and sh < a.min_overlap:
-            reasons.append(f"{k}: overlap {sh:.0%} of fields have propensity in 0.05-0.95")
-    base.update(n_treated_drought=arms["drought"][0], n_control_drought=arms["drought"][1], n_treated_normal=arms["normal"][0],
-                n_control_normal=arms["normal"][1], overlap_share_drought=ov["drought"].get("share_in_05_95"),
-                overlap_share_normal=ov["normal"].get("share_in_05_95"),
-                squares_both_arms_drought=ov["drought"]["units_with_both"], squares_both_arms_normal=ov["normal"]["units_with_both"])
-    if reasons:
+            kk = d0[keep]
+            trim_ok = all(len(x) and min(_arms(x)) >= a.soft_arm and units_both(x) >= a.soft_units for x in (kk[kk["drought"] == 1], kk[kk["drought"] == 0]))
+            tier, d = "limited", (kk if trim_ok else d0)
+            why = _reasons(arms, units, shares, a)
+            note = ("small sample: " + "; ".join(why) if why else "small sample") + ("" if trim_ok else "; overlap trimming skipped (it would leave too few fields)")
+    elif one_ks:
+        tier = "one season type"
+        miss = [k for k in ("drought", "normal") if k not in one_ks]
+        note = (f"drought effect not identified: only {' and '.join(one_ks)} seasons have enough fields in both arms; "
+                + "; ".join(f"{k}: arms {arms[k]}, {units[k]} squares with both arms" for k in miss))
+    elif ok("pooled", a.pooled_arm, a.soft_units):
+        tier = "pooled"
+        note = (f"too few fields in each season type separately (drought {arms['drought']}, normal {arms['normal']}); effect averaged over all seasons, "
+                "drought-specific effect not identified")
+    elif min(arms["pooled"]) >= 1:
+        tier = "descriptive"
+        note = (f"descriptive arm gap only, not a causal estimate: treated n={arms['pooled'][0]}, control n={arms['pooled'][1]}, "
+                f"{units['pooled']} squares with both arms")
+    reasons = _reasons(arms, units, shares, a)
+    if tier is None or (a.strict and tier != "full"):
+        if tier is None:
+            reasons = [f"no field-year in one arm (treated {arms['pooled'][0]}, control {arms['pooled'][1]})"]
+        return [dict(base, outcome=y, outcome_label=OUT_LABEL.get(y, y), abstain=True, abstain_reason="; ".join(reasons), evidence_tier="none") for y in outcomes], []
+    base.update(evidence_tier=tier, confidence=CONFIDENCE[tier], tier_note=note)
+    blank = dict(theta_drought=np.nan, se_drought=np.nan, lo_drought=np.nan, hi_drought=np.nan, theta_normal=np.nan, se_normal=np.nan, lo_normal=np.nan, hi_normal=np.nan,
+                 theta_pooled=np.nan, se_pooled=np.nan, lo_pooled=np.nan, hi_pooled=np.nan, gamma=np.nan, gamma_lo=np.nan, gamma_hi=np.nan,
+                 gamma_placebo_p=np.nan, gamma_identified=False, balance_pass=None, neg_control_pass=None, neg_control_theta=np.nan, neg_control_se=np.nan)
+    rows, balance = [], []
+    if tier in ("full", "limited"):
+        pair = Pair(d, tr, xcols, a)
+        d = pair.d
+        drd, nmd = d[d["drought"] == 1], d[d["drought"] == 0]
+        mn = 30 if tier == "full" else 15
         for y in outcomes:
-            rows.append(dict(base, outcome=y, outcome_label=OUT_LABEL.get(y, y), abstain=True, abstain_reason="; ".join(reasons)))
-        return rows, []
-    d = d0[keep].copy()
-    pair = Pair(d, tr, xcols, a)
-    d = pair.d
-    drd, nmd = d[d["drought"] == 1], d[d["drought"] == 0]
-    balance = []
+            r = dict(base, outcome=y, outcome_label=OUT_LABEL.get(y, y), abstain=False, abstain_reason="", **blank)
+            rd, rn = pair.dml(drd, y, min_n=mn), pair.dml(nmd, y, min_n=mn)
+            if rd is None or rn is None:
+                rows.append(dict(r, abstain=True, abstain_reason="too few outcome values", evidence_tier="none")); continue
+            bd, bn, bg = boot_cis(rd, rn, a.reps, rng)
+            if _few_sq(rd) or _few_sq(rn):                       # fewer than 3 squares carry the variation: a bootstrap interval would be meaningless
+                bd = bn = bg = (np.nan, np.nan)
+            r.update(n_drought=rd["n"], n_normal=rn["n"], squares=int(d["stratum"].nunique()), method=rd["method"],
+                     theta_drought=rd["theta"], se_drought=rd["se"], lo_drought=bd[0], hi_drought=bd[1],
+                     theta_normal=rn["theta"], se_normal=rn["se"], lo_normal=bn[0], hi_normal=bn[1])
+            r["few_clusters"] = bool(min(rd["n_clusters"], rn["n_clusters"]) < 10)
+            if y not in NO_GAMMA:
+                th = rd["theta"] - rn["theta"]
+                r.update(gamma=th, gamma_lo=bg[0], gamma_hi=bg[1], gamma_identified=True)
+                gl, gl_se = fe_interaction(d, y, "T", "drought", "fe", "stratum")
+                r["gamma_linear_fe"] = gl
+                r["gamma_placebo_p"] = placebo_p(d.dropna(subset=[y]), y, "T", "fe", "stratum", gl, a.placebo_reps, rng)
+                unc = (d["n_observed_steps"] < 12) | d["label_uncertain"].astype(bool)             # sensitivity: drop uncertain seasons
+                gl2, _ = fe_interaction(d[~unc], y, "T", "drought", "fe", "stratum")
+                r["gamma_linear_fe_drop_uncertain"] = gl2
+                r["sensitivity_same_sign"] = bool(np.isfinite(gl) and np.isfinite(gl2) and np.sign(gl) == np.sign(gl2))
+                r["sign_agrees_with_expected"] = bool(np.sign(th) == meta["expected"]) if np.isfinite(th) else None
+            try:                                                 # matching baseline (same strata, same outcome); needs the propensity of every row used
+                md, mnn = drd[drd["ps"].notna()], nmd[nmd["ps"].notna()]
+                mm_d, mm_n = match_att(md, y, xcols), match_att(mnn, y, xcols)
+            except Exception:
+                mm_d = mm_n = dict(att=np.nan, n_pairs=0, smd_before=np.nan, smd_after=np.nan, smd_by=None)
+            r.update(match_att_drought=mm_d["att"], match_att_normal=mm_n["att"], match_pairs_drought=mm_d["n_pairs"], match_pairs_normal=mm_n["n_pairs"],
+                     match_gamma=(mm_d["att"] - mm_n["att"]) if np.isfinite(mm_d["att"]) and np.isfinite(mm_n["att"]) else np.nan,
+                     max_smd_before=max(np.nan_to_num(mm_d["smd_before"]), np.nan_to_num(mm_n["smd_before"])),
+                     max_smd_after=max(np.nan_to_num(mm_d["smd_after"]), np.nan_to_num(mm_n["smd_after"])))
+            r["balance_pass"] = bool(r["max_smd_after"] < 0.1) if (mm_d["n_pairs"] and mm_n["n_pairs"]) else None
+            if mm_d["smd_by"] and y == outcomes[0]:
+                for k, v in mm_d["smd_by"].items():
+                    balance.append(dict(crop=crop, treatment=tr, season_type="drought", covariate=k, smd_before=v[0], smd_after=v[1]))
+                if mm_n["smd_by"]:
+                    for k, v in mm_n["smd_by"].items():
+                        balance.append(dict(crop=crop, treatment=tr, season_type="normal", covariate=k, smd_before=v[0], smd_after=v[1]))
+            rows.append(_headline(r, meta["expected"]))
+        # negative-control outcome: greenness before the treatment (t-2, t-3), pooled seasons
+        nc = pair.dml(d, "pre_ndvi_area", min_n=mn) if d["pre_ndvi_area"].notna().sum() > (200 if tier == "full" else 60) else None
+        for r in rows:
+            if nc is not None and not r.get("abstain"):
+                r.update(neg_control_theta=nc["theta"], neg_control_se=nc["se"], neg_control_pass=bool(abs(nc["theta"]) < 2 * nc["se"]))
+        return rows, balance
+    # ---- lower tiers: no gamma, no matching, no placebo
+    pair = Pair(d0, tr, xcols, a)
+    dp = pair.d
+    sets = {"drought": dp[dp["drought"] == 1], "normal": dp[dp["drought"] == 0]}
     for y in outcomes:
-        r = dict(base, outcome=y, outcome_label=OUT_LABEL.get(y, y), abstain=False, abstain_reason="")
-        rd, rn = pair.dml(drd, y), pair.dml(nmd, y)
-        if rd is None or rn is None:
-            rows.append(dict(r, abstain=True, abstain_reason="too few outcome values")); continue
-        bd, bn, bg = boot_cis(rd, rn, a.reps, rng)
-        r.update(n_drought=rd["n"], n_normal=rn["n"], squares=int(d["stratum"].nunique()),
-                 theta_drought=rd["theta"], se_drought=rd["se"], lo_drought=bd[0], hi_drought=bd[1],
-                 theta_normal=rn["theta"], se_normal=rn["se"], lo_normal=bn[0], hi_normal=bn[1])
-        r["few_clusters"] = bool(min(rd["n_clusters"], rn["n_clusters"]) < 10)
-        if y in NO_GAMMA:
-            r.update(gamma=np.nan, gamma_lo=np.nan, gamma_hi=np.nan, gamma_placebo_p=np.nan, gamma_identified=False)
+        r = dict(base, outcome=y, outcome_label=OUT_LABEL.get(y, y), abstain=False, abstain_reason="", squares=int(dp["stratum"].nunique()), **blank)
+        got = False
+        if tier == "one season type":
+            for k in one_ks:
+                res = pair.dml(sets[k], y, min_n=15)
+                if res is not None:
+                    lo, hi = ci_one(res, a.reps, rng)
+                    r.update({f"theta_{k}": res["theta"], f"se_{k}": res["se"], f"lo_{k}": lo, f"hi_{k}": hi, f"n_{k}": res["n"], "method": res["method"]})
+                    r["few_clusters"] = bool(res["n_clusters"] < 10)
+                    got = True
         else:
-            th = rd["theta"] - rn["theta"]
-            r.update(gamma=th, gamma_lo=bg[0], gamma_hi=bg[1], gamma_identified=True)
-            gl, gl_se = fe_interaction(d, y, "T", "drought", "fe", "stratum")
-            r["gamma_linear_fe"] = gl
-            r["gamma_placebo_p"] = placebo_p(d.dropna(subset=[y]), y, "T", "fe", "stratum", gl, a.placebo_reps, rng)
-            # sensitivity: drop uncertain seasons (few observed steps, uncertain crop label)
-            unc = (d["n_observed_steps"] < 12) | d["label_uncertain"].astype(bool)
-            gl2, _ = fe_interaction(d[~unc], y, "T", "drought", "fe", "stratum")
-            r["gamma_linear_fe_drop_uncertain"] = gl2
-            r["sensitivity_same_sign"] = bool(np.isfinite(gl) and np.isfinite(gl2) and np.sign(gl) == np.sign(gl2))
-            r["sign_agrees_with_expected"] = bool(np.sign(th) == meta["expected"]) if np.isfinite(th) else None
-        # matching baseline (same strata, same outcome)
-        mm_d, mm_n = match_att(drd, y, xcols + []), match_att(nmd, y, xcols + [])
-        r.update(match_att_drought=mm_d["att"], match_att_normal=mm_n["att"], match_pairs_drought=mm_d["n_pairs"], match_pairs_normal=mm_n["n_pairs"],
-                 match_gamma=(mm_d["att"] - mm_n["att"]) if np.isfinite(mm_d["att"]) and np.isfinite(mm_n["att"]) else np.nan,
-                 max_smd_before=max(np.nan_to_num(mm_d["smd_before"]), np.nan_to_num(mm_n["smd_before"])),
-                 max_smd_after=max(np.nan_to_num(mm_d["smd_after"]), np.nan_to_num(mm_n["smd_after"])))
-        r["balance_pass"] = bool(r["max_smd_after"] < 0.1)
-        if mm_d["smd_by"] and y == outcomes[0]:
-            for k, v in mm_d["smd_by"].items():
-                balance.append(dict(crop=crop, treatment=tr, season_type="drought", covariate=k, smd_before=v[0], smd_after=v[1]))
-            if mm_n["smd_by"]:
-                for k, v in mm_n["smd_by"].items():
-                    balance.append(dict(crop=crop, treatment=tr, season_type="normal", covariate=k, smd_before=v[0], smd_after=v[1]))
-        rows.append(r)
-    # negative-control outcome: greenness before the treatment (t-2, t-3), pooled seasons
-    nc = pair.dml(d, "pre_ndvi_area") if d["pre_ndvi_area"].notna().sum() > 200 else None
-    for r in rows:
-        if nc is not None and not r.get("abstain"):
-            ncx = [c for c in xcols if c not in ("pre_ndvi_area", "pre_peak_ndvi")]
-            r.update(neg_control_theta=nc["theta"], neg_control_se=nc["se"], neg_control_pass=bool(abs(nc["theta"]) < 2 * nc["se"]))
-        elif not r.get("abstain"):
-            r.update(neg_control_theta=np.nan, neg_control_se=np.nan, neg_control_pass=None)
-    return rows, balance
+            res = pair.dml(dp, y, simple=True if tier == "descriptive" else None, min_n=15 if tier == "pooled" else 2)
+            if tier == "descriptive" and (res is None or not np.isfinite(res["theta"])):
+                res = raw_gap(dp, y)
+            if res is not None and np.isfinite(res["theta"]):
+                lo, hi = ci_one(res, a.reps, rng)
+                r.update(theta_pooled=res["theta"], se_pooled=res["se"], lo_pooled=lo, hi_pooled=hi, n_pooled=res["n"], method=res["method"])
+                r["few_clusters"] = bool(res["n_clusters"] < 10)
+                got = True
+        if not got:
+            rows.append(dict(r, abstain=True, abstain_reason="too few outcome values", evidence_tier="none")); continue
+        rows.append(_headline(r, meta["expected"]))
+    return rows, []
 
 
 # =====================================================================================
@@ -780,19 +921,36 @@ def forest_fit(d, tr, y, het, wcols, a):
     return est, X, d
 
 
-def comparable(lat, lon, ref, a, chunk=20000):
-    """fields (unique CSBID) of the drought sample within the radius, by arm. Counts only (no index lists), targets in chunks."""
+def comparable(lat, lon, ref, radii_km, min_n, chunk=20000):
+    """fields (unique CSBID) of the drought sample around every target, by arm. Counts only. The radius is WIDENED (radii_km, ascending) for targets that
+    have fewer than min_n comparable fields in either arm: returns counts at the first radius, counts and radius used (smallest radius with min_n in both
+    arms, else the largest)."""
     from sklearn.neighbors import BallTree
-    r = a.radius_km / 6371.0088
-    out = []
+    n = len(lat)
+    trees = {}
     for arm in (1, 0):
         sub = ref[ref["T"] == arm]
-        if sub.empty:
-            out.append(np.zeros(len(lat), dtype=int)); continue
-        tree = BallTree(np.radians(sub[["centroid_lat", "centroid_lon"]].to_numpy()), metric="haversine")
-        q = np.radians(np.column_stack([lat, lon]))
-        out.append(np.concatenate([tree.query_radius(q[i:i + chunk], r=r, count_only=True) for i in range(0, len(q), chunk)]))
-    return out[0], out[1]
+        trees[arm] = BallTree(np.radians(sub[["centroid_lat", "centroid_lon"]].to_numpy()), metric="haversine") if len(sub) else None
+    q = np.radians(np.column_stack([lat, lon]))
+    n_t, n_c = np.zeros(n, dtype=int), np.zeros(n, dtype=int)
+    n_t0, n_c0 = n_t.copy(), n_c.copy()
+    used = np.full(n, float(radii_km[-1]))
+    todo = np.arange(n)
+    for ri, rk in enumerate(radii_km):
+        if len(todo) == 0:
+            break
+        r = rk / 6371.0088
+        cnt = []
+        for arm in (1, 0):
+            if trees[arm] is None:
+                cnt.append(np.zeros(len(todo), dtype=int)); continue
+            cnt.append(np.concatenate([trees[arm].query_radius(q[todo[i:i + chunk]], r=r, count_only=True) for i in range(0, len(todo), chunk)]))
+        n_t[todo], n_c[todo] = cnt[0], cnt[1]
+        if ri == 0:
+            n_t0, n_c0 = n_t.copy(), n_c.copy()
+        used[todo] = rk
+        todo = todo[~((cnt[0] >= min_n) & (cnt[1] >= min_n))]
+    return n_t0, n_c0, n_t, n_c, used
 
 
 def field_estimates(d_drought, crop, tr, y, xcols, a, targets, sens_gamma):
@@ -815,15 +973,25 @@ def field_estimates(d_drought, crop, tr, y, xcols, a, targets, sens_gamma):
         l_, h_ = est.effect_interval(blk, alpha=0.05)
         los.append(np.ravel(l_)); his.append(np.ravel(h_))
     tau, lo, hi = np.concatenate(taus), np.concatenate(los), np.concatenate(his)
-    n_t, n_c = comparable(tg["centroid_lat"].to_numpy(), tg["centroid_lon"].to_numpy(), dd[["centroid_lat", "centroid_lon", "T"]].drop_duplicates(), a)
+    radii = [float(a.radius_km)]
+    while radii[-1] * 2 <= a.max_radius_km:
+        radii.append(radii[-1] * 2)
+    n_t0, n_c0, n_t, n_c, rad = comparable(tg["centroid_lat"].to_numpy(), tg["centroid_lon"].to_numpy(), dd[["centroid_lat", "centroid_lon", "T"]].drop_duplicates(),
+                                           radii, a.min_comparable)
     out = tg[["CSBID", "centroid_lat", "centroid_lon"]].copy()
     out = out.assign(crop=crop, treatment=tr, outcome=y, treated=TREATMENTS[tr]["treated"], control=TREATMENTS[tr]["control"],
-                     effect_drought=tau, lo95=np.ravel(lo), hi95=np.ravel(hi), n_comparable_treated_30km=n_t, n_comparable_control_30km=n_c,
+                     effect_drought=tau, lo95=np.ravel(lo), hi95=np.ravel(hi), n_comparable_treated_30km=n_t0, n_comparable_control_30km=n_c0,
+                     n_comparable_treated_used=n_t, n_comparable_control_used=n_c, radius_used_km=rad,
                      scenario_d2_weeks=(a.scenario_d2 if a.scenario_d2 is not None else ref_d2), heterogeneity_vars=",".join(het),
                      evidence_label=EVIDENCE_LABEL)
-    few = (out["n_comparable_treated_30km"] < a.min_comparable) | (out["n_comparable_control_30km"] < a.min_comparable)
-    out["status"] = np.where(few, "insufficient evidence", "ok")
-    out["note"] = np.where(few, f"fewer than {a.min_comparable} comparable fields of one arm within {a.radius_km:.0f} km", "")
+    good = (n_t >= a.min_comparable) & (n_c >= a.min_comparable)
+    soft = (n_t >= a.min_comparable_soft) & (n_c >= a.min_comparable_soft)
+    out["status"] = np.where(good & (rad <= a.radius_km + 1e-9), "ok", np.where(soft, "limited evidence", "insufficient evidence"))
+    out["note"] = [("" if st == "ok" else
+                    f"fewer than {a.min_comparable} comparable fields of one arm within {a.radius_km:.0f} km; counted within {rk:.0f} km: {nt} treated, {nc} control"
+                    if st == "limited evidence" else
+                    f"fewer than {a.min_comparable_soft} comparable fields of one arm even within {rk:.0f} km ({nt} treated, {nc} control): indicative only")
+                   for st, rk, nt, nc in zip(out["status"], rad, n_t, n_c)]
     avg_ate = float(np.mean(tau)) if len(tau) else np.nan
     out["forest_mean_effect"] = avg_ate
     return out
@@ -845,7 +1013,9 @@ def county_check(o, crop, a):
                                               if s["crop_t1"].isin([CORN, SOY]).any() else np.nan),
                        "drought_share": g.apply(lambda s: s.loc[s["drought"] == 1, "area_acres"].sum() / max(s["area_acres"].sum(), 1e-9) if s["drought"].notna().any() else np.nan),
                        "n_fields": g.size()}).reset_index()
-    cy = cy[cy["n_fields"] >= a.county_min_fields]
+    min_f = getattr(a, f"county_min_fields_{crop}", None)
+    min_f = a.county_min_fields if min_f is None else min_f             # per-crop value, else the common --county-min-fields
+    cy = cy[cy["n_fields"] >= min_f]
     panel = pd.read_parquet(a.nass_yield)
     panel["county_fips"] = panel["county_fips"].astype(str).str.zfill(5)
     panel = panel[panel["crop"].str.upper() == crop.upper()]
@@ -853,7 +1023,7 @@ def county_check(o, crop, a):
     cy = cy.merge(panel[["county_fips", "year", "yield_bu_acre", prev]], on=["county_fips", "year"]).dropna()
     cy["anomaly"] = cy["yield_bu_acre"] / cy[prev]
     if len(cy) < 30 or cy["county_fips"].nunique() < 8:
-        log(f"{crop} county check skipped: {len(cy)} county-years, {cy['county_fips'].nunique()} counties (need 30 / 8; lower --county-min-fields or sample more fields)")
+        log(f"{crop} county check skipped: {len(cy)} county-years, {cy['county_fips'].nunique()} counties (need 30 / 8; lower --county-min-fields-{crop} (now {min_f}) or sample more fields)")
         return None
     cy["year_f"] = cy["year"].astype(str)
     cy["inter"] = cy["mono_share"] * cy["drought_share"]
@@ -944,6 +1114,37 @@ def cmd_check(a):
         print("\nT4 (winter cover) is skipped: no --winter-cover table (M1 output).")
 
 
+def add_verdicts(res, n_years):
+    """verdict, confidence and limits per row (res = effects table)"""
+    res["limits"] = " | ".join(LIMITS)
+    res["t_gamma"] = np.where(res.get("gamma").notna() if "gamma" in res else False, np.nan, np.nan)
+    if "gamma" in res:
+        # a conservative verdict per row: the cluster-bootstrap interval of gamma excludes 0, the placebo agrees, the checks pass
+        ex0 = (res["gamma_lo"] > 0) | (res["gamma_hi"] < 0)
+        res["verdict"] = np.where(res["abstain"], "abstain",
+                         np.where(~res["gamma_identified"].fillna(False).astype(bool), "arm gap only (drought effect not identified)",
+                         np.where(ex0 & (res["gamma_placebo_p"].fillna(1) < 0.1) & res["neg_control_pass"].fillna(True) & res["balance_pass"].fillna(False),
+                                  "supported (all checks pass)",
+                         np.where(ex0 & (res["gamma_placebo_p"].fillna(1) < 0.1) & res["neg_control_pass"].fillna(True),
+                                  "supported by the DML model; matched baseline not fully balanced",
+                         np.where(ex0, "interval excludes 0, but placebo or negative control fails", "no detectable drought-specific effect")))))
+        if "neg_control_pass" in res:                  # the check was not run (no pre-treatment greenness): say so instead of counting it as passed
+            nc = res["neg_control_pass"].isna() & res["verdict"].str.startswith("supported")
+            res.loc[nc, "verdict"] = res.loc[nc, "verdict"] + " (negative control NOT run: no pre-treatment greenness)"
+        if "evidence_tier" in res:
+            tier = res["evidence_tier"]
+            res["confidence"] = res["confidence"].where(tier != "full", np.where(res["verdict"].str.startswith("supported (all"), "high", "medium"))
+            res.loc[tier == "limited", "verdict"] = "small sample: " + res["verdict"]
+            res.loc[tier == "one season type", "verdict"] = "drought-specific effect not identified: effect in " + res["headline_basis"].fillna("").str.replace("effect in ", "", regex=False) + " only"
+            res.loc[tier == "pooled", "verdict"] = "drought-specific effect not identified: one pooled effect over all seasons"
+            res.loc[tier == "descriptive", "verdict"] = "descriptive arm gap only, not a causal estimate"
+        if n_years < 2:
+            one = ~res["abstain"].fillna(False).astype(bool)
+            res.loc[one, "verdict"] = "one season only: gamma compares drought squares with normal squares in different places, not the same weather (not identified)"
+            log("only one season in the data: theta_normal / theta_drought are within-square arm gaps; gamma is NOT identified (see verdict)")
+    return res.drop(columns=["t_gamma"])
+
+
 def cmd_run(a):
     out = Path(a.out)
     out.mkdir(parents=True, exist_ok=True)
@@ -998,6 +1199,7 @@ def cmd_run(a):
                     ladder.append(["T1"])
                 ladder.append([])
             t0 = time.time()
+            best = None
             for adj in ladder:
                 xtr = list(xcols)
                 for k in adj:
@@ -1005,9 +1207,12 @@ def cmd_run(a):
                     xtr.append(f"hist_{k}")
                 d = dcrop.join(T[[tr]]).dropna(subset=[tr])
                 rows, bal = estimate_pair(d, crop, tr, xtr, outs, a, rng, None)
-                overlap_fail = rows and all(r.get("abstain") for r in rows) and "overlap" in rows[0]["abstain_reason"]
-                if not overlap_fail:
+                rank = min([TIER_RANK.get(r.get("evidence_tier"), 5) if not r.get("abstain") else 5 for r in rows] or [5])
+                if best is None or rank < best[0]:
+                    best = (rank, rows, bal, adj, list(xtr), d)
+                if rank <= 1:                                        # full or limited: no need to weaken the adjustment
                     break
+            _, rows, bal, adj, xtr, d = best
             gc.collect()
             tag = "+".join(adj) if adj else "none"
             for r in rows:
@@ -1019,8 +1224,9 @@ def cmd_run(a):
             all_rows += rows
             all_bal += bal
             ok = [r for r in rows if not r.get("abstain")]
-            log(f"  {crop} {tr}: " + (f"{len(ok)} outcome estimates" if ok else "ABSTAIN - " + rows[0]["abstain_reason"]) + f" ({time.time() - t0:.0f}s)")
-            if use_forest and ok:
+            tier_ = ok[0]["evidence_tier"] if ok else None
+            log(f"  {crop} {tr}: " + (f"{len(ok)} outcome estimates, evidence tier '{tier_}'" if ok else "ABSTAIN - " + rows[0]["abstain_reason"]) + f" ({time.time() - t0:.0f}s)")
+            if use_forest and ok and tier_ in ("full", "limited"):
                 dd = d.copy(); dd["T"] = dd[tr].astype(float)
                 dd = dd[dd["drought"] == 1]
                 if a.predict_fields == "all":
@@ -1053,27 +1259,7 @@ def cmd_run(a):
         if cc is not None:
             cc.to_csv(out / f"county_check_{crop}.csv", index=False)
             log(f"{crop} county check:\n" + cc.round(4).to_string(index=False))
-    res = pd.DataFrame(all_rows)
-    res["limits"] = " | ".join(LIMITS)
-    res["t_gamma"] = np.where(res.get("gamma").notna() if "gamma" in res else False, np.nan, np.nan)
-    if "gamma" in res:
-        # a conservative verdict per row: the cluster-bootstrap interval of gamma excludes 0, the placebo agrees, the checks pass
-        ex0 = (res["gamma_lo"] > 0) | (res["gamma_hi"] < 0)
-        res["verdict"] = np.where(res["abstain"], "abstain",
-                         np.where(~res["gamma_identified"].fillna(False), "arm gap only (drought effect not identified)",
-                         np.where(ex0 & (res["gamma_placebo_p"].fillna(1) < 0.1) & res["neg_control_pass"].fillna(True) & res["balance_pass"].fillna(False),
-                                  "supported (all checks pass)",
-                         np.where(ex0 & (res["gamma_placebo_p"].fillna(1) < 0.1) & res["neg_control_pass"].fillna(True),
-                                  "supported by the DML model; matched baseline not fully balanced",
-                         np.where(ex0, "interval excludes 0, but placebo or negative control fails", "no detectable drought-specific effect")))))
-        if "neg_control_pass" in res:                  # the check was not run (no pre-treatment greenness): say so instead of counting it as passed
-            nc = res["neg_control_pass"].isna() & res["verdict"].str.startswith("supported")
-            res.loc[nc, "verdict"] = res.loc[nc, "verdict"] + " (negative control NOT run: no pre-treatment greenness)"
-        if o["year"].nunique() < 2:
-            one = ~res["abstain"].fillna(False).astype(bool)
-            res.loc[one, "verdict"] = "one season only: gamma compares drought squares with normal squares in different places, not the same weather (not identified)"
-            log("only one season in the data: theta_normal / theta_drought are within-square arm gaps; gamma is NOT identified (see verdict)")
-    res = res.drop(columns=["t_gamma"])
+    res = add_verdicts(pd.DataFrame(all_rows), o["year"].nunique())
     res.to_csv(out / "effects.csv", index=False)
     pd.DataFrame(all_bal).to_csv(out / "balance.csv", index=False)
     pd.DataFrame(diag).to_csv(out / "outcome_diagnostics.csv", index=False)
@@ -1083,7 +1269,7 @@ def cmd_run(a):
         import pyarrow.csv as pacsv
         import pyarrow.parquet as pq
         schema = pa.unify_schemas([pq.read_schema(f) for f in fe_files], promote_options="permissive")
-        n_rows = n_ok = 0
+        n_rows = n_ok = n_lim = 0
         with pq.ParquetWriter(out / "field_effects.parquet", schema) as pw, open(out / "field_effects.csv", "wb") as cf:
             first = True
             for f in fe_files:                                     # one block at a time
@@ -1092,7 +1278,8 @@ def cmd_run(a):
                 pacsv.write_csv(t, cf, write_options=pacsv.WriteOptions(include_header=first)); first = False
                 n_rows += t.num_rows
                 n_ok += int(sum(1 for v in t.column("status").to_pylist() if v == "ok"))
-        log(f"field-level estimates: {n_rows:,} rows ({n_ok / max(n_rows, 1):.0%} with enough comparable fields)")
+                n_lim += int(sum(1 for v in t.column("status").to_pylist() if v == "limited evidence"))
+        log(f"field-level estimates: {n_rows:,} rows ({n_ok / max(n_rows, 1):.0%} ok, {n_lim / max(n_rows, 1):.0%} limited evidence, rest insufficient)")
         for f in fe_files:
             f.unlink()
     write_report(out, res, diag, a)
@@ -1108,7 +1295,8 @@ def write_report(out, res, diag, a):
         L += ["## Does the outcome see the drought?", "", pd.DataFrame(diag).round(4).to_markdown(index=False), ""]
     if len(res):
         show = res[~res["abstain"]]
-        cols = [c for c in ("crop", "treatment", "outcome", "gamma", "gamma_lo", "gamma_hi", "theta_normal", "gamma_placebo_p", "balance_pass",
+        cols = [c for c in ("crop", "treatment", "outcome", "evidence_tier", "confidence", "headline_basis", "headline_effect", "headline_lo", "headline_hi",
+                            "gamma", "gamma_lo", "gamma_hi", "theta_normal", "gamma_placebo_p", "balance_pass",
                             "neg_control_pass", "sign_agrees_with_expected", "verdict") if c in show.columns]
         L += ["## Estimates", "", show[cols].round(4).to_markdown(index=False) if len(show) else "none", ""]
         ab = res[res["abstain"]].drop_duplicates(["crop", "treatment"])
@@ -1136,7 +1324,9 @@ def main():
     ap.add_argument("--tmp", help="spill / scratch folder (default <out>/_tmp)")
     ap.add_argument("--chunk-rows", dest="chunk_rows", type=int, default=200000, help="rows per batch when reading the tensors and predicting the forest")
     ap.add_argument("--reuse-table", dest="reuse_table", action="store_true", help="run: reuse <out>/field_year_table.parquet instead of reading the inputs again")
-    ap.add_argument("--county-min-fields", dest="county_min_fields", type=int, default=20)
+    ap.add_argument("--county-min-fields", dest="county_min_fields", type=int, default=20, help="min sampled fields per county-year for the county check (both crops unless overridden below)")
+    ap.add_argument("--county-min-fields-corn", dest="county_min_fields_corn", type=int, default=10, help="overrides --county-min-fields for corn")
+    ap.add_argument("--county-min-fields-soybeans", dest="county_min_fields_soybeans", type=int, default=5, help="overrides --county-min-fields for soybeans")
     ap.add_argument("--out")
     ap.add_argument("--crops", nargs="+", default=["corn", "soybeans"], choices=list(CROPS))
     ap.add_argument("--treatments", nargs="+", default=["T1", "T2", "T3", "T4", "T5"], choices=list(TREATMENTS))
@@ -1152,6 +1342,12 @@ def main():
     ap.add_argument("--placebo-reps", dest="placebo_reps", type=int, default=200)
     ap.add_argument("--min-arm", dest="min_arm", type=int, default=100)
     ap.add_argument("--min-units", dest="min_units", type=int, default=5)
+    ap.add_argument("--soft-arm", dest="soft_arm", type=int, default=20, help="limited tier: min fields in the smaller arm of EACH season type")
+    ap.add_argument("--soft-units", dest="soft_units", type=int, default=2, help="limited / one-season-type / pooled tiers: min squares with both arms")
+    ap.add_argument("--pooled-arm", dest="pooled_arm", type=int, default=10, help="pooled tier: min fields in the smaller arm over all seasons")
+    ap.add_argument("--strict", action="store_true", help="old behaviour: abstain unless the full thresholds are met (no limited / pooled / descriptive tiers)")
+    ap.add_argument("--max-radius-km", dest="max_radius_km", type=float, default=120.0, help="field what-if: widen the neighbour radius (x2 steps) up to this")
+    ap.add_argument("--min-comparable-soft", dest="min_comparable_soft", type=int, default=10, help="field what-if: 'limited evidence' needs this many per arm")
     ap.add_argument("--min-overlap", dest="min_overlap", type=float, default=0.5)
     ap.add_argument("--min-extra-outcome", dest="min_extra_outcome", type=int, default=1000)
     ap.add_argument("--no-adjust-history", dest="adjust_history", action="store_false",
