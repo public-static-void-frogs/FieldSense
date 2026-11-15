@@ -5,7 +5,7 @@ import time
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 from fastapi.testclient import TestClient
@@ -141,8 +141,9 @@ class FakeGemini:
         events = self.rounds[index] if index < len(self.rounds) else self.rounds[-1]
         if callable(events):
             events = events(self.requests[-1])
-        if events == 500:
-            return httpx.Response(500, text="boom")
+        if isinstance(events, int):
+            body = {"error": {"message": "The model is overloaded"}}
+            return httpx.Response(events, json=body)
         return httpx.Response(
             200, text="".join(f"data: {json.dumps(event)}\n\n" for event in events)
         )
@@ -285,6 +286,16 @@ class AssistantChatTests(unittest.TestCase):
             self.chat(FakeGemini(text("Hi", finish="MAX_TOKENS"))),
             [{"delta": "Hi"}, {"done": True}],
         )
+
+    def test_overloaded_model_is_retried_once_and_the_status_is_logged(self):
+        self.login_with_field()
+        with patch("app.services.llm.asyncio.sleep", new=AsyncMock()):
+            retried = FakeGemini(503, text("Hi"))
+            self.assertEqual(self.chat(retried), [{"delta": "Hi"}, {"done": True}])
+            self.assertEqual(len(retried.requests), 2)
+            with self.assertLogs("app.services.assistant", "WARNING") as logs:
+                self.assertEqual(self.chat(FakeGemini(400)), [])
+        self.assertIn("HTTP 400: The model is overloaded", logs.output[0])
 
     # ------------------------------------------------------------------ tool loop
     def test_weather_tool_round_trip(self):

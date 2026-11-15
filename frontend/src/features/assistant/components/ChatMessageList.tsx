@@ -135,7 +135,7 @@ function ChatWelcome({
       </ul>
       <p className="assistant-disclaimer">
         {t(
-          'AI answers can be wrong. Check important decisions, and ask a local agronomist about pesticide, fertilizer or irrigation doses.',
+          'SI answers can be wrong. Check important decisions, and ask a local agronomist about pesticide, fertilizer or irrigation doses.',
         )}
       </p>
     </div>
