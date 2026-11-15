@@ -218,7 +218,7 @@ class AssistantChatTests(unittest.TestCase):
     # ------------------------------------------------------------------ basics
     def test_requires_auth_and_configuration_and_valid_conversation(self):
         body = {"messages": MESSAGES}
-        self.assertEqual(self.client.post(PATH, json=body).status_code, 401)
+        self.assertEqual(self.client.post(PATH, json=body).status_code, 503)
         self.assertEqual(register(self.client).status_code, 201)
         self.assertEqual(self.client.post(PATH, json=body).status_code, 503)
         self.enable()

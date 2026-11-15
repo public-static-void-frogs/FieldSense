@@ -137,7 +137,7 @@ class WeatherTests(unittest.TestCase):
         app.state.weather.close()
         app.state.weather = self.service
         with TestClient(app) as client:
-            self.assertEqual(client.get("/api/v1/weather/forecast").status_code, 401)
+            self.assertEqual(client.get("/api/v1/weather/forecast").status_code, 422)
             register(client)
             self.assertEqual(client.get("/api/v1/weather/current").status_code, 422)
             settings = client.get("/api/v1/users/me/settings").json()

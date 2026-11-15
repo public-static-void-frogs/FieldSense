@@ -1465,5 +1465,9 @@
   "All reviewed": "All reviewed",
   "This action": "This action",
   "Accept event: {{value0}}": "Accept event: {{value0}}",
-  "Reject event: {{value0}}": "Reject event: {{value0}}"
+  "Reject event: {{value0}}": "Reject event: {{value0}}",
+  "Try the demo": "Try the demo",
+  "Demo visitor": "Demo visitor",
+  "No saved demo fields": "No saved demo fields",
+  "Use the field map to select and analyze an area.": "Use the field map to select and analyze an area."
 }

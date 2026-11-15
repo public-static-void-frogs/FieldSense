@@ -2,7 +2,7 @@
   "openapi": "3.1.0",
   "info": {
     "title": "Field Shift NASA API",
-    "description": "Authenticated farm API with SQL-backed accounts, shared fields, per-user field selections and live Open-Meteo weather. No demo field data is seeded.",
+    "description": "Authenticated farm API with SQL-backed accounts, shared fields, per-user field selections and live Open-Meteo weather. Signed-out visitors can browse the read-only demo.",
     "version": "1.0.0"
   },
   "paths": {
@@ -7564,6 +7564,18 @@
       },
       "PublicUser": {
         "properties": {
+          "isDemo": {
+            "anyOf": [
+              {
+                "type": "boolean",
+                "const": true
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Isdemo"
+          },
           "id": {
             "type": "string",
             "title": "Id"

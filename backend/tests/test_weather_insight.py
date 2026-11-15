@@ -33,7 +33,7 @@ class WeatherInsightTests(unittest.TestCase):
         client = TestClient(app)
         self.addCleanup(client.close)
         path = "/api/v1/weather/forecast/insight"
-        self.assertEqual(client.post(path, params={"day": "2026-11-10"}).status_code, 401)
+        self.assertEqual(client.post(path, params={"day": "2026-11-10"}).status_code, 503)
         self.assertEqual(register(client).status_code, 201)
         field = create_field(client, crop="Corn", properties=None)
         forecast = client.get("/api/v1/weather/forecast", params={"field_id": field["id"]}).json()

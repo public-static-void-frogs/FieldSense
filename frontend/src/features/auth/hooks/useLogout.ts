@@ -23,7 +23,7 @@ export function useLogout() {
       await client.cancelQueries();
       client.clear();
     }
-    navigate('/login', { replace: true });
+    navigate('/', { replace: true });
   }
 
   return { logout, pending: mutation.isPending };

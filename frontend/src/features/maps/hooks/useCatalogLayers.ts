@@ -1,20 +1,25 @@
 import { canvas, circleMarker, divIcon, layerGroup, marker, type CircleMarker } from 'leaflet';
-import { useLayoutEffect, useRef, useState } from 'react';
+import { useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useMapEvents } from 'react-leaflet';
+import type { Field } from '../../../types/fields/field.types.ts';
 import type { CatalogMapView } from '../../../types/maps/map.types.ts';
 import { clusterMarkerSize, layoutMapClusters } from '../utils/clusterLayout.ts';
 import { clusterView } from '../utils/catalogViewport.ts';
 import { catalogPointStyle } from '../utils/catalogPointStyle.ts';
 import type { LayerGroup } from 'leaflet';
 import { isPointInLasso, type ScreenPoint } from '../utils/lassoSelection.ts';
+import { getSavedFieldCoverage, isCoveredBySavedField } from '../utils/savedFieldCoverage.ts';
 import type { MapSection } from '../utils/sectionSelection.ts';
 
 export function useCatalogLayers(
   data: CatalogMapView | undefined,
   selectedIds: ReadonlySet<string>,
   sections: readonly MapSection[],
+  savedFields: Field[] | undefined,
 ) {
+  const savedIds = useMemo(() => new Set(savedFields?.map(({ id }) => id)), [savedFields]);
+  const coverage = useMemo(() => getSavedFieldCoverage(savedFields), [savedFields]);
   const points = useRef(new Map<string, { marker: CircleMarker; owner: LayerGroup }>());
   const [revision, setRevision] = useState(0);
   const refreshLayout = () => setRevision((value) => value + 1);
@@ -99,12 +104,17 @@ export function useCatalogLayers(
     for (const [id, point] of points.current) {
       const { lat, lng } = point.marker.getLatLng();
       const position = project(lat, lng);
-      if (selectedIds.has(id) || outlines.some((outline) => isPointInLasso(position, outline))) {
+      if (
+        savedIds.has(id) ||
+        isCoveredBySavedField([lng, lat], coverage) ||
+        selectedIds.has(id) ||
+        outlines.some((outline) => isPointInLasso(position, outline))
+      ) {
         point.marker.closeTooltip();
         point.owner.removeLayer(point.marker);
       } else {
         point.owner.addLayer(point.marker);
       }
     }
-  }, [map, data, selectedIds, sections, t, revision]);
+  }, [map, data, selectedIds, sections, savedIds, coverage, t, revision]);
 }

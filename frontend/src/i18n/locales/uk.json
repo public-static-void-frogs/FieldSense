@@ -1465,5 +1465,9 @@
   "All reviewed": "Усе розглянуто",
   "This action": "Ця дія",
   "Accept event: {{value0}}": "Прийняти подію: {{value0}}",
-  "Reject event: {{value0}}": "Відхилити подію: {{value0}}"
+  "Reject event: {{value0}}": "Відхилити подію: {{value0}}",
+  "Try the demo": "Спробувати демоверсію",
+  "Demo visitor": "Гість демоверсії",
+  "No saved demo fields": "У демоверсії ще немає збережених полів",
+  "Use the field map to select and analyze an area.": "Скористайтеся картою полів, щоб вибрати й проаналізувати ділянку."
 }
