@@ -10,6 +10,25 @@
   transition: opacity 0.15s ease;
 }
 
+.rotation-explainer.ant-card > .ant-card-body {
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.rotation-explainer h2 {
+  margin: 0 0 8px;
+  font-size: clamp(19px, 2.4vw, 25px);
+  font-weight: 600;
+}
+
+.rotation-explainer p {
+  margin: 0;
+  color: #58664d;
+}
+
+.rotation-explainer p + p {
+  margin-top: 8px;
+}
+
 .rotation-candidates {
   container: rotation-leaderboard / inline-size;
   margin: 0;

@@ -61,14 +61,6 @@ export function FieldRecommendationPage() {
           </>
         }
         eyebrow=""
-        description={
-          advice
-            ? t(
-                'Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.',
-                { year: seasonYear(advice) },
-              )
-            : undefined
-        }
         titlePrefix={
           <>
             <RouterButton
@@ -96,6 +88,20 @@ export function FieldRecommendationPage() {
         )}
         {advice && (
           <>
+            <Card className="rotation-explainer">
+              <h2>{t('How it works')}</h2>
+              <p>
+                {t(
+                  'Compare crops for the {{year}} season using this field’s available crop history, soil data, and past weather. Choose the crop you plan to grow to see how it ranks, then select any goals you want the ranking to give more weight.',
+                  { year: seasonYear(advice) },
+                )}
+              </p>
+              <p>
+                {t(
+                  'Crops with lower scores rank higher. The leaderboard shows each crop’s risk level and estimated gross revenue where available. Open View details to see what contributed to the recommendation.',
+                )}
+              </p>
+            </Card>
             <RecommendationCalculator
               advice={advice}
               selectedCrop={selectedCrop}
