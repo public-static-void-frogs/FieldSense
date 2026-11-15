@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next';
 import type { Field } from '../../../types/fields/field.types.ts';
 import type { PlannedEvent } from '../../../types/planning/planning.types.ts';
 
+import { formatPercent } from '../../../utils/format.ts';
 import { priorityColors } from '../utils/eventPresentation.ts';
 import { formatPlanDate, getEventStatus } from '../utils/planningDates.ts';
 import { EventDecisionControls } from './EventDecisionControls';
@@ -120,12 +121,12 @@ function CalendarFieldConditions({ field }: CalendarFieldConditionsProps) {
           {
             key: 'health',
             label: t('Crop health'),
-            children: `${field.health}%`,
+            children: formatPercent(field.health, t('Not supplied')),
           },
           {
             key: 'moisture',
             label: t('Soil moisture'),
-            children: `${field.moisture}%`,
+            children: formatPercent(field.moisture, t('Not supplied')),
           },
           {
             key: 'nitrogen',
