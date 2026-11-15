@@ -203,3 +203,217 @@
   padding: 0;
   list-style: none;
 }
+
+.rotation-control-narrow {
+  flex: 0 1 180px;
+}
+
+.rotation-seasons-select {
+  width: 96px;
+}
+
+.rotation-plan-top {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rotation-plan-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #dfe5d5;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.rotation-plan-card .ant-tag {
+  margin: 0;
+}
+
+.rotation-plan-card > .ant-btn {
+  align-self: flex-start;
+  margin-top: auto;
+}
+
+.rotation-plan-sequence {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rotation-plan-sequence li {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 10px;
+  border-radius: 8px;
+  background: #f8faf4;
+}
+
+.rotation-plan-sequence li:first-child {
+  background: #e6efdc;
+}
+
+.rotation-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 12px 16px;
+  margin: 0;
+}
+
+.rotation-stats-wide {
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  margin-bottom: 20px;
+}
+
+.rotation-stats-full {
+  grid-column: 1 / -1;
+}
+
+.rotation-stats dt {
+  color: #58664d;
+  font-size: 13px;
+}
+
+.rotation-stats dd {
+  margin: 0;
+  color: #1f2a1b;
+  font-size: 18px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.rotation-stats dd small {
+  color: #58664d;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.rotation-plan-section {
+  margin-top: 24px;
+}
+
+.rotation-plan-section h5.ant-typography,
+.rotation-forecast h5.ant-typography {
+  margin: 0 0 10px;
+}
+
+.rotation-forecast .rotation-table,
+.rotation-forecast .ant-collapse {
+  margin-bottom: 20px;
+}
+
+.rotation-outcomes {
+  margin: 0 0 8px;
+}
+
+.rotation-outcomes-legend {
+  display: flex;
+  gap: 16px;
+  margin: 0 0 4px;
+  padding: 0;
+  color: #58664d;
+  font-size: 13px;
+  list-style: none;
+}
+
+.rotation-outcomes-legend li {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.rotation-outcomes-legend span {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.rotation-outcomes-tooltip {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 8px 12px;
+  border: 1px solid #dfe5d5;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 13px;
+  box-shadow: 0 2px 8px rgb(0 0 0 / 12%);
+}
+
+.rotation-inputs {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 24px;
+  align-items: start;
+}
+
+.rotation-results-box.ant-input {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 13px;
+}
+
+.rotation-input-actions {
+  margin: 12px 0;
+}
+
+.rotation-results-errors,
+.rotation-own-yields,
+.rotation-soil-used {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rotation-soil-form {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0 16px;
+}
+
+.rotation-soil-form .ant-form-item {
+  margin-bottom: 12px;
+}
+
+.rotation-soil-form .ant-input-number {
+  width: 100%;
+}
+
+.rotation-soil-actions {
+  grid-column: 1 / -1;
+}
+
+.rotation-soil-used .ant-tag {
+  margin: 0;
+}
+
+.rotation-economics-grid {
+  display: grid;
+  grid-template-columns: minmax(96px, 1.2fr) repeat(2, minmax(120px, 1fr));
+  gap: 8px 16px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.rotation-economics-grid .ant-form-item {
+  margin-bottom: 0;
+}
+
+.rotation-economics-grid .ant-input-number {
+  width: 100%;
+}
+
+.rotation-economics-rent {
+  max-width: 260px;
+}

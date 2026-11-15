@@ -7,7 +7,9 @@ import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { CandidateDetails } from '../features/rotation/components/CandidateDetails';
+import { PlanForecast } from '../features/rotation/components/PlanForecast';
 import { useRotationAdvice } from '../features/rotation/hooks/useRotationAdvice.ts';
+import { planCrop, pricedPlan } from '../features/rotation/utils/planPresentation.ts';
 import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
 import '../styles/rotation.css';
 
@@ -55,8 +57,11 @@ export function FieldRecommendationCropPage() {
     );
   }
 
+  const plan = pricedPlan(advice);
+  const entry = planCrop(advice, candidate.crop);
+
   return (
-    <div className="rotation-page">
+    <div className="rotation-page rotation-stack">
       <PageHeading
         title={t(candidate.label)}
         eyebrow={t('Crop strategies for next season')}
@@ -73,6 +78,11 @@ export function FieldRecommendationCropPage() {
           </>
         }
       />
+      {plan && entry && (
+        <Card>
+          <PlanForecast advice={advice} plan={plan} entry={entry} />
+        </Card>
+      )}
       <Card>
         <CandidateDetails advice={advice} candidate={candidate} />
       </Card>

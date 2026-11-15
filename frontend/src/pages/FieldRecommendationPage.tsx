@@ -13,7 +13,12 @@ import { CandidateList } from '../features/rotation/components/CandidateList';
 import { CropHistoryStrip } from '../features/rotation/components/CropHistoryStrip';
 import { InformationGaps } from '../features/rotation/components/InformationGaps';
 import { OffSeasonCard } from '../features/rotation/components/OffSeasonCard';
+import { PlanOverview } from '../features/rotation/components/PlanOverview';
+import { EconomicsCard } from '../features/rotation/components/EconomicsCard';
+import { SeasonResultsCard } from '../features/rotation/components/SeasonResultsCard';
+import { SoilSurveyCard } from '../features/rotation/components/SoilSurveyCard';
 import { useRotationAdvice } from '../features/rotation/hooks/useRotationAdvice.ts';
+import { pricedPlan } from '../features/rotation/utils/planPresentation.ts';
 import { seasonYear } from '../features/rotation/utils/rotationPresentation.ts';
 import '../styles/rotation.css';
 
@@ -21,8 +26,30 @@ export function FieldRecommendationPage() {
   const { t } = useTranslation();
   const { fieldId } = useLoaderData<FieldRouteData>();
   const { data: field } = useSuspenseQuery(fieldQueries.byId(fieldId));
-  const { advice, isLoading, isUpdating, error, retry, priorities, setCrop, togglePriority } =
-    useRotationAdvice(fieldId);
+  const {
+    advice,
+    isLoading,
+    isUpdating,
+    error,
+    retry,
+    priorities,
+    setCrop,
+    setSeasons,
+    togglePriority,
+  } = useRotationAdvice(fieldId);
+  const plan = advice ? pricedPlan(advice) : null;
+  let description: string | undefined;
+  if (advice && plan) {
+    description = t(
+      'What to grow over the next {{seasons}} seasons, with what past years say could happen. The best plan comes first.',
+      { seasons: plan.seasons },
+    );
+  } else if (advice) {
+    description = t(
+      'Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.',
+      { year: seasonYear(advice) },
+    );
+  }
   if (!field || advice === null) {
     return (
       <Result
@@ -43,14 +70,7 @@ export function FieldRecommendationPage() {
       <PageHeading
         title={t('Crop recommendation')}
         eyebrow={field.crop || field.name}
-        description={
-          advice
-            ? t(
-                'Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.',
-                { year: seasonYear(advice) },
-              )
-            : undefined
-        }
+        description={description}
         titlePrefix={
           <RouterButton
             type="text"
@@ -78,11 +98,23 @@ export function FieldRecommendationPage() {
             advice={advice}
             priorities={priorities}
             onCropChange={setCrop}
+            onSeasonsChange={setSeasons}
             onPriorityToggle={togglePriority}
           />
-          <AdviceVerdict advice={advice} />
+          {plan ? (
+            <PlanOverview advice={advice} plan={plan} />
+          ) : (
+            <>
+              <AdviceVerdict advice={advice} />
+              <CandidateList advice={advice} />
+            </>
+          )}
+          <div className="rotation-inputs">
+            <SeasonResultsCard advice={advice} />
+            <SoilSurveyCard advice={advice} />
+            <EconomicsCard advice={advice} />
+          </div>
           <CropHistoryStrip advice={advice} />
-          <CandidateList advice={advice} />
           <OffSeasonCard advice={advice} />
           {advice.dataGaps.length > 0 && (
             <Card>

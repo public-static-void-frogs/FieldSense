@@ -94,6 +94,10 @@ export type RotationCandidate = {
   revenue: RotationRevenue | null;
   dataGaps: RotationDataGap[];
   needsLocalReview: boolean;
+  /** Rank by rotation risk alone; `rank` follows the plan when one could be priced. */
+  riskRank?: number;
+  tier?: 'top' | 'alternative' | 'not_modelled';
+  notModelledCode?: string | null;
 };
 
 export type RotationHistoryYear = {
@@ -180,17 +184,241 @@ export type RotationAdvice = {
   historySource: {
     kind: 'cdl' | 'declared' | 'none';
     seasons: number;
+    /** Seasons taken from the farmer's own results instead of the satellite label. */
+    declaredSeasons?: number;
     firstYear: number | null;
     lastYear: number | null;
     satelliteEstimate: boolean;
   };
   history: RotationHistoryYear[];
   seasonsAvailable: number[];
+  summarySource?: {
+    kind: 'own' | 'weather_cell' | 'nearby_cell' | 'none';
+    distanceKm: number | null;
+  } | null;
   weatherRecord: RotationWeatherRecord | null;
   offSeason: RotationOffSeason | null;
   dataGaps: RotationDataGap[];
   candidates: RotationCandidate[];
   seasonTiming: RotationSeasonTiming | null;
+  soilInputs?: RotationSoilInput[];
+  plan?: RotationPlan | null;
+};
+
+export type RotationSoilInput = {
+  id: 'ph' | 'organicMatterPct' | 'phosphorusPpm' | 'potassiumPpm';
+  value: number;
+  source: 'survey' | 'ssurgo';
+  /** Empty: the value is stored but not yet part of the calculation. */
+  usedIn: ('rules' | 'soil_carbon')[];
+};
+
+export type RotationEstablishment = 'reliable' | 'marginal' | 'unlikely';
+
+export type RotationAutumnAction = 'none' | 'sow_cover_crop' | 'sow_winter_crop' | 'keep_stand';
+
+/** One season of a plan. Money is USD per acre; net is revenue less production cost. */
+export type RotationPlanStep = {
+  season: number;
+  crop: string;
+  tillage: 'conventional' | 'strip_till' | 'no_till';
+  coverCrop: 'none' | 'rye';
+  autumnBefore: RotationAutumnAction;
+  objectiveUsdPerAcre: number;
+  netUsdPerAcre: number;
+  worstYearUsdPerAcre: number;
+  bestYearUsdPerAcre: number;
+  worstYear: number;
+  revenueUsdPerAcre: number;
+  costUsdPerAcre: number;
+  riskPenaltyUsdPerAcre: number;
+  soilValueUsdPerAcre: number;
+  yieldPerAcre: number;
+  yieldUnit: string;
+  rules: string[];
+};
+
+export type RotationSimulatedYear = { year: number; netUsdPerAcre: number };
+
+export type RotationSimulatedSpread = {
+  lossProbability: number;
+  meanUsdPerAcre: number;
+  p10UsdPerAcre: number;
+  p50UsdPerAcre: number;
+  p90UsdPerAcre: number;
+  worst: RotationSimulatedYear;
+  best: RotationSimulatedYear;
+};
+
+/** The first season if this past year's weather and price came again. */
+export type RotationSimulatedOutcome = {
+  year: number;
+  probability: number;
+  netUsdPerAcre: number;
+  yieldPerAcre: number;
+  priceUsd: number;
+  yieldMode: 'observed' | 'modelled' | 'none';
+};
+
+export type RotationPlanSimulation = {
+  firstSeason: RotationSimulatedSpread & {
+    years: number;
+    yieldPerAcre: {
+      unit: string;
+      meanPerAcre: number;
+      p10PerAcre: number;
+      p50PerAcre: number;
+      p90PerAcre: number;
+    };
+    planningPriceUsd: number;
+    observedYieldYears: number;
+    beatsTopProbability: number | null;
+    outcomes: RotationSimulatedOutcome[];
+  };
+  plan: (RotationSimulatedSpread & { runs: number }) | null;
+};
+
+/** The best plan that starts with this crop. */
+export type RotationPlanCrop = {
+  crop: string;
+  rank: number;
+  tier: 'top' | 'alternative';
+  demoted: 'autumn_establishment_unlikely' | null;
+  planObjectiveUsdPerAcre: number;
+  planNetUsdPerAcre: number;
+  autumn: {
+    action: RotationAutumnAction;
+    species: string | null;
+    establishment: RotationEstablishment | null;
+    ryeCoverGainUsdPerAcre: number | null;
+    ryeCoverEstablishment: RotationEstablishment | null;
+  };
+  steps: RotationPlanStep[];
+  simulation: RotationPlanSimulation;
+};
+
+export type RotationOwnYieldLevel = {
+  crop: string;
+  yieldUnit: string;
+  /** Field level over the county level; fewer than four years are filled at 1.0. */
+  ratio: number;
+  expectedYieldPerAcre: number;
+  points: { year: number; yieldPerAcre: number; referenceYieldPerAcre: number }[];
+};
+
+export type RotationPlan = {
+  status: 'ok' | 'no_modellable_crop';
+  seasons: number;
+  firstSeason: number | null;
+  years: {
+    source: 'climate_record' | 'field_seasons' | 'price_years';
+    count: number;
+    first: number;
+    last: number;
+  } | null;
+  costRegion: string | null;
+  yearOdds: {
+    method: 'analog_years' | 'equal';
+    effectiveYears: number;
+    startsAfter: number | null;
+    signals: string[];
+  } | null;
+  ownYields: RotationOwnYieldLevel[];
+  crops: RotationPlanCrop[];
+  notModelled: ({ crop: string; code: string } & Record<string, unknown>)[];
+  gaps: RotationDataGap[];
+  economics?: {
+    landRentUsdPerAcre: number;
+    landRentSource: 'farmer' | 'not_charged';
+    crops: {
+      crop: string;
+      priceUsd: number;
+      priceSource: 'farmer' | 'planning';
+      costUsdPerAcre: number;
+      costSource: 'farmer' | 'tables';
+      soilTestCostChangeUsdPerAcre: number;
+    }[];
+  } | null;
+  soilTest?: RotationSoilTestEffect[];
+  soilYield?: {
+    crop: string;
+    index: 'nccpi_corn' | 'nccpi_soy';
+    fieldIndex: number;
+    countyIndex: number;
+    countyFields: number;
+    ratio: number;
+    expectedYieldPerAcre: number;
+    verified: boolean;
+  }[];
+};
+
+/** What the farmer grew in one past season. Yield is bu/acre; hay is ton/acre. */
+export type RotationSeasonResult = { year: number; crop: string; yieldPerAcre?: number | null };
+
+export type RotationSeasonResults = { results: RotationSeasonResult[] };
+
+/** The farmer's own soil test. pH and organic matter replace the soil survey estimate. */
+export type RotationSoilSurvey = {
+  sampledOn?: string | null;
+  ph?: number | null;
+  organicMatterPct?: number | null;
+  phosphorusPpm?: number | null;
+  potassiumPpm?: number | null;
+  phosphorusTest?: 'bray_p1' | 'mehlich3_colorimetric' | 'mehlich3_icp' | 'olsen' | null;
+  potassiumSample?: 'dried' | 'moist' | null;
+};
+
+/** The farmer's own price, cost and rent. What is left out keeps the USDA average. */
+export type RotationEconomicsInputs = {
+  landRentUsdPerAcre?: number | null;
+  crops: { crop: string; priceUsd?: number | null; costUsdPerAcre?: number | null }[];
+};
+
+export type RotationLandRentDefault = {
+  usdPerAcre: number;
+  year: number;
+  level: 'county' | 'state' | 'ers_region';
+  source: 'nass_cash_rents' | 'ers_land_opportunity_cost';
+};
+
+export type RotationEconomics = {
+  inputs: RotationEconomicsInputs | null;
+  defaults: {
+    costRegion: string | null;
+    landRent: RotationLandRentDefault | null;
+    irrigatedLandRent: RotationLandRentDefault | null;
+    crops: {
+      crop: string;
+      priceUsd: number;
+      priceUnit: string;
+      priceLevel: string;
+      costUsdPerAcre: number;
+      costLevel: 'ers_region' | 'national' | 'state_budget';
+      costYear: number | null;
+      costItems: Record<string, number> | null;
+    }[];
+  };
+};
+
+export type RotationSoilTestCategory = 'very_low' | 'low' | 'optimum' | 'high' | 'very_high';
+
+/** A soil-test nutrient: its category and what the recommended rate does to the cost. */
+export type RotationSoilTestEffect = {
+  nutrient: 'phosphorus' | 'potassium';
+  ppm: number;
+  test: string;
+  category: RotationSoilTestCategory;
+  yieldResponseProbability: number;
+  fertilizerUnit: string;
+  fertilizerUsdPerLb: number;
+  calibration: 'iowa' | 'iowa_applied_elsewhere';
+  verified: boolean;
+  crops: {
+    crop: string;
+    rateLbPerAcre: number;
+    maintenanceRateLbPerAcre: number;
+    costChangeUsdPerAcre: number;
+  }[];
 };
 
 export type RotationWeatherRecord = {
@@ -239,4 +467,5 @@ export type RotationAdviceRequest = {
   fieldId: string;
   crop?: string;
   priorities: RotationPriority[];
+  seasons?: number;
 };

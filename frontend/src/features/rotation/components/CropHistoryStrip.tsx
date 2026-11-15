@@ -2,6 +2,7 @@ import { Card, Flex, Tag, Typography } from 'antd';
 import { Satellite } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { RotationAdvice } from '../../../types/rotation/rotation.types.ts';
+import { catalogCropLabels } from '../constants/rotationLabels.ts';
 import { cropLabelMap } from '../utils/rotationPresentation.ts';
 
 type CropHistoryStripProps = { advice: RotationAdvice };
@@ -15,7 +16,7 @@ export function CropHistoryStrip({ advice }: CropHistoryStripProps) {
       return t('Other land cover');
     }
 
-    return t(labels[crop] ?? historyCropLabels[crop] ?? crop);
+    return t(labels[crop] ?? catalogCropLabels[crop] ?? crop);
   };
 
   return (
@@ -25,7 +26,9 @@ export function CropHistoryStrip({ advice }: CropHistoryStripProps) {
       extra={
         historySource.satelliteEstimate && (
           <Tag icon={<Satellite size={14} aria-hidden="true" />} className="rotation-estimate-tag">
-            {t('Satellite estimate')}
+            {(historySource.declaredSeasons ?? 0) > 0
+              ? t('Satellite estimate and your records')
+              : t('Satellite estimate')}
           </Tag>
         )
       }
@@ -40,6 +43,9 @@ export function CropHistoryStrip({ advice }: CropHistoryStripProps) {
             <li key={entry.year} className="rotation-history-year">
               <Typography.Text type="secondary">{entry.year}</Typography.Text>
               <Typography.Text strong>{cropName(entry.crop)}</Typography.Text>
+              {entry.source === 'declared' && historySource.satelliteEstimate && (
+                <Typography.Text type="secondary">{t('Your record')}</Typography.Text>
+              )}
             </li>
           ))}
         </Flex>
@@ -59,24 +65,3 @@ export function CropHistoryStrip({ advice }: CropHistoryStripProps) {
     </Card>
   );
 }
-
-// Crops that can appear in history without being a candidate in the state.
-const historyCropLabels: Record<string, string> = {
-  corn: 'Corn (grain)',
-  sorghum: 'Sorghum (grain)',
-  soybeans: 'Soybeans',
-  oats: 'Oats',
-  winter_wheat: 'Winter wheat',
-  spring_wheat: 'Spring wheat',
-  rye: 'Rye (grain)',
-  barley: 'Barley',
-  alfalfa: 'Alfalfa',
-  other_hay: 'Other hay (non-alfalfa)',
-  grass_pasture: 'Grassland or pasture',
-  dry_beans: 'Dry beans',
-  canola: 'Canola',
-  sunflower: 'Sunflower',
-  fallow: 'Fallow or idle cropland',
-  double_crop_winter_wheat_soybeans: 'Double crop winter wheat / soybeans',
-  non_crop: 'Not cropland',
-};
