@@ -16,21 +16,22 @@ export function useCatalogViewport() {
       map.getZoom(),
     );
   };
-  const [viewport, setViewport] = useState(readViewport);
+  const [requested, setRequested] = useState(() => ({ viewport: readViewport(), revision: 0 }));
   const [revision, setRevision] = useState(0);
   useMapEvents({ moveend: () => setRevision((value) => value + 1) });
   useEffect(() => {
     const timeout = setTimeout(() => {
       const bounds = map.getBounds();
-      setViewport(
-        normalizeViewport(
+      setRequested({
+        revision,
+        viewport: normalizeViewport(
           bounds.getWest(),
           bounds.getSouth(),
           bounds.getEast(),
           bounds.getNorth(),
           map.getZoom(),
         ),
-      );
+      });
     }, 180);
     return () => clearTimeout(timeout);
   }, [map, revision]);
@@ -39,5 +40,9 @@ export function useCatalogViewport() {
     observer.observe(map.getContainer());
     return () => observer.disconnect();
   }, [map]);
-  return useQuery(mapQueries.geojson(viewport));
+  const query = useQuery(mapQueries.geojson(requested.viewport));
+  const canSelect =
+    requested.revision === revision && query.data?.mode === 'fields' && !query.isPlaceholderData;
+
+  return { query, canSelect };
 }

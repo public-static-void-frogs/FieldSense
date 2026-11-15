@@ -97,9 +97,8 @@ type CatalogViewportProps = {
 };
 
 function CatalogViewport({ fields, fitSavedFieldsOnOpen }: CatalogViewportProps) {
-  const query = useCatalogViewport();
+  const { query, canSelect } = useCatalogViewport();
   const selection = useMapSections();
-  const canSelect = query.data?.mode === 'fields' && !query.isPlaceholderData && !query.isFetching;
   const { activeTool, setTool } = useMapSelectionTool({
     features: query.data?.features ?? [],
     available: canSelect,

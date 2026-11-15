@@ -231,9 +231,6 @@
 .map-crop-icon-saved {
   pointer-events: auto;
 }
-.map-lasso-active .map-crop-icon-saved {
-  pointer-events: none;
-}
 .map-detected-fields {
   display: grid;
   gap: 4px;
@@ -283,6 +280,7 @@
 .leaflet-dragging .map-crop-icon {
   cursor: grabbing;
 }
+.map-lasso-active .map-section-crop,
 .map-lasso-active .map-crop-icon {
-  cursor: pointer;
+  pointer-events: none;
 }
