@@ -206,7 +206,6 @@ function M2FieldLine({ effect, signed }: LineProps<M2FieldEffect>) {
     return <p className="field-insights-muted">{t('This field: not enough comparable fields.')}</p>;
   }
 
-
   return (
     <p className="field-insights-muted">
       {t('This field in drought: {{value}} [{{low}}, {{high}}]', {
@@ -223,7 +222,6 @@ function M2NeighbourLine({ effect, signed }: LineProps<M2NeighbourEffect>) {
   if (effect.median == null) {
     return null;
   }
-
 
   return (
     <p className="field-insights-muted">
