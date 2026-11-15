@@ -11,6 +11,7 @@ import { EventResponseControls } from '../features/planning/components/EventResp
 import { priorityColors } from '../features/planning/utils/eventPresentation.ts';
 import { formatPlanDate, getEventStatus } from '../features/planning/utils/planningDates.ts';
 import { calendarEventPath } from '../features/planning/utils/planningRoutes.ts';
+import { formatPercent } from '../utils/format.ts';
 
 export function ActionDetailsPage() {
   const { eventId } = useParams<'eventId'>();
@@ -98,8 +99,16 @@ export function ActionDetailsPage() {
               column={1}
               items={[
                 { key: 'crop', label: t('Current crop'), children: field.crop },
-                { key: 'health', label: t('Field health'), children: `${field.health}%` },
-                { key: 'moisture', label: t('Soil moisture'), children: `${field.moisture}%` },
+                {
+                  key: 'health',
+                  label: t('Field health'),
+                  children: formatPercent(field.health, t('Not supplied')),
+                },
+                {
+                  key: 'moisture',
+                  label: t('Soil moisture'),
+                  children: formatPercent(field.moisture, t('Not supplied')),
+                },
                 {
                   key: 'nitrogen',
                   label: t('Nitrogen'),
