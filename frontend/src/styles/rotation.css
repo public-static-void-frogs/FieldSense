@@ -1,3 +1,14 @@
+.main-content.ant-layout-content:has(> .rotation-recommendation-page) {
+  max-width: none;
+  padding: 0;
+}
+
+.rotation-page-content {
+  max-width: 1900px;
+  margin-inline: auto;
+  padding: 8px var(--workspace-gutter) 20px;
+}
+
 .rotation-stack {
   display: flex;
   flex-direction: column;
@@ -450,9 +461,83 @@
   margin: 0 0 10px;
 }
 
-.rotation-forecast .rotation-table,
-.rotation-forecast .ant-collapse {
+.rotation-forecast-toolbar {
+  margin-bottom: 10px;
+}
+
+.rotation-forecast-metrics {
+  display: grid;
+  gap: 8px;
+  margin: 0 0 20px;
+}
+
+.rotation-forecast-metrics > div,
+.rotation-forecast-metrics dd {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 2px 8px;
+}
+
+.rotation-forecast-metrics dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+
+.rotation-forecast-metrics small {
+  color: #58664d;
+  font-size: 13px;
+  font-weight: 400;
+}
+
+.rotation-forecast-comparison {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.rotation-forecast-indicator {
+  display: inline-grid;
+  flex-shrink: 0;
+  place-items: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #edf0f2;
+  color: #4b5563;
+}
+
+.rotation-forecast-indicator[data-direction='up'] {
+  background: #edf4e6;
+  color: #315327;
+}
+
+.rotation-forecast-indicator[data-direction='down'] {
+  background: #fcece7;
+  color: #923a2e;
+}
+
+.rotation-forecast .rotation-forecast-toolbar h5.ant-typography {
+  margin: 0;
+}
+
+.rotation-forecast .rotation-table {
   margin-bottom: 20px;
+}
+
+.rotation-season-chart {
+  margin: 0 0 20px;
+}
+
+.rotation-season-chart figcaption {
+  color: #58664d;
+  font-size: 13px;
+}
+
+.rotation-season-chart .rotation-outcomes-legend {
+  flex-wrap: wrap;
+  gap: 4px 16px;
 }
 
 .rotation-outcomes {
@@ -497,6 +582,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 16px;
+  scroll-margin-top: 40px;
 }
 
 .rotation-inputs-heading {

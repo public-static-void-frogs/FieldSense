@@ -1051,6 +1051,48 @@
         }
       }
     },
+    "/api/v1/fields/{field_id}/rotation-inputs": {
+      "delete": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Reset Rotation Inputs",
+        "description": "Clear the caller's overrides together so the advice returns to field defaults.",
+        "operationId": "reset_rotation_inputs_api_v1_fields__field_id__rotation_inputs_delete",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/fields/{field_id}/economics": {
       "get": {
         "tags": [

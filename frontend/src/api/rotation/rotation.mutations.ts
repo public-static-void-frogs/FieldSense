@@ -1,4 +1,5 @@
 import { mutationOptions, type QueryClient } from '@tanstack/react-query';
+import type { RotationEconomics } from '../../types/rotation/rotation.types.ts';
 import { rotationApi } from './rotation.api.ts';
 import { rotationQueryKeys } from './rotation.queries.ts';
 
@@ -7,6 +8,12 @@ const refresh = (client: QueryClient, fieldId: string) =>
   client.invalidateQueries({ queryKey: rotationQueryKeys.field(fieldId) });
 
 export const rotationMutations = {
+  resetInputs: (client: QueryClient, fieldId: string) =>
+    mutationOptions({
+      mutationKey: ['rotation', 'reset-inputs', fieldId],
+      mutationFn: rotationApi.resetInputs,
+      onSuccess: () => refresh(client, fieldId),
+    }),
   saveSeasonResults: (client: QueryClient, fieldId: string) =>
     mutationOptions({
       mutationKey: ['rotation', 'season-results', fieldId],
@@ -42,7 +49,10 @@ export const rotationMutations = {
       mutationKey: ['rotation', 'economics', fieldId],
       mutationFn: rotationApi.saveEconomics,
       onSuccess: (saved) => {
-        client.setQueryData(rotationQueryKeys.economics(fieldId), saved);
+        client.setQueryData<RotationEconomics>(
+          rotationQueryKeys.economics(fieldId),
+          (current) => current && { ...current, inputs: saved },
+        );
 
         return refresh(client, fieldId);
       },

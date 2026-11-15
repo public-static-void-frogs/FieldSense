@@ -29,6 +29,8 @@ export const rotationApi = {
   // The first request for a field may also look up its soil, so it gets a longer timeout.
   getAdvice: (input: RotationAdviceRequest, signal?: AbortSignal): Promise<RotationAdvice | null> =>
     request(rotationAdvicePath(input), { signal, allowMissing: true, timeoutMs: 30_000 }),
+  resetInputs: (fieldId: string): Promise<void> =>
+    request(`/fields/${fieldId}/rotation-inputs`, { method: 'DELETE' }, async () => undefined),
   getSeasonResults: (fieldId: string, signal?: AbortSignal): Promise<RotationSeasonResults> =>
     request(`/fields/${fieldId}/season-results`, { signal }),
   saveSeasonResults: ({
@@ -62,7 +64,7 @@ export const rotationApi = {
   }: {
     fieldId: string;
     inputs: RotationEconomicsInputs;
-  }): Promise<RotationEconomics> =>
+  }): Promise<RotationEconomicsInputs> =>
     request(`/fields/${fieldId}/economics`, { method: 'PUT', body: JSON.stringify(inputs) }),
   removeEconomics: (fieldId: string): Promise<void> =>
     request(`/fields/${fieldId}/economics`, { method: 'DELETE' }, async () => undefined),
