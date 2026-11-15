@@ -1,15 +1,33 @@
-version: "2026-11-10"
+version: "2026-11-15"
 rules:
+  # Yield factors calibrated by rule_engine/planner/scripts/calibrate_yield_factors.py: the
+  # literature range (midpoint +- 2 sd) blended with measured yields; see the planner README.
   - id: continuous_corn_yield_penalty
     title: Corn-after-corn yield drag
     category: yield
     applies_to: {crops: [corn]}
     when:
       - {fact: history.consecutive_same_crop, op: ge, value: 1}
-    effect: {kind: risk, level: medium, yield_factor: [0.85, 0.96]}
+    # literature [0.85, 0.96]; same-field greenness panel 3.9 +- 0.9 % loss; blend 4.4 +- 0.9 %
+    effect: {kind: risk, level: medium, yield_factor: [0.94, 0.97]}
     evidence_strength: strong
     sources:
       - "ISU ICM, corn following corn; Seifert et al. 2017"
+      - "FieldSense same-field MODIS greenness panel, 2019-2023 (ndvi_field_panel.py)"
+    needs_local_review: false
+
+  - id: soy_after_soy_yield_penalty
+    title: Soybean-after-soybean yield drag
+    category: yield
+    applies_to: {crops: [soybeans]}
+    when:
+      - {fact: history.consecutive_same_crop, op: ge, value: 1}
+    # Seifert 10.3 %; county panel 8.9 +- 3.8 %; blend 10.2 +- 1.0 %
+    effect: {kind: risk, level: medium, yield_factor: [0.88, 0.92]}
+    evidence_strength: strong
+    sources:
+      - "Seifert et al. 2017, satellite-estimated field yields (soybeans after soybeans -10.3 %)"
+      - "FieldSense county panel of NASS yields and CDL repeat shares (repeat_yield_panel.py)"
     needs_local_review: false
 
   - id: rotation_yield_benefit
@@ -20,10 +38,13 @@ rules:
       - {fact: history.prev1.crop, op: not_null}
       - {fact: history.prev1.crop, op: ne, value: "@candidate.crop"}
       - {fact: history.distinct_groups_5y, op: ge, value: 3}
-    effect: {kind: benefit, yield_factor: [1.00, 1.09]}
+    # literature [1.00, 1.09]; same-field greenness panel after a small grain or hay: corn
+    # +7.5 +- 2.2 %, soybeans +5.3 +- 3.6 %; blend +5.9 +- 1.4 %
+    effect: {kind: benefit, yield_factor: [1.03, 1.09]}
     evidence_strength: strong
     sources:
       - "Davis et al. 2012, PLOS ONE (Marsden Farm)"
+      - "FieldSense same-field MODIS greenness panel, 2019-2023 (small_grain_field_panel.py)"
     needs_local_review: false
 
   - id: thin_local_market

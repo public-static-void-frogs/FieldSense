@@ -29,7 +29,10 @@ from rule_engine.planner.tabular import (
     ACTIONS,
     CROPS,
     HISTORY,
+    LOCAL,
     MAX_YEARS,
+    SLOT,
+    SUB,
     FieldTable,
     field_statics,
     myopic_choice,
@@ -76,62 +79,109 @@ class PolicyNet(nn.Module):
 
 
 class FieldSet:
-    """Many FieldTables concatenated into tensors, with global node indices."""
+    """Many FieldTables concatenated, with global node indices.
+
+    The per-node arrays stay in main memory (they are large and only a batch is read at a time);
+    the per-field arrays and the network live on `device`.
+    """
 
     def __init__(self, tables: list[FieldTable], device: str = "cpu"):
         self.tables = tables
         self.device = device
         offsets = np.cumsum([0] + [t.nodes for t in tables])
-        self.root = torch.as_tensor(offsets[:-1], device=device)
-        following = [
-            np.where(t.next_node >= 0, t.next_node + o, -1) for t, o in zip(tables, offsets)
-        ]
+        self.total = int(offsets[-1])
+        self.root_cpu = torch.as_tensor(offsets[:-1])
+        self.scale = torch.empty((self.total, LOCAL), dtype=torch.float32)
+        self.fixed = torch.empty((self.total, LOCAL), dtype=torch.float32)
+        self.mask = torch.empty((self.total, LOCAL), dtype=torch.bool)
+        self.next_node = torch.empty((self.total, tables[0].next_node.shape[1]), dtype=torch.int32)
+        self.node_t = torch.empty(self.total, dtype=torch.int8)
+        self.node_history = torch.empty((self.total, HISTORY), dtype=torch.int8)
+        self.node_field = torch.empty(self.total, dtype=torch.int32)
+        for i, (table, start) in enumerate(zip(tables, offsets)):
+            rows = slice(int(start), int(start) + table.nodes)
+            self.scale[rows] = torch.from_numpy(table.scale)
+            self.fixed[rows] = torch.from_numpy(table.fixed)
+            self.mask[rows] = torch.from_numpy(table.mask)
+            self.next_node[rows] = torch.from_numpy(
+                np.where(table.next_node >= 0, table.next_node + start, -1).astype(np.int32)
+            )
+            self.node_t[rows] = torch.from_numpy(table.node_t.astype(np.int8))
+            self.node_history[rows] = torch.from_numpy(table.node_history)
+            self.node_field[rows] = i
 
-        def cat(parts, dtype):
-            return torch.as_tensor(np.concatenate(parts), dtype=dtype, device=device)
+        def stack(parts, dtype):
+            return torch.as_tensor(np.stack(parts), dtype=dtype, device=device)
 
-        # Half precision (about 0.5 USD at 1,000 USD/acre) keeps 45 years of every field on an
-        # 8 GB card; exact scoring reads the tables themselves.
-        reward = np.empty((int(offsets[-1]), *tables[0].reward.shape[1:]), dtype=np.float16)
-        for table, start in zip(tables, offsets):
-            reward[start : start + table.nodes] = table.reward
-        self.reward = torch.as_tensor(reward, device=device)
-        self.mask = cat([t.mask for t in tables], torch.bool)
-        self.next_node = cat(following, torch.long)
-        self.node_t = cat([t.node_t for t in tables], torch.long)
-        self.node_history = cat([t.node_history for t in tables], torch.long)
-        self.node_field = cat(
-            [np.full(t.nodes, i, dtype=np.int64) for i, t in enumerate(tables)], torch.long
-        )
-        self.odds = cat([t.odds[None] for t in tables], torch.float32)
-        self.signals = cat([t.signals[None] for t in tables], torch.float32)
-        self.statics = cat([t.statics[None] for t in tables], torch.float32)
+        self.gain = stack([t.gain for t in tables], torch.float32)  # [field, slot, year]
+        self.weather = stack([t.weather for t in tables], torch.float32)
+        self.odds = stack([t.odds for t in tables], torch.float32)
+        self.signals = stack([t.signals for t in tables], torch.float32)
+        self.statics = stack([t.statics for t in tables], torch.float32)
         self.first = torch.as_tensor([t.first for t in tables], device=device)
         self.horizon = torch.as_tensor([t.horizon for t in tables], device=device)
+        # expected gain and weather term of the coming year: [field, year just experienced, slot]
+        self.gain_ahead = torch.einsum("fpy,fsy->fps", self.odds, self.gain)
+        self.weather_ahead = torch.einsum("fpy,fsy->fps", self.odds, self.weather)
+        crops = stack([t.crops for t in tables], torch.long)  # [field, slot], -1 unused
+        slot = torch.as_tensor(SLOT, device=device)
+        within = torch.arange(LOCAL, device=device) % SUB
+        # local action -> global action; unused slots point at a spare column that is dropped
+        self.to_global = torch.where(crops >= 0, crops, len(CROPS))[:, slot] * SUB + within
+        self.slot_of_crop = torch.full((len(tables), len(CROPS) + 1), 0, device=device)
+        self.slot_of_crop.scatter_(
+            1, torch.where(crops >= 0, crops, len(CROPS)), slot[::SUB].expand_as(crops)
+        )
+        self.slot = slot
 
     def __len__(self) -> int:
         return len(self.tables)
 
     def observe(self, node: torch.Tensor, prev: torch.Tensor):
-        """(network input, action mask) for decisions at `node` after year `prev`."""
-        field = self.node_field[node]
-        odds = self.odds[field, prev]  # [B, year]
-        expected = torch.einsum("bay,by->ba", self.reward[node].float(), odds)
-        mask = self.mask[node]
+        """(network input, global action mask) for decisions at `node` (a CPU index tensor)
+        after year `prev` (on the device)."""
+        device = self.device
+        field = self.node_field[node].long().to(device)
+        scale, fixed = self.scale[node].to(device), self.fixed[node].to(device)
+        local_mask = self.mask[node].to(device)
+        ahead = self.gain_ahead[field, prev][:, self.slot]
+        expected_local = scale * ahead + fixed + self.weather_ahead[field, prev][:, self.slot]
+        index = self.to_global[field]
+        expected = torch.zeros((len(node), N_ACTIONS + SUB), device=device)
+        mask = torch.zeros((len(node), N_ACTIONS + SUB), dtype=torch.bool, device=device)
+        expected.scatter_(1, index, expected_local)
+        mask.scatter_(1, index, local_mask)
+        expected, mask = expected[:, :N_ACTIONS], mask[:, :N_ACTIONS]
         obs = encode(
             expected,
             mask,
-            self.horizon[field] - self.node_t[node],
-            self.node_history[node],
+            self.horizon[field] - self.node_t[node].to(device),
+            self.node_history[node].to(device),
             self.signals[field, prev],
             self.statics[field],
         )
         return obs, mask
 
+    def local_action(self, node: torch.Tensor, action: torch.Tensor) -> torch.Tensor:
+        """Global action index (device) -> the field's local action index (device)."""
+        field = self.node_field[node].long().to(self.device)
+        return self.slot_of_crop[field, action // SUB] * SUB + action % SUB
+
+    def step(self, node: torch.Tensor, action: torch.Tensor, year: torch.Tensor):
+        """(reward in USD/acre on the device, next node on the CPU) of global `action` in `year`."""
+        local = self.local_action(node, action)
+        local_cpu = local.cpu()
+        field = self.node_field[node].long().to(self.device)
+        slot = local // SUB
+        scale = self.scale[node, local_cpu].to(self.device)
+        fixed = self.fixed[node, local_cpu].to(self.device)
+        reward = scale * self.gain[field, slot, year] + fixed + self.weather[field, slot, year]
+        return reward, self.next_node[node, local_cpu // SUB].long().clamp(min=0)
+
     @property
     def inputs(self) -> int:
-        node = torch.zeros(1, dtype=torch.long, device=self.device)
-        return self.observe(node, node)[0].shape[1]
+        node = torch.zeros(1, dtype=torch.long)
+        return self.observe(node, node.to(self.device))[0].shape[1]
 
 
 @dataclass
@@ -152,17 +202,20 @@ class Config:
 
 
 def greedy_choices(net: PolicyNet, data: FieldSet, batch: int = 65536) -> list[np.ndarray]:
-    """The policy's most likely action for every [node, year just experienced] of every field."""
-    nodes = torch.arange(len(data.node_t), device=data.device).repeat_interleave(MAX_YEARS)
-    prev = torch.arange(MAX_YEARS, device=data.device).repeat(len(data.node_t))
+    """The policy's most likely local action for every [node, year just experienced] of every
+    field."""
+    years = torch.arange(MAX_YEARS, device=data.device)
+    rows = max(1, batch // MAX_YEARS)
     picks = []
     net.eval()
     with torch.no_grad():
-        for i in range(0, len(nodes), batch):
-            obs, mask = data.observe(nodes[i : i + batch], prev[i : i + batch])
-            picks.append(net(obs, mask)[0].argmax(dim=1))
+        for start in range(0, data.total, rows):
+            node = torch.arange(start, min(start + rows, data.total)).repeat_interleave(MAX_YEARS)
+            obs, mask = data.observe(node, years.repeat(len(node) // MAX_YEARS))
+            action = net(obs, mask)[0].argmax(dim=1)
+            picks.append(data.local_action(node, action).view(-1, MAX_YEARS).cpu())
     net.train()
-    flat = torch.cat(picks).view(-1, MAX_YEARS).cpu().numpy()
+    flat = torch.cat(picks).numpy()
     sizes = np.cumsum([t.nodes for t in data.tables])[:-1]
     return np.split(flat, sizes)
 
@@ -174,7 +227,7 @@ def benchmark(net: PolicyNet, data: FieldSet) -> dict:
         best, _ = score(table)
         learned, _ = score(table, choice)
         short, _ = score(table, myopic_choice)
-        rows.append((best, learned, short, int(table.statics[-12::3].sum())))
+        rows.append((best, learned, short, int((table.crops >= 0).sum())))
     best, learned, short, crops = (np.asarray(c, dtype=np.float64) for c in zip(*rows))
     gap = best - short
 
@@ -215,8 +268,10 @@ def train(data: FieldSet, config: Config = Config(), watch: FieldSet | None = No
         entropy_weight = config.entropy + (config.entropy_end - config.entropy) * progress
 
         # -- collect one plan per environment ---------------------------------------------
-        field = torch.randint(len(data), (config.envs,), device=device)
-        node, prev = data.root[field], data.first[field]
+        field = torch.randint(len(data), (config.envs,))
+        node = data.root_cpu[field]
+        field = field.to(device)
+        prev = data.first[field]
         kept = {k: [] for k in ("obs", "mask", "action", "logp", "value", "reward")}
         with torch.no_grad():
             for _ in range(horizon):
@@ -225,12 +280,13 @@ def train(data: FieldSet, config: Config = Config(), watch: FieldSet | None = No
                 policy = torch.distributions.Categorical(logits=logits)
                 action = policy.sample()
                 year = torch.multinomial(data.odds[field, prev], 1).squeeze(1)
-                reward = data.reward[node, action, year].float() / REWARD_SCALE
+                reward, following = data.step(node, action, year)
+                reward = reward / REWARD_SCALE
                 for key, item in zip(
                     kept, (obs, mask, action, policy.log_prob(action), value, reward)
                 ):
                     kept[key].append(item)
-                node, prev = data.next_node[node, action].clamp(min=0), year
+                node, prev = following, year
         values, rewards = torch.stack(kept["value"]), torch.stack(kept["reward"])
         advantage = torch.zeros_like(rewards)
         running = torch.zeros(config.envs, device=device)

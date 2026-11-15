@@ -7,7 +7,7 @@ from statistics import median
 
 from rule_engine.engine import RotationAdvisor
 from rule_engine.facts import HISTORY_WINDOW, crop_history
-from rule_engine.summary import SeasonSummary, SeasonSummaryStore
+from rule_engine.summary import SeasonSummary, SeasonSummaryStore, summary_key
 
 
 @dataclass(frozen=True)
@@ -53,13 +53,13 @@ def build_context(
 ) -> FieldContext:
     region, gaps = advisor.region_for(record)
     seasons: dict[int, SeasonSummary] = {}
-    csbid, county = record.get("sourceId"), record.get("countyFips")
+    csbid, county, own = summary_key(record)
     for root in summary_roots:
         if csbid and county:
             for season in SeasonSummaryStore(root).seasons(str(csbid), str(county)):
                 seasons[season.year] = season
     ordered = [seasons[y] for y in sorted(seasons)]
-    history = [y for y in crop_history(record, ordered, advisor.catalog) if y.crop]
+    history = [y for y in crop_history(record, ordered if own else [], advisor.catalog) if y.crop]
     if not seasons:
         gaps = gaps + [{"code": "no_season_summary", "affects": ["weather", "yield"]}]
     if not history:

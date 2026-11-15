@@ -70,7 +70,7 @@ rules:
   - id: droughty_soil_high_water_demand
     title: High water demand on a soil that stores little water
     category: water
-    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture, fiber_crop, root_crop, perennial_cane]}
     when:
       - {fact: candidate.water_demand, op: eq, value: high}
       - {fact: field.soil.aws_100cm_mm, op: lt, value: 100}
@@ -83,7 +83,7 @@ rules:
   - id: sandy_soil_high_water_demand
     title: High water demand on a sandy soil
     category: water
-    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture]}
+    applies_to: {groups: [warm_season_grain, small_grain, grain_legume, perennial_forage_legume, grass_hay_pasture, fiber_crop, root_crop, perennial_cane]}
     when:
       - {fact: candidate.water_demand, op: eq, value: high}
       - {fact: field.soil.aws_100cm_mm, op: is_null}

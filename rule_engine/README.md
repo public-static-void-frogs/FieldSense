@@ -50,6 +50,7 @@ farmer is left to the consumer, such as an LLM agent:
 
 - `historySource`: {kind `cdl | declared | none`, seasons, firstYear, lastYear,
   `satelliteEstimate`}, plus `history[]` and `seasonsAvailable[]`.
+  `summarySource` says whose seasons those are (see "Fields outside the sample").
 - `candidates[]`, ranked (lower `score` is better). Each one has:
   - `scoreBreakdown[]`: the points per rule and the `income_rank` entry; the points sum to `score`.
   - `economicsAvailable`.
@@ -176,8 +177,10 @@ assessed on the declared crop, with the missing context listed in `dataGaps`.
 
 The region is resolved per field: the state from `stateFips`, else from the first two digits
 of `countyFips` (`regions.py`). The result carries it as `region`. `build_advisor(region="IA")`
-only sets the fallback for a field without a state or in a state with no candidate crops; that
-fallback adds the gap `region_not_supported`.
+only sets the fallback for a field without a known state (gap `region_unknown`) or in a state
+with no candidate crops (gap `region_not_supported`). The backend gives a field the user adds the
+state and county of the nearest catalog field within about 15 km (`app/services/maps.py`), so
+only a field far from every catalog field falls back.
 
 | Table | Built by | Content |
 | --- | --- | --- |
@@ -214,9 +217,10 @@ back to the crop or group default (`calendar_not_nass`), which was written for I
   without a price) gets 0 income points, not a penalty. `economicsAvailable: false` marks it,
   and it loses ties.
 - CDL/CSB crop labels are satellite estimates, not farmer-declared ground truth.
-- Outside Iowa: 30 % of sampled fields get an Iowa-based default calendar; cotton, rice,
-  peanuts, durum, sugarbeets and potatoes are not in the catalog, so their history years are
-  unknown; rule thresholds were written for the Corn Belt and have not been reviewed elsewhere.
+- Outside Iowa: 30 % of sampled fields get an Iowa-based default calendar; triticale and the
+  CDL double-crop classes are in the catalog for history but not planned; rule thresholds were
+  written for the Corn Belt and have not been reviewed elsewhere (the rotation yield rules for
+  peanuts, potatoes, sugarbeets, pulses and flax come from trials in their own regions).
 - With no priorities the score is agronomic risk only, so hay or pasture ranks first on every
   sampled field. Use the `income` priority, or read the rank among cash crops.
 - Soil, tillage, cover-crop and herbicide rules only fire on declared inputs; nothing is
@@ -226,3 +230,22 @@ back to the crop or group default (`calendar_not_nass`), which was written for I
   Sorghum, other hay and pasture have no plant-back column and are reported as unknown.
 - Double-crop winter wheat / soybeans is a ranked candidate but has no yield or price, and
   carries a fixed high risk for Iowa (ISU trials).
+
+## Fields outside the sample
+
+Season summaries exist only for sampled fields. The large national sample
+(`rule_engine/planner/scripts/build_cell_chunks.py`) takes one CSB field per gridMET weather cell
+(1/24 degree, about 4 km) and county: 362,105 fields in 3,087 counties. Everything in a season
+summary except the crop labels (weather, Drought Monitor, county yield, county insurance losses)
+is the same for all fields of one cell and county, so any other field reads the sampled field
+there. `rule_engine/cells.py` finds it from `<data root>/summary_index.parquet`:
+
+1. the field itself, when it is sampled: `summarySource.kind = "own"`;
+2. the sampled field of the same cell and county: `"weather_cell"`;
+3. the nearest sampled cell of the same county, up to 40 km: `"nearby_cell"`, with `distanceKm`
+   between cell centres. The county is kept before distance because the county yield is.
+4. otherwise no seasons: `"none"` and the `no_season_summary` gap.
+
+The caller puts the result on the field record as `summaryTwin` (`sourceId`, `countyFips`,
+`source`, `distanceKm`). Crop history and soil are never taken from the stand-in field: the
+history comes from the field's own CDL labels, the soil from its own map unit.

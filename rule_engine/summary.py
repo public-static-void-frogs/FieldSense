@@ -69,6 +69,26 @@ class SeasonSummary:
         return {"sum": sum, "min": min, "max": max}[aggregate](values)
 
 
+def summary_key(field: dict) -> tuple[str | None, str | None, bool]:
+    """(field id, county, own) the summaries of a field are stored under.
+
+    A field outside the sample reads the sampled field of its weather cell (`summaryTwin`, set by
+    the caller from rule_engine.cells). Those summaries then carry another field's crop labels.
+    """
+    twin = field.get("summaryTwin") or {}
+    csbid = twin.get("sourceId") or field.get("sourceId")
+    county = twin.get("countyFips") or field.get("countyFips")
+    return csbid, county, twin.get("source", "own") == "own"
+
+
+def summary_source(field: dict, seasons: list) -> dict:
+    """What the season summaries of a field rest on, for the response."""
+    twin = field.get("summaryTwin") or {}
+    if not seasons:
+        return {"kind": "none", "distanceKm": None}
+    return {"kind": twin.get("source", "own"), "distanceKm": twin.get("distanceKm", 0.0)}
+
+
 class SeasonSummaryStore:
     """Per-field access to summary parquets laid out as <root>/<year>/<county_fips>.parquet."""
 

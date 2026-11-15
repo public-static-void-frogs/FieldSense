@@ -3,7 +3,7 @@ rules:
   - id: low_rotation_diversity
     title: Low rotation diversity (weeds and herbicide resistance)
     category: diversity
-    applies_to: {groups: [warm_season_grain, grain_legume]}
+    applies_to: {groups: [warm_season_grain, grain_legume, fiber_crop]}
     when:
       - {fact: history.years, op: ge, value: 3}
       - {fact: history.distinct_groups_5y, op: le, value: 2}

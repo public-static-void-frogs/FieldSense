@@ -26,7 +26,14 @@ from rule_engine.reference import ReferenceTables, StageCalendar, localize
 from rule_engine.regions import field_region
 from rule_engine.rules import Rule, RuleSet, applies, check
 from rule_engine.soil import DerivedSoilIndicators, SoilHealthProvider
-from rule_engine.summary import ClimateRecord, ClimateRecordStore, SeasonSummary, SeasonSummaryStore
+from rule_engine.summary import (
+    ClimateRecord,
+    ClimateRecordStore,
+    SeasonSummary,
+    SeasonSummaryStore,
+    summary_key,
+    summary_source,
+)
 from rule_engine.yield_model import (
     YieldModel,
     apply_yield_factors,
@@ -120,7 +127,7 @@ class RotationAdvisor:
         """The field's state when the catalog has candidate crops for it, else the default."""
         state = field_region(field)
         if state is None:
-            return self.region, []
+            return self.region, [_gap("region_unknown", usedRegion=self.region)]
         if self.catalog.candidates(state):
             return state, []
         return self.region, [_gap("region_not_supported", state=state, usedRegion=self.region)]
@@ -133,9 +140,10 @@ class RotationAdvisor:
         unknown = set(priorities) - set(PRIORITY_CATEGORIES)
         if unknown:
             raise ValueError(f"unknown priorities {sorted(unknown)}")
-        csbid, county = field.get("sourceId"), field.get("countyFips")
+        csbid, county, own = summary_key(field)
         seasons = self.summaries.seasons(str(csbid), str(county)) if csbid and county else []
-        history = crop_history(field, seasons, self.catalog)
+        # a stand-in field's summaries carry that field's crop labels, not this one's
+        history = crop_history(field, seasons if own else [], self.catalog)
         climate = self.climate.record(*self._position(field, seasons)) if self.climate else None
         area_ha = float(field.get("area") or 0.0)
 
@@ -180,6 +188,7 @@ class RotationAdvisor:
                 for y in history
             ],
             "seasonsAvailable": [s.year for s in seasons],
+            "summarySource": summary_source(field, seasons),
             "weatherRecord": climate.describe() if climate else None,
             "offSeason": self._off_season(field, history, region, climate),
             "candidates": assessed,
@@ -540,6 +549,7 @@ class RotationAdvisor:
         return {
             "kind": kind,
             "seasons": len(history),
+            "declaredSeasons": sum(y.source == "declared" for y in history),
             "firstYear": history[0].year if history else None,
             "lastYear": history[-1].year if history else None,
             "satelliteEstimate": kind == "cdl",  # CDL is a classification, not a farmer record

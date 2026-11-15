@@ -44,6 +44,10 @@ def crop_history(field: dict, seasons: list[SeasonSummary], catalog: Catalog) ->
         years[int(match.group(1))] = HistoryYear(
             int(match.group(1)), crop.id if crop else None, code, "cdl"
         )
+    # the farmer's own record of what grew replaces the satellite label of that year
+    for year, crop_id in (field.get("declaredHistory") or {}).items():
+        if crop_id in catalog.crops:
+            years[int(year)] = HistoryYear(int(year), crop_id, None, "declared")
     if not years:
         for season in seasons:
             for offset, code in ((1, season.cdl_prev1), (2, season.cdl_prev2)):
@@ -89,11 +93,12 @@ def history_facts(history: list[HistoryYear], candidate: Crop, catalog: Catalog)
         if crop.value("family") != family:
             break
         consecutive_family += 1
-    since_family = None
+    since_family = since_crop = None
     for index, crop in enumerate(newest_first, start=1):
-        if crop.value("family") == family:
+        if since_family is None and crop.value("family") == family:
             since_family = index
-            break
+        if since_crop is None and crop.id == candidate.id:
+            since_crop = index
     alternation = 0
     for index, crop in enumerate(newest_first):
         if crop.id not in ("corn", "soybeans"):
@@ -109,6 +114,7 @@ def history_facts(history: list[HistoryYear], candidate: Crop, catalog: Catalog)
             "history.consecutive_same_crop": consecutive_crop,
             "history.consecutive_same_family": consecutive_family,
             "history.years_since_same_family": since_family,
+            "history.years_since_same_crop": since_crop,
             "history.distinct_groups_5y": len({c.group.id for c in recent}),
             "history.share_same_crop_5y": (
                 sum(c.id == candidate.id for c in recent) / len(recent) if recent else 0.0

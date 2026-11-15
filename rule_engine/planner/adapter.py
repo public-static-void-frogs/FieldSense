@@ -86,6 +86,7 @@ class RuleAdapter:
         }
         self._history_cache: dict = {}
         self._weather_cache: dict = {}
+        self._rules_cache: dict = {}
 
     def field_with(self, tillage: str | None, cover: str | None) -> dict:
         practices = dict(self.context.field.get("practices") or {})
@@ -100,6 +101,18 @@ class RuleAdapter:
     def _points(self, rule, level) -> tuple[float, dict]:
         finding = self.advisor._finding(rule, level)
         return self.advisor._points(finding, self.priorities), finding
+
+    def _rotation_rules(self, crop) -> tuple:
+        """Rules without a hazard or county fact that apply to `crop` (fixed per crop)."""
+        if crop.id not in self._rules_cache:
+            self._rules_cache[crop.id] = tuple(
+                rule
+                for rule in self.advisor.rules.rules
+                if rule.hazard is None
+                and rule.id not in self.county_rule_ids
+                and applies(rule, crop, self.advisor.catalog)
+            )
+        return self._rules_cache[crop.id]
 
     def history_part(
         self, history: tuple[str, ...], crop_id: str, tillage: str, cover: str
@@ -118,11 +131,7 @@ class RuleAdapter:
         calendar = advisor.reference.calendar(crop, self.context.region)
         facts.update(herbicide_facts(field, crop, calendar, advisor.plantback)[0])
         point_rules, yield_rules, weak = [], [], []
-        for rule in advisor.rules.rules:
-            if rule.hazard is not None or rule.id in self.county_rule_ids:
-                continue
-            if not applies(rule, crop, advisor.catalog):
-                continue
+        for rule in self._rotation_rules(crop):
             if not all(check(c, facts)[0] for c in rule.when):
                 continue
             points, finding = self._points(rule, rule.effect.level)
