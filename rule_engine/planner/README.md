@@ -13,13 +13,13 @@ python -m rule_engine.planner --field 191825000034355 \
 
 ## The decision problem
 
-| Part     | Definition                                                                                                                                                                                                                 |
-| -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| State    | Plan year, the last five crops, two soil carbon pools, and the year just experienced. |
+| Part     | Definition                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| State    | Plan year, the last five crops, two soil carbon pools, and the year just experienced.                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
 | Action   | Crop × tillage (`conventional`, `strip_till`, `no_till`) × cover crop before it (`none`, `rye`). Invalid combinations are masked: a standing perennial is not tilled, and rye goes only before warm-season annual crops. A perennial stand is kept for its minimum life and ended at its maximum (`crop_adjustments.csv`: sugarcane stands three harvests, then a fallow year). Sugarbeets and flax come back no sooner than every third year (`{crop}_min_return_years`: NDSU guidance; CDL shows 6.9 % of beet and 4.2 % of flax fields returning sooner). |
-| Chance   | One whole historical year is drawn each step: its weather, yields and prices together, so their real correlation is kept. The odds of each year depend on the year just experienced (see below). |
-| Reward   | USD per acre per year: revenue − production cost − risk penalty + soil carbon value. Land cost is excluded.                                                                                                                |
-| Dynamics | The crop history shifts by one and the soil carbon pools take one yearly step; the year just experienced is the drawn year. |
+| Chance   | One whole historical year is drawn each step: its weather, yields and prices together, so their real correlation is kept. The odds of each year depend on the year just experienced (see below).                                                                                                                                                                                                                                                                                                                                                             |
+| Reward   | USD per acre per year: revenue − production cost − risk penalty + soil carbon value. Land cost is excluded.                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Dynamics | The crop history shifts by one and the soil carbon pools take one yearly step; the year just experienced is the drawn year.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 
 Sugarbeets, sugarcane and potatoes are sold under contract to a nearby factory, mill or packer.
 They are planned only in the counties of `data/processor_counties.csv`
@@ -92,7 +92,8 @@ every sixth of the rest, 2,543 in all; 2,254 for training, 289 in held-out count
 | 4 crops (10)    | 488.6         | 463.4          | 441.8             | 46 %       |
 | 5 crops (262)   | 606.2         | 595.4          | 544.8             | 82 %       |
 
-One held-out field has two crops and is not shown. The learned policy is within 1 % of the optimum
+One held-out field has two crops and is not shown; a table holds at most five crops per field.
+The learned policy is within 1 % of the optimum
 on 69 % of held-out fields, falls 10.7 USD short of it on average, and trails the year-by-year
 rule on 18 %. On its training fields it closes 94 % of the gap. It is an approximation: where the
 exact plan is affordable, use it. A longer run on every field is the next step.
@@ -177,6 +178,7 @@ order it was trained with, and `learned.load_policy` refuses a file whose order 
   - chickpea after pea or lentil borrows the pea range;
   - flax is farm records;
   - the 0.87 end of the two rye-before-corn rules is ISU SP 435's mean less one SD.
+
 - **Price.** The rule engine's current planning price × that year's price change: the year's
   marketing-year price over the previous year's, in constant dollars (CPI-U, `data/cpi_u.csv`),
   scaled to mean 1. See [Backtest](#backtest) for why it is the change and not the price level. `data/nass_long_history.csv`
@@ -281,16 +283,16 @@ year (`data/costs_regional_history.csv`, land excluded). Run on the 30,000-field
 (one field per county, counties with at least 15 earlier yields), target years 1997–2025:
 45,793 corn forecasts in 2,018 counties and 36,888 soybean forecasts in 1,673 counties.
 
-| Forecast variant                                   | Crop     | Mean predicted loss chance | Observed loss share | Brier skill | Actual inside p10–p90 | Mean net forecast / actual, USD/ac |
-| -------------------------------------------------- | -------- | -------------------------- | ------------------- | ----------- | --------------------- | ---------------------------------- |
-| Price level, analog odds (the model before)        | corn     | 0.59                       | 0.38                | 0.11        | 0.63                  | 33 / 82                            |
-| Price level, equal odds                            | corn     | 0.51                       | 0.38                | 0.31        | 0.88                  | 58 / 82                            |
-| Price change, trend one year ahead, equal odds     | corn     | 0.44                       | 0.38                | 0.39        | 0.75                  | 78 / 82                            |
-| Price change, trend one year ahead, analog (now)   | corn     | 0.41                       | 0.38                | 0.41        | 0.75                  | 87 / 82                            |
-| Price level, analog odds (the model before)        | soybeans | 0.41                       | 0.24                | 0.15        | 0.68                  | 69 / 101                           |
-| Price level, equal odds                            | soybeans | 0.35                       | 0.24                | 0.32        | 0.83                  | 84 / 101                           |
-| Price change, trend one year ahead, equal odds     | soybeans | 0.28                       | 0.24                | 0.37        | 0.75                  | 99 / 101                           |
-| Price change, trend one year ahead, analog (now)   | soybeans | 0.25                       | 0.24                | 0.36        | 0.71                  | 106 / 101                          |
+| Forecast variant                                 | Crop     | Mean predicted loss chance | Observed loss share | Brier skill | Actual inside p10–p90 | Mean net forecast / actual, USD/ac |
+| ------------------------------------------------ | -------- | -------------------------- | ------------------- | ----------- | --------------------- | ---------------------------------- |
+| Price level, analog odds (the model before)      | corn     | 0.59                       | 0.38                | 0.11        | 0.63                  | 33 / 82                            |
+| Price level, equal odds                          | corn     | 0.51                       | 0.38                | 0.31        | 0.88                  | 58 / 82                            |
+| Price change, trend one year ahead, equal odds   | corn     | 0.44                       | 0.38                | 0.39        | 0.75                  | 78 / 82                            |
+| Price change, trend one year ahead, analog (now) | corn     | 0.41                       | 0.38                | 0.41        | 0.75                  | 87 / 82                            |
+| Price level, analog odds (the model before)      | soybeans | 0.41                       | 0.24                | 0.15        | 0.68                  | 69 / 101                           |
+| Price level, equal odds                          | soybeans | 0.35                       | 0.24                | 0.32        | 0.83                  | 84 / 101                           |
+| Price change, trend one year ahead, equal odds   | soybeans | 0.28                       | 0.24                | 0.37        | 0.75                  | 99 / 101                           |
+| Price change, trend one year ahead, analog (now) | soybeans | 0.25                       | 0.24                | 0.36        | 0.71                  | 106 / 101                          |
 
 Brier skill is 1 − Brier score ÷ the Brier score of always predicting the observed loss share
 (0 = no better than that constant, 1 = perfect).
