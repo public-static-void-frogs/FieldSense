@@ -1,4 +1,6 @@
-import { Collapse, Table, Typography } from 'antd';
+import { Flex, Segmented, Table, Typography } from 'antd';
+import { ArrowDown, ArrowUp, Equal } from 'lucide-react';
+import { useState, type ReactNode } from 'react';
 import { useTranslation } from 'react-i18next';
 import type {
   RotationAdvice,
@@ -16,6 +18,7 @@ type PlanForecastProps = { advice: RotationAdvice; plan: RotationPlan; entry: Ro
 
 export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
   const { t, i18n } = useTranslation();
+  const [view, setView] = useState<'chart' | 'data'>('chart');
   const language = i18n.language;
   const name = cropNamer(advice);
   const { firstSeason, plan: wholePlan } = entry.simulation;
@@ -23,87 +26,114 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
   const year = plan.firstSeason;
   const top = rankedPlanCrops(plan)[0];
   const usd = (value: number) => formatSignedUsd(value, language);
+  const yieldValue = (value: number) => formatNumber(value, language);
+  const priceValue = (value: number) => formatNumber(value, language, 2);
   const chartLabel = t('Result per acre in {{year}} under each past year', { year });
+  const previousYear = firstSeason.outcomes.find((outcome) => outcome.year + 1 === year);
+  const previousYield = previousYear?.yieldMode === 'none' ? undefined : previousYear?.yieldPerAcre;
+  const compare = (
+    current: number,
+    previous: number | undefined,
+    format: (value: number) => string,
+  ) => {
+    if (!previousYear || previous === undefined) {
+      return undefined;
+    }
+
+    const previousValue = format(previous);
+
+    return {
+      direction: format(current) === previousValue ? 0 : Math.sign(current - previous),
+      label: t('vs {{value}} in the {{year}} replay', {
+        value: previousValue,
+        year: previousYear.year,
+      }),
+    };
+  };
 
   return (
     <section className="rotation-forecast">
+      <Flex
+        className="rotation-forecast-toolbar"
+        align="center"
+        justify="space-between"
+        gap={8}
+        wrap
+      >
+        <Typography.Title level={5}>{chartLabel}</Typography.Title>
+        <Segmented<'chart' | 'data'>
+          size="small"
+          aria-label={t('View for {{label}}', { label: chartLabel })}
+          value={view}
+          onChange={setView}
+          options={[
+            { label: t('Chart'), value: 'chart' },
+            { label: t('Data'), value: 'data' },
+          ]}
+        />
+      </Flex>
+      {view === 'chart' ? (
+        <OutcomeChart outcomes={firstSeason.outcomes} yieldUnit={yields.unit} label={chartLabel} />
+      ) : (
+        <OutcomeTable outcomes={firstSeason.outcomes} yieldUnit={yields.unit} />
+      )}
       <Typography.Title level={5}>{t('Forecast for {{year}}', { year })}</Typography.Title>
-      <dl className="rotation-stats rotation-stats-wide">
-        <div>
-          <dt>{t('Chance of a loss')}</dt>
-          <dd>{formatPercent(firstSeason.lossProbability, language)}</dd>
-        </div>
-        <div>
-          <dt>{t('Typical result per acre')}</dt>
-          <dd>{usd(firstSeason.p50UsdPerAcre)}</dd>
-        </div>
-        <div>
-          <dt>{t('Poor year to good year')}</dt>
-          <dd>
+      <dl className="rotation-forecast-metrics">
+        <ForecastMetric label={t('Chance of a loss')}>
+          {formatPercent(firstSeason.lossProbability, language)}
+        </ForecastMetric>
+        <ForecastMetric
+          label={t('Typical result per acre')}
+          comparison={compare(firstSeason.p50UsdPerAcre, previousYear?.netUsdPerAcre, usd)}
+        >
+          {usd(firstSeason.p50UsdPerAcre)}
+        </ForecastMetric>
+        <ForecastMetric label={t('Poor year to good year')}>
+          {t('{{low}} to {{high}}', {
+            low: usd(firstSeason.p10UsdPerAcre),
+            high: usd(firstSeason.p90UsdPerAcre),
+          })}
+        </ForecastMetric>
+        <ForecastMetric
+          label={t('Expected yield, {{unit}}', { unit: yields.unit })}
+          comparison={compare(yields.meanPerAcre, previousYield, yieldValue)}
+        >
+          {yieldValue(yields.meanPerAcre)}{' '}
+          <small>
             {t('{{low}} to {{high}}', {
-              low: usd(firstSeason.p10UsdPerAcre),
-              high: usd(firstSeason.p90UsdPerAcre),
+              low: yieldValue(yields.p10PerAcre),
+              high: yieldValue(yields.p90PerAcre),
             })}
-          </dd>
-        </div>
-        <div>
-          <dt>{t('Expected yield, {{unit}}', { unit: yields.unit })}</dt>
-          <dd>
-            {formatNumber(yields.meanPerAcre, language)}{' '}
-            <small>
-              {t('{{low}} to {{high}}', {
-                low: formatNumber(yields.p10PerAcre, language),
-                high: formatNumber(yields.p90PerAcre, language),
-              })}
-            </small>
-          </dd>
-        </div>
-        <div>
-          <dt>{t('Planning price, USD per {{unit}}', { unit: yields.unit.split('/')[0] })}</dt>
-          <dd>{formatNumber(firstSeason.planningPriceUsd, language, 2)}</dd>
-        </div>
-        <div>
-          <dt>{t('Worst year on record')}</dt>
-          <dd>
-            {usd(firstSeason.worst.netUsdPerAcre)} <small>{firstSeason.worst.year}</small>
-          </dd>
-        </div>
-        <div>
-          <dt>{t('Best year on record')}</dt>
-          <dd>
-            {usd(firstSeason.best.netUsdPerAcre)} <small>{firstSeason.best.year}</small>
-          </dd>
-        </div>
+          </small>
+        </ForecastMetric>
+        <ForecastMetric
+          label={t('Planning price, USD per {{unit}}', { unit: yields.unit.split('/')[0] })}
+          comparison={compare(firstSeason.planningPriceUsd, previousYear?.priceUsd, priceValue)}
+        >
+          {priceValue(firstSeason.planningPriceUsd)}
+        </ForecastMetric>
+        <ForecastMetric label={t('Worst year on record')}>
+          {usd(firstSeason.worst.netUsdPerAcre)} <small>{firstSeason.worst.year}</small>
+        </ForecastMetric>
+        <ForecastMetric label={t('Best year on record')}>
+          {usd(firstSeason.best.netUsdPerAcre)} <small>{firstSeason.best.year}</small>
+        </ForecastMetric>
         {firstSeason.beatsTopProbability !== null && top && top.crop !== entry.crop && (
-          <div>
-            <dt>{t('Earns at least as much as {{crop}}', { crop: t(name(top.crop)) })}</dt>
-            <dd>
-              {t('{{share}} of years', {
-                share: formatPercent(firstSeason.beatsTopProbability, language),
-              })}
-            </dd>
-          </div>
+          <ForecastMetric
+            label={t('Earns at least as much as {{crop}}', { crop: t(name(top.crop)) })}
+          >
+            {t('{{share}} of years', {
+              share: formatPercent(firstSeason.beatsTopProbability, language),
+            })}
+          </ForecastMetric>
         )}
       </dl>
-      <Typography.Title level={5}>{chartLabel}</Typography.Title>
-      <OutcomeChart outcomes={firstSeason.outcomes} yieldUnit={yields.unit} label={chartLabel} />
       <Typography.Paragraph type="secondary">
         {t(
           'Yields in {{observed}} of {{years}} years are county or state records; the others are modelled from that year’s weather. "Poor" and "good" mean one year in ten is worse or better.',
           { observed: firstSeason.observedYieldYears, years: firstSeason.years },
         )}
       </Typography.Paragraph>
-      <Collapse
-        ghost
-        size="small"
-        items={[
-          {
-            key: 'years',
-            label: t('Show the years as a table'),
-            children: <OutcomeTable outcomes={firstSeason.outcomes} yieldUnit={yields.unit} />,
-          },
-        ]}
-      />
       <Typography.Title level={5}>{t('Season by season')}</Typography.Title>
       <StepTable advice={advice} steps={entry.steps} />
       {wholePlan && plan.seasons > 1 && (
@@ -151,6 +181,43 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
         </>
       )}
     </section>
+  );
+}
+
+type ForecastMetricProps = {
+  label: string;
+  children: ReactNode;
+  comparison?: { direction: number; label: string };
+};
+
+function ForecastMetric({ label, children, comparison }: ForecastMetricProps) {
+  const { t } = useTranslation();
+  let Icon = Equal;
+  let direction = 'neutral';
+  let meaning = comparison ? t('Same value') : t('No year-over-year comparison');
+  if (comparison && comparison.direction > 0) {
+    Icon = ArrowUp;
+    direction = 'up';
+    meaning = t('Higher');
+  } else if (comparison && comparison.direction < 0) {
+    Icon = ArrowDown;
+    direction = 'down';
+    meaning = t('Lower');
+  }
+
+  return (
+    <div>
+      <dt>{label}:</dt>
+      <dd>
+        <span>{children}</span>
+        <span className="rotation-forecast-comparison">
+          <span className="rotation-forecast-indicator" data-direction={direction}>
+            <Icon size={17} strokeWidth={2.75} role="img" aria-label={meaning} />
+          </span>
+          {comparison && <small>{comparison.label}</small>}
+        </span>
+      </dd>
+    </div>
   );
 }
 
