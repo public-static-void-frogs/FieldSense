@@ -4,6 +4,7 @@ import { request } from '../core/http.ts';
 export type ChatStreamRequest = {
   messages: ChatMessage[];
   fieldId?: string;
+  calendarDate?: string;
   locale: string;
   signal: AbortSignal;
   onDelta: (delta: string) => void;
@@ -66,12 +67,25 @@ async function readChat(
 }
 
 export const assistantApi = {
-  streamChat: ({ messages, fieldId, locale, signal, onDelta, onTool }: ChatStreamRequest) =>
+  streamChat: ({
+    messages,
+    fieldId,
+    calendarDate,
+    locale,
+    signal,
+    onDelta,
+    onTool,
+  }: ChatStreamRequest) =>
     request(
       '/assistant/chat',
       {
         method: 'POST',
-        body: JSON.stringify({ messages, field_id: fieldId, locale }),
+        body: JSON.stringify({
+          messages,
+          field_id: fieldId,
+          calendar_date: calendarDate,
+          locale,
+        }),
         signal,
         timeoutMs: CHAT_TIMEOUT_MS,
       },

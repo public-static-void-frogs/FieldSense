@@ -2889,6 +2889,19 @@
             "title": "Field Id",
             "description": "The selected field. Field-specific tools (M3 insights, soil depletion, field crop alerts) use it. Omit for general questions."
           },
+          "calendar_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calendar Date",
+            "description": "The day selected on the calendar page. The session block tells the model, which reads that day's events with get_calendar_events."
+          },
           "tools": {
             "anyOf": [
               {

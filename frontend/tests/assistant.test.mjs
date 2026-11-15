@@ -20,6 +20,12 @@ import { classifyChatError } from '../src/features/assistant/utils/chatErrors.ts
 import { buildHistory } from '../src/features/assistant/utils/chatHistory.ts';
 import { progressLabel } from '../src/features/assistant/utils/chatProgress.ts';
 import { i18nOptions } from '../src/i18n/options.ts';
+import {
+  calendarAssistantIntro,
+  calendarAssistantPlaceholder,
+  calendarAssistantPrompt,
+  calendarAssistantSuggestions,
+} from '../src/features/planning/constants/calendarAssistant.constants.ts';
 
 // Compile the real JSX components for Node's test runner, using the same JSX runtime as Vite.
 registerHooks({
@@ -270,4 +276,42 @@ test('messages render as escaped plain text; empty answers, progress and errors 
   assert.match(failed, /The assistant is unavailable right now/);
   assert.match(failed, /Try again/);
   assert.match(failed, /role="alert"/);
+});
+
+test('a selected calendar day is sent as calendar_date and omitted otherwise', async (t) => {
+  configure(t);
+  const bodies = [];
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    bodies.push(JSON.parse(options.body));
+    return stream('{"done":true}\n');
+  });
+  await chat({ fieldId: undefined, calendarDate: '2026-11-20' }).promise;
+  await chat({ fieldId: undefined }).promise;
+  assert.equal(bodies[0].calendar_date, '2026-11-20');
+  assert.equal('field_id' in bodies[0], false);
+  assert.equal('calendar_date' in bodies[1], false);
+  assert.equal(progressLabel('get_calendar_events'), 'Reading calendar events…');
+});
+
+test('calendar assistant phrases exist in both catalogs and the chat list can show its own intro', async () => {
+  const en = readLocale('en');
+  const uk = readLocale('uk');
+  const phrases = [
+    calendarAssistantPrompt,
+    calendarAssistantIntro,
+    calendarAssistantPlaceholder,
+    ...calendarAssistantSuggestions,
+    toolProgressLabels.get_calendar_events,
+  ];
+  for (const phrase of phrases) {
+    assert.equal(en[phrase], phrase, `English catalog: ${phrase}`);
+    assert.ok(uk[phrase]?.trim() && uk[phrase] !== phrase, `Ukrainian catalog: ${phrase}`);
+  }
+  const html = await render({
+    intro: calendarAssistantIntro,
+    suggestions: calendarAssistantSuggestions,
+  });
+  assert.match(html, /Ask about the actions and warnings planned for this day\./);
+  assert.match(html, /What could delay these actions\?/);
+  assert.doesNotMatch(html, /Is there a frost risk this week\?/);
 });

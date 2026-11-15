@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 from uuid import UUID
 
@@ -28,6 +29,10 @@ class ChatRequest(BaseModel):
     field_id: UUID | None = Field(
         default=None,
         description="The selected field. Field-specific tools (M3 insights, soil depletion, field crop alerts) use it. Omit for general questions.",
+    )
+    calendar_date: date | None = Field(
+        default=None,
+        description="The day selected on the calendar page. The session block tells the model, which reads that day's events with get_calendar_events.",
     )
     tools: list[str] | None = Field(
         default=None,

@@ -46,6 +46,8 @@ def build_system_prompt(prompt: str, ctx: ChatContext) -> str:
     """Prompt plus a tiny session block. Field data itself is fetched through tools."""
     field = {"name": ctx.field.get("name"), "crop": ctx.field.get("crop")} if ctx.field else None
     session = {"locale": ctx.locale, "selected_field": field}
+    if ctx.calendar_date:
+        session["calendar_day"] = ctx.calendar_date.isoformat()
     return f"{prompt}\n\n{SESSION_HEADER}\n{json.dumps(session, ensure_ascii=False)}"
 
 

@@ -5,7 +5,11 @@ import type { AssistantErrorKind } from '../constants/assistant.constants.ts';
 import { buildHistory, type ChatEntry } from '../utils/chatHistory.ts';
 import { classifyChatError } from '../utils/chatErrors.ts';
 
-export function useAssistantChat(fieldId: string, locale: string) {
+export function useAssistantChat(
+  fieldId: string | undefined,
+  locale: string,
+  calendarDate?: string,
+) {
   const chat = useMutation(assistantMutations.chat());
   const [entries, setEntries] = useState<ChatEntry[]>([]);
   const [activeTool, setActiveTool] = useState<string | null>(null);
@@ -39,6 +43,7 @@ export function useAssistantChat(fieldId: string, locale: string) {
       await chat.mutateAsync({
         messages: buildHistory([...previous, question]),
         fieldId,
+        calendarDate,
         locale,
         signal: abort.signal,
         onDelta: (delta) => {
@@ -79,5 +84,28 @@ export function useAssistantChat(fieldId: string, locale: string) {
     controller.current?.abort();
   }
 
-  return { entries, activeTool, error, isStreaming: chat.isPending, send, retry, stop };
+  /** Drop the conversation and start a new one with this question (stops any running answer). */
+  function restart(text: string) {
+    controller.current?.abort();
+    void ask([], text);
+  }
+
+  function clear() {
+    controller.current?.abort();
+    setEntries([]);
+    setError(null);
+    setActiveTool(null);
+  }
+
+  return {
+    entries,
+    activeTool,
+    error,
+    isStreaming: chat.isPending,
+    send,
+    retry,
+    stop,
+    restart,
+    clear,
+  };
 }

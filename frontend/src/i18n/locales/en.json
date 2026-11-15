@@ -1418,5 +1418,14 @@
   "Rotation fit": "Rotation fit",
   "Rule-engine fit of the recommended crop against the current crop, rescaled across all candidate crops: 100 is the best-scoring crop, 0 the worst. It compares crops for this field; it does not predict yield.": "Rule-engine fit of the recommended crop against the current crop, rescaled across all candidate crops: 100 is the best-scoring crop, 0 the worst. It compares crops for this field; it does not predict yield.",
   "{{value0}} → {{value1}} → {{value2}} · {{value3}} outlook": "{{value0}} → {{value1}} → {{value2}} · {{value3}} outlook",
-  "Rule engine": "Rule engine"
+  "Rule engine": "Rule engine",
+  "Explain in more detail what is planned for {{date}}: why each action falls on that date, how to prepare and what could change it.": "Explain in more detail what is planned for {{date}}: why each action falls on that date, how to prepare and what could change it.",
+  "Ask about the actions and warnings planned for this day.": "Ask about the actions and warnings planned for this day.",
+  "Ask about this day…": "Ask about this day…",
+  "What could delay these actions?": "What could delay these actions?",
+  "What should I prepare beforehand?": "What should I prepare beforehand?",
+  "Is the weather suitable for this work?": "Is the weather suitable for this work?",
+  "Reading calendar events…": "Reading calendar events…",
+  "AI assistant": "AI assistant",
+  "Actions": "Actions"
 }

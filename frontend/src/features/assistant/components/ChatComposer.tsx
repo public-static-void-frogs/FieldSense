@@ -8,9 +8,15 @@ type ChatComposerProps = {
   isStreaming: boolean;
   onSend: (text: string) => void;
   onStop: () => void;
+  placeholder?: string;
 };
 
-export function ChatComposer({ isStreaming, onSend, onStop }: ChatComposerProps) {
+export function ChatComposer({
+  isStreaming,
+  onSend,
+  onStop,
+  placeholder = 'Ask about this field…',
+}: ChatComposerProps) {
   const { t } = useTranslation();
   const [text, setText] = useState('');
   const canSend = Boolean(text.trim()) && !isStreaming;
@@ -38,8 +44,8 @@ export function ChatComposer({ isStreaming, onSend, onStop }: ChatComposerProps)
         onPressEnter={handleEnter}
         autoSize={{ minRows: 1, maxRows: 5 }}
         maxLength={MAX_MESSAGE_CHARS}
-        placeholder={t('Ask about this field…')}
-        aria-label={t('Ask about this field…')}
+        placeholder={t(placeholder)}
+        aria-label={t(placeholder)}
       />
       <SendOrStop canSend={canSend} isStreaming={isStreaming} onSend={submit} onStop={onStop} />
     </Flex>

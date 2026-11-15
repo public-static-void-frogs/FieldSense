@@ -1418,5 +1418,14 @@
   "Rotation fit": "Відповідність сівозміни",
   "Rule-engine fit of the recommended crop against the current crop, rescaled across all candidate crops: 100 is the best-scoring crop, 0 the worst. It compares crops for this field; it does not predict yield.": "Відповідність рекомендованої культури порівняно з поточною за оцінками рушія правил, зведена до шкали всіх кандидатів: 100 — найкраща культура, 0 — найгірша. Це порівняння культур для цього поля, а не прогноз урожаю.",
   "{{value0}} → {{value1}} → {{value2}} · {{value3}} outlook": "{{value0}} → {{value1}} → {{value2}} · {{value3}}",
-  "Rule engine": "Рушій правил"
+  "Rule engine": "Рушій правил",
+  "Explain in more detail what is planned for {{date}}: why each action falls on that date, how to prepare and what could change it.": "Поясніть докладніше, що заплановано на {{date}}: чому кожна дія припадає на цю дату, як підготуватися і що може її змінити.",
+  "Ask about the actions and warnings planned for this day.": "Запитайте про дії та попередження, заплановані на цей день.",
+  "Ask about this day…": "Запитайте про цей день…",
+  "What could delay these actions?": "Що може затримати ці дії?",
+  "What should I prepare beforehand?": "Що слід підготувати заздалегідь?",
+  "Is the weather suitable for this work?": "Чи підходить погода для цієї роботи?",
+  "Reading calendar events…": "Читаю події календаря…",
+  "AI assistant": "ШІ-помічник",
+  "Actions": "Дії"
 }

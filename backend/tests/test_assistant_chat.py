@@ -91,6 +91,16 @@ class StubRotation:
         }  # fmt: skip
 
 
+class StubCalendar:
+    def __init__(self):
+        self.calls = []
+        self.events = []
+
+    def for_fields(self, fields, preferences):
+        self.calls.append([f["id"] for f in fields])
+        return self.events
+
+
 class StubSoil:
     def __init__(self, result):
         self.result, self.error, self.calls = result, None, []
@@ -182,6 +192,8 @@ class AssistantChatTests(unittest.TestCase):
         self.m2 = StubM2()
         self.app.state.m3_advice = self.m3
         self.app.state.m2_evidence = self.m2
+        self.calendar = StubCalendar()
+        self.app.state.calendar = self.calendar
         self.rotation = StubRotation()
         self.app.state.rotation = self.rotation
         self.app.state.soil_assessments = self.soil
@@ -256,6 +268,7 @@ class AssistantChatTests(unittest.TestCase):
                 "get_m3_insights",
                 "get_soil_depletion",
                 "get_neighbour_evidence",
+                "get_calendar_events",
                 "get_soil_moisture",
                 "get_rotation_advice",
             ],
@@ -335,6 +348,47 @@ class AssistantChatTests(unittest.TestCase):
         self.assertNotIn("trigger", ok["candidates"][0]["risks"][0])
         bad = tool_responses(gemini.requests[2])[-1]["response"]
         self.assertEqual((bad["status"], bad["cropOptions"]), ("unavailable", ["corn"]))
+
+    def test_calendar_day_reaches_the_session_and_the_calendar_tool(self):
+        field = self.login_with_field()
+        other = create_field(self.client, crop="Soybeans", properties=None)
+
+        def event(day, title, field_id):
+            return {
+                "id": "e", "fieldId": field_id, "fieldName": "F", "date": day, "category": "Harvest",
+                "title": title, "description": "d", "priority": "Routine", "duration": "1 day",
+                "rationale": "r", "kind": "harvest",
+            }  # fmt: skip
+
+        self.calendar.events = [
+            event("2026-11-19", "Before", field["id"]),
+            event("2026-11-20", "Seed cereal rye", field["id"]),
+            event("2026-11-21", "After", field["id"]),
+        ]
+        gemini = FakeGemini(
+            call("get_calendar_events"),
+            call("get_calendar_events", date="2026-11-19", days=3),
+            call("get_calendar_events", date="soon"),
+            text("done"),
+        )
+        self.chat(gemini, calendar_date="2026-11-20")
+        system = gemini.requests[0]["systemInstruction"]["parts"][0]["text"]
+        self.assertIn('"calendar_day": "2026-11-20"', system)
+        self.assertEqual(self.calendar.calls[0], [field["id"], other["id"]])  # no field selected
+        first = tool_responses(gemini.requests[1])[0]["response"]
+        self.assertEqual([e["title"] for e in first["events"]], ["Seed cereal rye"])
+        self.assertEqual((first["from"], first["to"], first["total"]), ("2026-11-20",) * 2 + (1,))
+        self.assertNotIn("id", first["events"][0])
+        self.assertNotIn("kind", first["events"][0])
+        second = tool_responses(gemini.requests[2])[-1]["response"]
+        self.assertEqual(second["total"], 3)
+        third = tool_responses(gemini.requests[3])[-1]["response"]
+        self.assertEqual(third["status"], "unavailable")
+        self.calendar.calls.clear()
+        self.chat(FakeGemini(call("get_calendar_events"), text("ok")), field_id=field["id"])
+        self.assertEqual(self.calendar.calls, [[field["id"]]])  # the selected field only
+        bad = self.client.post(PATH, json={"messages": MESSAGES, "calendar_date": "tomorrow"})
+        self.assertEqual(bad.status_code, 422)
 
     def test_soil_moisture_tool_compares_only_when_asked(self):
         field = self.login_with_field()
@@ -500,6 +554,7 @@ class AssistantChatTests(unittest.TestCase):
                 "get_m3_insights",
                 "get_soil_depletion",
                 "get_neighbour_evidence",
+                "get_calendar_events",
                 "get_soil_moisture",
                 "get_rotation_advice",
                 "get_crop_zones",

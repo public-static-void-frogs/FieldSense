@@ -21,6 +21,7 @@ import json
 import logging
 from collections.abc import Callable
 from dataclasses import dataclass
+from datetime import date, timedelta
 from functools import cached_property
 
 from fastapi import HTTPException
@@ -41,11 +42,15 @@ NO_FIELD = {
 class ChatContext:
     """Per-request inputs shared by all tools. Plain data only; see the module docstring."""
 
-    def __init__(self, state, location, field, locale: str):
+    def __init__(
+        self, state, location, field, locale: str, fields=(), calendar_date: date | None = None
+    ):
         self.state = state
         self.location = location  # snapshot of the account's saved location and units
         self.field = field  # selected field dict, or None
         self.locale = locale
+        self.fields = list(fields)  # snapshot of all the account's fields (calendar tool)
+        self.calendar_date = calendar_date  # day selected on the calendar page, or None
 
     @cached_property
     def series(self):
@@ -205,6 +210,49 @@ def soil_moisture_tool(ctx: ChatContext, args: dict) -> dict | None:
     return result
 
 
+MAX_CALENDAR_EVENTS = 30
+MAX_CALENDAR_DAYS = 14
+EVENT_KEYS = (
+    "date",
+    "fieldName",
+    "category",
+    "title",
+    "description",
+    "priority",
+    "duration",
+    "rationale",
+)
+
+
+def calendar_events_tool(ctx: ChatContext, args: dict) -> dict | None:
+    """Calendar events (rotation dates and weather or drought warnings) for one day or a short range."""
+    try:
+        start = date.fromisoformat(args["date"]) if args.get("date") else ctx.calendar_date
+    except (TypeError, ValueError):
+        return {"status": "unavailable", "error": "date must be YYYY-MM-DD"}
+    start = start or ctx.state.weather.today(ctx.location)
+    days = args.get("days")
+    days = days if isinstance(days, int) and 1 <= days <= MAX_CALENDAR_DAYS else 1
+    fields = [ctx.field] if ctx.field else ctx.fields
+    if not fields:
+        return {"status": "unavailable", "reason": "The account has no fields."}
+    end = start + timedelta(days=days)
+    events = [
+        event
+        for event in ctx.state.calendar.for_fields(fields, ctx.location)
+        if start.isoformat() <= event["date"] < end.isoformat()
+    ]
+    return {
+        "status": "ready",
+        "from": start.isoformat(),
+        "to": (end - timedelta(days=1)).isoformat(),
+        "total": len(events),
+        "events": [
+            {key: event[key] for key in EVENT_KEYS} for event in events[:MAX_CALENDAR_EVENTS]
+        ],
+    }
+
+
 PRIORITIES = ("water", "soil", "erosion", "income", "pest_break")
 DETAILED_CANDIDATES = 3  # the intended crop and the best-ranked crops get full detail
 
@@ -346,6 +394,33 @@ def default_registry() -> ToolRegistry:
                         "description": "Limit to practices: T1 continuous crop, T2 diverse "
                         "rotation, T3 small grain or hay, T4 winter cover, T5 host-crop "
                         "return interval.",
+                    },
+                },
+            },
+        )
+    )
+    registry.register(
+        Tool(
+            "get_calendar_events",
+            "Planned calendar events of the user's fields on one day or a short range: rotation "
+            "dates (harvest, cover crop, soil check, field preparation, sowing, scouting) and "
+            "weather warnings (heatwave, storms, frost, heavy rain, wind, drought), each with "
+            "its description, priority, duration and the reason it is scheduled. Covers the "
+            "selected field, or all fields when none is selected. Defaults to the day selected "
+            "on the calendar page. Use it to explain what is planned and why.",
+            calendar_events_tool,
+            {
+                "type": "object",
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "description": "First day, YYYY-MM-DD. Defaults to the selected calendar "
+                        "day, else today.",
+                    },
+                    "days": {
+                        "type": "integer",
+                        "description": f"Number of days from date, 1 to {MAX_CALENDAR_DAYS}. "
+                        "Default 1.",
                     },
                 },
             },

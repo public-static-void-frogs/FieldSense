@@ -13,6 +13,7 @@ keeps the context small however many data sources are added.
 {
   "messages": [{"role": "user", "content": "When can I plant corn?"}],
   "field_id": "optional field uuid",
+  "calendar_date": "optional YYYY-MM-DD",
   "tools": ["get_weather_forecast", "get_m3_insights"],
   "locale": "en"
 }
@@ -21,6 +22,8 @@ keeps the context small however many data sources are added.
 - `messages`: the whole conversation, oldest first, up to 20 messages of 4000 characters. It must
   start and end with a `user` message. The server stores nothing.
 - `field_id`: the selected field. Field-specific tools use it. Optional.
+- `calendar_date`: the day selected on the calendar page. The session block tells the model, which
+  then reads that day with `get_calendar_events`. Optional.
 - `tools`: names of tools the model may call. Omit to allow all, send `[]` to disable tools.
   `GET /api/v1/assistant/tools` lists names and descriptions; an unknown name returns 422.
 - The client cannot send a system prompt.
@@ -66,6 +69,7 @@ frontend endpoints) and never modify them.
 | `get_weather_forecast` | forecast + crop-risk rule alerts | next 3 days; uses the selected field, or the account location without one |
 | `get_m3_insights` | `services/m3_lookup.py` | planting/frost timing windows, heat/frost risk, Fallow-Zero. Optional `include_delay_scan` (large; only when the user asks about delaying sowing). Needs a field; `status: unavailable` outside model coverage. Reads local model output files (`M3_OUT`). |
 | `get_neighbour_evidence` | `services/m2_lookup.py` | rotation practices vs drought resilience from neighbouring fields: verdict, extra drought effect with intervals, what-if for the field or fields within 30 km, warnings. Optional `crop` and `treatments` (T1-T5). Per-outcome tables are dropped to keep the result small. Needs a field; `status: unavailable` outside coverage. Reads local model output files (`M2_OUT`). |
+| `get_calendar_events` | `services/calendar_events.py` | planned events of the selected field (all fields when none is selected) on one day or up to 14 days: rotation dates and weather/drought warnings with description, priority, duration and rationale. `date` defaults to `calendar_date`, else today. Capped at 30 events. |
 | `get_soil_moisture` | `services/soil_moisture.py` | latest modelled soil moisture per layer and profile mean at the field's reference point (Open-Meteo). Optional `compare_to_past_years` adds anomaly and percentile against past years (slower). Needs a field. |
 | `get_rotation_advice` | `services/rotation_advice.py` | the data behind the crop recommendation page (`GET /fields/{id}/rotation-advice`): ranked candidate crops with score breakdown, risks, benefits, advisories, yield/revenue, sowing calendar, off-season options, history and data gaps. Optional `crop` (the page's `:cropId`) and `priorities`. Only the intended crop and the top 3 get yield, revenue, calendar and soil detail; the season timing block is left to `get_m3_insights`. An unknown crop returns the valid ids. Needs a field. |
 | `get_soil_depletion` | `services/soil_depletion.py` via `SoilAssessments` | same cache as `GET /fields/{id}/soil-depletion`. Never waits: the first call starts the background calculation and returns `status: pending`; once it is ready (up to ~100 s) later calls return the full assessment. Needs a field. |

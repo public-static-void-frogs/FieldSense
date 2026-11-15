@@ -17,6 +17,9 @@ type ChatMessageListProps = {
   error: AssistantErrorKind | null;
   onAsk: (question: string) => void;
   onRetry: () => void;
+  /** Welcome text and example questions; defaults to the field assistant's. */
+  intro?: string;
+  suggestions?: readonly string[];
 };
 
 export function ChatMessageList({
@@ -26,6 +29,8 @@ export function ChatMessageList({
   error,
   onAsk,
   onRetry,
+  intro,
+  suggestions,
 }: ChatMessageListProps) {
   const { t } = useTranslation();
   const end = useScrollToEnd([entries, activeTool, error]);
@@ -33,7 +38,7 @@ export function ChatMessageList({
   const waiting = isStreaming && (activeTool !== null || !last?.content);
 
   if (!entries.length) {
-    return <ChatWelcome onAsk={onAsk} />;
+    return <ChatWelcome onAsk={onAsk} intro={intro} suggestions={suggestions} />;
   }
 
   return (
@@ -102,17 +107,25 @@ function ChatProgress({ tool }: ChatProgressProps) {
   );
 }
 
-type ChatWelcomeProps = { onAsk: (question: string) => void };
+type ChatWelcomeProps = {
+  onAsk: (question: string) => void;
+  intro?: string;
+  suggestions?: readonly string[];
+};
 
-function ChatWelcome({ onAsk }: ChatWelcomeProps) {
+function ChatWelcome({
+  onAsk,
+  intro = 'Ask about this field’s weather risk, planting timing or soil depletion.',
+  suggestions = assistantSuggestions,
+}: ChatWelcomeProps) {
   const { t } = useTranslation();
 
   return (
     <div className="assistant-welcome">
       <Sparkles size={28} className="ai-insight-sparkle" aria-hidden="true" />
-      <p>{t('Ask about this field’s weather risk, planting timing or soil depletion.')}</p>
+      <p>{t(intro)}</p>
       <ul className="assistant-suggestions">
-        {assistantSuggestions.map((question) => (
+        {suggestions.map((question) => (
           <li key={question}>
             <Button block onClick={() => onAsk(t(question))}>
               {t(question)}

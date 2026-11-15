@@ -14,6 +14,7 @@ export const toolProgressLabels: Record<string, string> = {
   get_m3_insights: 'Looking up climate timing and risk…',
   get_neighbour_evidence: 'Checking evidence from neighbouring fields…',
   get_rotation_advice: 'Reviewing crop recommendations…',
+  get_calendar_events: 'Reading calendar events…',
   get_soil_moisture: 'Checking soil moisture…',
   get_soil_depletion: 'Checking soil depletion…',
 };
