@@ -1,7 +1,9 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { Button, Card, Result, Skeleton } from 'antd';
 import { ArrowLeft } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLoaderData, useLocation } from 'react-router-dom';
+import { fieldQueries } from '../api/fields/fields.queries.ts';
 import type { RecommendationCropRouteData } from '../app/route-loaders.ts';
 import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
@@ -17,6 +19,7 @@ export function FieldRecommendationCropPage() {
   const { fieldId, cropId } = useLoaderData<RecommendationCropRouteData>();
   const { search } = useLocation();
   const { advice, isLoading, error, retry } = useRotationAdvice(fieldId);
+  const { data: field } = useSuspenseQuery(fieldQueries.byId(fieldId));
   const candidate = advice?.candidates.find(({ crop }) => crop === cropId);
   const recommendation = { pathname: recommendationPath(fieldId), search };
   const backLabel = t('Back to crop recommendations');
@@ -46,22 +49,34 @@ export function FieldRecommendationCropPage() {
     );
   }
 
-  if (!advice || !candidate) {
+  if (!field || !advice || !candidate) {
     return (
       <Result
         status="404"
-        title={advice ? t('Strategy not found') : t('Field not found')}
+        title={field && advice ? t('Strategy not found') : t('Field not found')}
         extra={<RouterButton to={recommendation}>{backLabel}</RouterButton>}
       />
     );
   }
 
   return (
-    <div className="rotation-page">
+    <div className="rotation-page rotation-strategy-page">
       <PageHeading
-        title={t(candidate.label)}
-        eyebrow={t('Crop strategies for next season')}
-        description={t('Rank {{rank}}', { rank: candidate.rank })}
+        title={
+          <>
+            {field.crop || field.name} <span aria-hidden="true">·</span> {t('Recommendations')}{' '}
+            <span aria-hidden="true">·</span>{' '}
+            <span className="rotation-strategy-title-crop">
+              <CropIcon crop={candidate.label} size={36} />
+              {t('{{crop}} Strategy', { crop: t(candidate.label) })}
+            </span>
+          </>
+        }
+        eyebrow=""
+        description={t('Ranked {{rank}} out of {{total}} crops for this field', {
+          rank: candidate.rank,
+          total: advice.candidates.length,
+        })}
         titlePrefix={
           <>
             <RouterButton
@@ -70,7 +85,7 @@ export function FieldRecommendationCropPage() {
               aria-label={backLabel}
               to={recommendation}
             />
-            <CropIcon crop={candidate.label} size={36} />
+            {field.crop && <CropIcon crop={field.crop} size={36} />}
           </>
         }
       />

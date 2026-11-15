@@ -167,72 +167,25 @@
   --rotation-badge-ink: #882d32;
 }
 
-.rotation-candidate-details {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.rotation-strategy-title-crop .crop-icon {
+  display: inline-block;
+  margin-inline-end: 6px;
+  vertical-align: middle;
 }
 
-.rotation-candidate-details h5.ant-typography {
-  margin: 0 0 8px;
-}
-
-.rotation-findings ul,
-.rotation-gaps ul {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.rotation-strategy-page .page-heading .ant-typography-secondary {
+  color: #315327;
+  font-size: 19px;
+  font-weight: 600;
 }
 
 .rotation-gaps ul {
+  display: flex;
+  flex-direction: column;
   gap: 4px;
-  padding-left: 18px;
-  list-style: disc;
-}
-
-.rotation-finding {
-  padding: 10px 14px;
-  border-left: 4px solid #cfd8c3;
-  border-radius: 4px;
-  background: #f8faf4;
-}
-
-.rotation-finding-risk {
-  border-left-color: #d4763b;
-}
-
-.rotation-finding-benefit {
-  border-left-color: #476b3c;
-}
-
-.rotation-finding .ant-tag {
   margin: 0;
-}
-
-.rotation-finding-reason.ant-typography {
-  margin: 6px 0 4px;
-}
-
-.rotation-finding-evidence {
-  display: block;
-  font-size: 13px;
-}
-
-.rotation-stages {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-  margin: 0 0 8px;
-  padding: 0;
-  list-style: none;
-}
-
-.rotation-stages li {
-  display: flex;
-  flex-direction: column;
+  padding: 0 0 0 18px;
+  list-style: disc;
 }
 
 .rotation-off-season {

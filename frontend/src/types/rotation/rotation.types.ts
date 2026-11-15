@@ -69,6 +69,7 @@ export type RotationSoilIndicator = {
   value: number | string | null;
   unit: string | null;
   direction: string | null;
+  threshold?: number | null;
   verified: boolean | null;
 };
 
