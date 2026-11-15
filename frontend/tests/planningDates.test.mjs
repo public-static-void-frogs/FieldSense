@@ -18,3 +18,14 @@ test('action statuses use the shared planning clock and seven-day window', () =>
   assert.equal(getEventStatus('2026-05-31', planningToday), 'Due soon');
   assert.equal(getEventStatus('2026-06-01', planningToday), 'Planned');
 });
+
+test('the calendar opens on today when this month has actions, else on the next upcoming one', async () => {
+  const { defaultCalendarDate } = await import('../src/features/planning/utils/planningDates.ts');
+  assert.equal(defaultCalendarDate(['2026-11-20'], '2026-11-15'), '2026-11-15');
+  assert.equal(
+    defaultCalendarDate(['2026-03-02', '2027-02-01', '2027-01-10'], '2026-11-15'),
+    '2027-01-10',
+  );
+  assert.equal(defaultCalendarDate(['2026-03-02'], '2026-11-15'), '2026-11-15');
+  assert.equal(defaultCalendarDate([], '2026-11-15'), '2026-11-15');
+});

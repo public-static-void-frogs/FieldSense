@@ -24,7 +24,7 @@ import { useCalendarFilters } from '../features/planning/hooks/useCalendarFilter
 import { useCalendarRoute } from '../features/planning/hooks/useCalendarRoute.ts';
 import { useCalendarView } from '../features/planning/hooks/useCalendarView.ts';
 import { getCalendarEvents, getEventDecision } from '../features/planning/utils/eventResponses.ts';
-import { formatPlanDate } from '../features/planning/utils/planningDates.ts';
+import { defaultCalendarDate, formatPlanDate } from '../features/planning/utils/planningDates.ts';
 import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
 import type { PlannedEvent } from '../types/planning/planning.types.ts';
 
@@ -35,8 +35,15 @@ export function CalendarPage() {
   const { data: eventResponses } = useSuspenseQuery(planningQueries.responses());
   const { data: context } = useSuspenseQuery(planningQueries.context());
   const planningToday = context.today;
-  const route = useCalendarRoute(planningToday);
-  const filters = useCalendarFilters(getCalendarEvents(allEvents, eventResponses), route.fieldId);
+  const calendarEvents = getCalendarEvents(allEvents, eventResponses);
+  const route = useCalendarRoute(
+    planningToday,
+    defaultCalendarDate(
+      calendarEvents.map((event) => event.date),
+      planningToday,
+    ),
+  );
+  const filters = useCalendarFilters(calendarEvents, route.fieldId);
   const drawer = useCalendarDrawer(route.eventId, route);
   const drawerSize = useResizableDrawer('calendar-drawer-width');
   const view = useCalendarView();
@@ -121,6 +128,14 @@ export function CalendarPage() {
           onChange={(event) => filters.update({ query: event.target.value })}
           allowClear
         />
+        <Button
+          onClick={() => {
+            view.setMode('month');
+            route.changeDate(planningToday);
+          }}
+        >
+          {t('Current month')}
+        </Button>
         <Button
           onClick={() => {
             filters.reset();
