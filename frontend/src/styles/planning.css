@@ -1,7 +1,3 @@
-.rotation-plan-anchor {
-  scroll-margin-top: 24px;
-}
-
 .rotation-plan-card.ant-collapse {
   border: 1px solid #b4c69e;
   border-inline-start: 5px solid #476b3c;
@@ -527,38 +523,6 @@
   .calendar-main {
     padding-inline: 6px;
   }
-}
-
-.rotation-summary .ant-card-body {
-  padding: 20px 24px;
-}
-
-.rotation-summary h4.ant-typography {
-  margin: 12px 0 6px;
-}
-
-.rotation-summary-copy {
-  flex: 1 1 320px;
-  min-width: 0;
-}
-
-.rotation-summary-actions {
-  flex: 0 1 auto;
-}
-
-.rotation-summary .ant-tag {
-  font-size: 11px;
-  padding: 0 6px;
-}
-
-.rotation-summary-date {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.rotation-summary-date > .ant-typography {
-  font-size: 12px;
 }
 
 .strategy-sections,

@@ -1200,6 +1200,7 @@
   "the main crop of this state": "the main crop of this state",
   "Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.": "Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.",
   "The recommendation could not be loaded": "The recommendation could not be loaded",
+  "The rotation strategy could not be loaded": "The rotation strategy could not be loaded",
   "What we do not know about this field": "What we do not know about this field",
   "Poorly drained": "Poorly drained",
   "Somewhat poorly drained": "Somewhat poorly drained",

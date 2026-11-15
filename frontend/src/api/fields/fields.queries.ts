@@ -9,7 +9,6 @@ export const fieldQueryKeys = {
   crops: () => [...fieldQueryKeys.all(), 'crops'] as const,
   properties: (id: string) => [...fieldQueryKeys.byId(id), 'properties'] as const,
   history: (id: string) => [...fieldQueryKeys.byId(id), 'history'] as const,
-  strategyOptions: () => [...fieldQueryKeys.all(), 'strategy-options'] as const,
 };
 export const fieldQueries = {
   list: () =>
@@ -41,10 +40,5 @@ export const fieldQueries = {
     queryOptions({
       queryKey: fieldQueryKeys.history(id),
       queryFn: ({ signal }) => fieldsApi.getHistory(id, signal),
-    }),
-  strategyOptions: () =>
-    queryOptions({
-      queryKey: fieldQueryKeys.strategyOptions(),
-      queryFn: fieldsApi.getStrategyOptions,
     }),
 };

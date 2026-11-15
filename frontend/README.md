@@ -124,16 +124,16 @@ the versions recorded in `package-lock.json`.
 
 ## Crop rotation and system planning
 
-Field pages feature a compact rotation summary and planting window linking to
-`/fields/:id/strategy`. The strategy page includes step-by-step actions, technical
-inputs, conditional recommendations, and interactive illustrative forecast charts.
+The Crop recommendation button on a field opens `/fields/:id/recommendation`.
+The page combines ranked crop recommendations with the rotation strategy, including
+its planting window, step-by-step actions, technical inputs, and rotation fit chart.
 Dates link to
 `/calendar/YYYY-MM-DD` with optional field/event filters. Action details use
 `/calendar/actions/:eventId`.
 
-The entire field schedule supports Accept all and Reject all on the strategy page,
+The entire field schedule supports Accept all and Reject all on the recommendation page,
 calendar drawer, and action details. Accepted events remain confirmed; rejected events are
-hidden from the calendar but remain editable on the strategy page. Responses persist
+hidden from the calendar but remain editable on the recommendation page. Responses persist
 in the backend demo repository and reset to proposed when event instructions change.
 
 Planning fixtures and calculations live in the backend `app/data` and `app/services/planning.py`.
