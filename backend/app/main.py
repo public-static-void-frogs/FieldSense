@@ -36,6 +36,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
             app.state.weather.close()
             app.state.drought.close()
             app.state.nass.close()
+            app.state.calendar.close()
             app.state.soil_assessments.close()
             engine.dispose()
 

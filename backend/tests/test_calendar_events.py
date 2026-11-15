@@ -274,6 +274,41 @@ class CalendarServiceTests(unittest.TestCase):
         service.for_field(self.field(), self.preferences)
         self.assertEqual(len(calls), 1)
 
+    def test_fields_are_computed_in_parallel_and_the_list_skips_what_is_not_ready(self):
+        import threading
+        from unittest import mock
+
+        from app.services import calendar_events
+
+        release = threading.Event()
+        started = threading.Barrier(2, timeout=5)
+
+        class Rotation:
+            def advise(self, field, *args):
+                if field["name"] == "Slow":
+                    release.wait(5)
+                else:
+                    started.wait()  # both fast fields must be running at the same time
+                return advice()
+
+        class Drought:
+            def status(self, *args):
+                return None
+
+        service = self.service(Rotation(), Drought())
+        self.addCleanup(service.close)
+        fields = [
+            {**self.field(), "id": str(i), "name": name}
+            for i, name in enumerate(["A", "B", "Slow"])
+        ]
+        with mock.patch.object(calendar_events, "LIST_BUDGET_SECONDS", 1.0):
+            events = service.for_fields(fields, self.preferences)
+        self.assertEqual({e["fieldName"] for e in events}, {"A", "B"})
+        release.set()
+        service.pool.shutdown(wait=True)  # the late work finishes and fills the cache
+        key = ("2", TODAY, "metric", (-93.6, 42.0))
+        self.assertIn(key, service._rotation_cache)
+
 
 class CalendarEndpointTests(unittest.TestCase):
     def setUp(self):

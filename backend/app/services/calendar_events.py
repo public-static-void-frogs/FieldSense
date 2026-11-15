@@ -11,11 +11,17 @@ Two sources feed the calendar, and both reuse existing services:
   ``crop_conditions.py`` (heat, cold, heavy rain, wind, dry soil), multi-day heatwaves,
   thunderstorms and extreme rain or wind, and the county drought level from ``drought.py``.
 
+The sources of all fields run in parallel, because the first call computes the rotation advice,
+the forecast and the drought status of every field. The all-fields list waits for a limited
+time and leaves out what is not ready; that work goes on and fills the caches, so the next
+request has it.
+
 Nothing here is stored. Event ids are derived from the field and the event, so they stay the same
 between requests. A failing source removes only its own events.
 """
 
 import logging
+from concurrent.futures import ThreadPoolExecutor, wait
 from datetime import date, timedelta
 from threading import Lock
 from time import monotonic
@@ -30,6 +36,8 @@ from app.services.drought import DroughtMonitor
 logger = logging.getLogger(__name__)
 
 ROTATION_TTL_SECONDS = 6 * 3600
+WORKERS = 8  # sources of different fields are computed side by side
+LIST_BUDGET_SECONDS = 30.0  # the all-fields list returns what is ready after this long
 WEATHER_CATEGORY = "Weather alert"
 HEATWAVE_C = 32.0  # daily high, three days in a row
 HEATWAVE_DAYS = 3
@@ -365,6 +373,7 @@ class CalendarEvents:
         self.drought, self.clock = drought, clock
         self._rotation_cache: dict[tuple, tuple[float, list[dict]]] = {}
         self._lock = Lock()
+        self.pool = ThreadPoolExecutor(WORKERS, thread_name_prefix="calendar")
 
     def _rotation(self, field, preferences, today):
         key = (field["id"], today, preferences.units, tuple(field["geometry"]["coordinates"]))
@@ -403,15 +412,35 @@ class CalendarEvents:
             logger.info("Drought status unavailable: %s", type(error).__name__)
             return []
 
-    def for_field(self, field: dict, preferences) -> list[dict]:
+    def close(self):
+        self.pool.shutdown(wait=False, cancel_futures=True)
+
+    def _compute(self, fields: list[dict], preferences, budget: float | None) -> list[dict]:
+        """Events of the fields; every source of every field is one task on the pool.
+
+        With a budget, tasks that are not finished in time are left out (they keep running).
+        """
         today = self.weather.today(preferences)
-        events = [
-            *self._rotation(field, preferences, today),
-            *self._weather(field, preferences),
-            *self._drought(field, today),
-        ]
-        return sorted(events, key=lambda event: (event["date"], event["title"]))
+        futures = []
+        for field in fields:
+            futures += [
+                self.pool.submit(self._rotation, field, preferences, today),
+                self.pool.submit(self._weather, field, preferences),
+                self.pool.submit(self._drought, field, today),
+            ]
+        done, late = wait(futures, timeout=budget)
+        if late:
+            logger.warning("Calendar events: %d source(s) not ready in time", len(late))
+        events = []
+        for future in futures:
+            if future in done:
+                events += future.result()
+        return sorted(events, key=lambda e: (e["date"], e["fieldName"], e["title"]))
+
+    def for_field(self, field: dict, preferences) -> list[dict]:
+        """All events of one field; waits for every source."""
+        return self._compute([field], preferences, None)
 
     def for_fields(self, fields: list[dict], preferences) -> list[dict]:
-        events = [event for field in fields for event in self.for_field(field, preferences)]
-        return sorted(events, key=lambda event: (event["date"], event["fieldName"], event["title"]))
+        """Events of all fields, without what is not ready within the time budget."""
+        return self._compute(fields, preferences, LIST_BUDGET_SECONDS)
