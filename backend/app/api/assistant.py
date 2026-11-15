@@ -1,3 +1,4 @@
+import logging
 from types import SimpleNamespace
 
 from fastapi import APIRouter, HTTPException, Request
@@ -10,6 +11,8 @@ from app.schemas.assistant import ChatRequest
 from app.services import assistant as service
 from app.services.assistant_tools import ChatContext
 from app.services.llm import llm_available
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/assistant", tags=["assistant"])
 
@@ -51,6 +54,13 @@ def tools(request: Request):
 )
 def chat(request: Request, body: ChatRequest, user: CurrentUser, store: Store):
     state = request.app.state
+    if not llm_available(state.config):
+        logger.warning(
+            "Assistant chat refused with 503: gemini_enabled=%s, api_key_set=%s. Set "
+            "GEMINI_ENABLED=true and GEMINI_API_KEY in the server environment and restart.",
+            state.config.gemini_enabled,
+            bool(state.config.gemini_api_key.strip()),
+        )
     if user.is_demo or not llm_available(state.config):
         raise HTTPException(503, "Assistant is unavailable")
     registry = state.assistant_tools
@@ -60,6 +70,11 @@ def chat(request: Request, body: ChatRequest, user: CurrentUser, store: Store):
     try:
         prompt = service.load_system_prompt(state.config.assistant_prompt_file)
     except service.PromptUnavailable as error:
+        logger.warning(
+            "Assistant chat refused with 503: cannot read prompt file %s (%s)",
+            state.config.assistant_prompt_file,
+            error,
+        )
         raise HTTPException(503, "Assistant prompt is not configured") from error
     field = store.require_field(body.field_id) if body.field_id else None
     # Tools run while streaming, after this request's database session is closed, so copy
