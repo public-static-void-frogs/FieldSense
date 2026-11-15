@@ -113,13 +113,34 @@ function M2Results({ insights }: M2ResultsProps) {
           <summary>{t('Evidence notes')}</summary>
           <ul className="field-insights-notes">
             {insights.warnings.map((warning) => (
-              <li key={warning}>{t(warning, { defaultValue: warning })}</li>
+              <li key={warning}>
+                <EvidenceNote text={t(warning, { defaultValue: warning })} />
+              </li>
             ))}
           </ul>
         </details>
       )}
       <small>{t('Neighbour Evidence Engine (CropTwin Detective + CausalSoil)')}</small>
     </div>
+  );
+}
+
+type EvidenceNoteProps = { text: string };
+
+/** Shows the part before the first colon, and the colon, in bold italics. */
+function EvidenceNote({ text }: EvidenceNoteProps) {
+  const split = text.indexOf(': ');
+  if (split < 0) {
+    return text;
+  }
+
+  return (
+    <>
+      <strong>
+        <em>{text.slice(0, split + 1)}</em>
+      </strong>
+      {text.slice(split + 1)}
+    </>
   );
 }
 
@@ -168,20 +189,17 @@ function M2TreatmentCard({ treatment, region, field, neighbourhood }: M2Treatmen
   const hoodEffect = outcomeKey ? neighbourhood?.[outcomeKey] : undefined;
 
   return (
-    <Card
-      size="small"
-      className="field-insights-metric"
-      title={t(m2Treatments[treatment])}
-      extra={
-        lowerTier ? (
+    <div className="field-m2-card">
+      <div className="field-m2-card-heading">
+        <h4>{t(m2Treatments[treatment])}</h4>
+        {lowerTier ? (
           <Tag>{t(m2Tiers[tier])}</Tag>
         ) : (
           <Tag color={verdict.tone === 'default' ? undefined : verdict.tone}>
             {t(verdict.label)}
           </Tag>
-        )
-      }
-    >
+        )}
+      </div>
       {region.abstain || !headline ? (
         <p className="field-insights-muted">{t('Not enough comparable fields for an estimate.')}</p>
       ) : (
@@ -199,7 +217,7 @@ function M2TreatmentCard({ treatment, region, field, neighbourhood }: M2Treatmen
           )}
         </>
       )}
-    </Card>
+    </div>
   );
 }
 
@@ -216,7 +234,7 @@ function M2Headline({ headline, outcomeName, signed }: M2HeadlineProps) {
 
     return (
       <>
-        <p>
+        <p className="field-m2-value">
           <strong>
             {signed(headline.headline_effect)} [{signed(headline.headline_lo)},{' '}
             {signed(headline.headline_hi)}]
@@ -237,7 +255,7 @@ function M2Headline({ headline, outcomeName, signed }: M2HeadlineProps) {
 
   return (
     <>
-      <p>
+      <p className="field-m2-value">
         <strong>
           {signed(headline.gamma)} [{signed(headline.gamma_lo)}, {signed(headline.gamma_hi)}]
         </strong>{' '}
