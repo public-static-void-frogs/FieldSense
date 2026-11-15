@@ -6,6 +6,7 @@ import type {
 } from '../../../types/rotation/rotation.types.ts';
 
 export const SEASON_CHOICES = [1, 2, 3, 4, 5];
+export const DEFAULT_PLAN_SEASONS = 3;
 
 /** The plan when the solver could price at least one crop. */
 export function pricedPlan(advice: RotationAdvice): RotationPlan | null {

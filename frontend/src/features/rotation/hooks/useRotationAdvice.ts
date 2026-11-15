@@ -42,6 +42,7 @@ export function useRotationAdvice(fieldId: string) {
     error: query.error,
     retry: query.refetch,
     selectedCrop: crop,
+    selectedSeasons: seasons,
     priorities,
     setCrop,
     setSeasons,

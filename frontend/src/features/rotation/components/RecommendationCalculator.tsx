@@ -1,11 +1,19 @@
-import { Card, Select, Skeleton, Typography } from 'antd';
+import { Card, Skeleton, Typography } from 'antd';
 import { Check, CircleDollarSign, Droplets, Mountain, RotateCcw, Sprout } from 'lucide-react';
-import { type ReactNode, useId } from 'react';
+import {
+  type CSSProperties,
+  type ReactNode,
+  useEffect,
+  useEffectEvent,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 import { useTranslation } from 'react-i18next';
 import { CropIcon } from '../../../components/common/CropIcon';
 import type { RotationAdvice, RotationPriority } from '../../../types/rotation/rotation.types.ts';
 import { priorityOptions, sourceKindLabels } from '../constants/rotationLabels.ts';
-import { pricedPlan, SEASON_CHOICES } from '../utils/planPresentation.ts';
+import { DEFAULT_PLAN_SEASONS, SEASON_CHOICES } from '../utils/planPresentation.ts';
 import { AdviceVerdict } from './AdviceVerdict';
 import { CandidateList } from './CandidateList';
 import './RecommendationCalculator.css';
@@ -21,16 +29,18 @@ const goalIcons = {
 type RecommendationCalculatorProps = {
   advice: RotationAdvice;
   selectedCrop: string | undefined;
+  selectedSeasons: number | undefined;
   priorities: RotationPriority[];
   isUpdating: boolean;
   onCropChange: (crop: string) => void;
-  onSeasonsChange?: (seasons: number) => void;
+  onSeasonsChange: (seasons: number) => void;
   onPriorityToggle: (priority: RotationPriority, selected: boolean) => void;
 };
 
 export function RecommendationCalculator({
   advice,
   selectedCrop,
+  selectedSeasons,
   priorities,
   isUpdating,
   onCropChange,
@@ -41,7 +51,8 @@ export function RecommendationCalculator({
   const cropGroup = useId();
   const cropTitle = t('Choose the crop you plan to grow');
   const goalTitle = t('Select your goals for this season');
-  const plan = pricedPlan(advice);
+  const seasonsTitle = t('Seasons to plan');
+  const seasons = selectedSeasons ?? advice.plan?.seasons ?? DEFAULT_PLAN_SEASONS;
   const crop = isUpdating ? (selectedCrop ?? advice.intendedCrop) : advice.intendedCrop;
 
   return (
@@ -95,24 +106,15 @@ export function RecommendationCalculator({
           {t('Risks and benefits in the areas you pick count double.')}
         </Typography.Text>
       </CalculatorStep>
-      <CalculatorStep number={3} title={t('Crop leaderboard')}>
-        {plan && onSeasonsChange && (
-          <div className="rotation-control rotation-control-narrow">
-            <Typography.Text strong id="rotation-seasons-label">
-              {t('Seasons to plan')}
-            </Typography.Text>
-            <Select
-              aria-labelledby="rotation-seasons-label"
-              className="rotation-seasons-select"
-              value={plan.seasons}
-              options={SEASON_CHOICES.map((value) => ({ value, label: String(value) }))}
-              onChange={onSeasonsChange}
-            />
-            <Typography.Text type="secondary">
-              {t('First season: {{year}}.', { year: plan.firstSeason })}
-            </Typography.Text>
-          </div>
-        )}
+      <CalculatorStep number={3} title={seasonsTitle}>
+        <SeasonSlider
+          label={seasonsTitle}
+          seasons={seasons}
+          firstSeason={advice.plan?.firstSeason ?? null}
+          onChange={onSeasonsChange}
+        />
+      </CalculatorStep>
+      <CalculatorStep number={4} title={t('Crop leaderboard')}>
         <div aria-busy={isUpdating}>
           {isUpdating ? (
             <Skeleton active title={false} paragraph={{ rows: 4 }} />
@@ -121,6 +123,98 @@ export function RecommendationCalculator({
           )}
         </div>
       </CalculatorStep>
+    </div>
+  );
+}
+
+const minSeasons = SEASON_CHOICES[0];
+const maxSeasons = SEASON_CHOICES[SEASON_CHOICES.length - 1];
+const seasonColors = ['#9bad86', '#88a46e', '#6d9155', '#527a43', '#386333'];
+
+type SeasonSliderProps = {
+  label: string;
+  seasons: number;
+  firstSeason: number | null;
+  onChange: (seasons: number) => void;
+};
+
+function SeasonSlider({ label, seasons, firstSeason, onChange }: SeasonSliderProps) {
+  const { t } = useTranslation();
+  const descriptionId = useId();
+  const input = useRef<HTMLInputElement>(null);
+  const [draft, setDraft] = useState<number | null>(null);
+  const value = draft ?? seasons;
+  const progress = ((value - minSeasons) / (maxSeasons - minSeasons)) * 100;
+  const seasonCount = (count: number) => t('{{count}} seasons', { count });
+  function commit(next: number) {
+    setDraft(null);
+    if (next !== seasons) {
+      onChange(next);
+    }
+  }
+
+  const commitSlider = useEffectEvent((control: HTMLInputElement) => commit(control.valueAsNumber));
+  useEffect(() => {
+    const control = input.current;
+    if (!control) {
+      return;
+    }
+    // The native change event commits a drag once. Input events update the preview.
+    const finish = () => commitSlider(control);
+    control.addEventListener('change', finish);
+    return () => control.removeEventListener('change', finish);
+  }, []);
+
+  let years;
+  if (firstSeason != null) {
+    years = value === 1 ? String(firstSeason) : `${firstSeason}–${firstSeason + value - 1}`;
+  }
+
+  return (
+    <div
+      className="rotation-season-slider"
+      style={
+        {
+          '--rotation-season-fill': `${progress}%`,
+          '--rotation-season-color': seasonColors[value - minSeasons],
+        } as CSSProperties
+      }
+    >
+      <div className="rotation-season-slider-summary">
+        <strong>{seasonCount(value)}</strong>
+        {years && <span>{years}</span>}
+      </div>
+      <div className="rotation-season-track">
+        <input
+          ref={input}
+          type="range"
+          aria-label={label}
+          aria-describedby={descriptionId}
+          aria-valuetext={seasonCount(value)}
+          min={minSeasons}
+          max={maxSeasons}
+          step={1}
+          value={value}
+          onChange={(event) => setDraft(event.currentTarget.valueAsNumber)}
+        />
+      </div>
+      <div className="rotation-season-options" role="group" aria-label={label}>
+        {SEASON_CHOICES.map((season) => (
+          <button
+            key={season}
+            type="button"
+            aria-pressed={season === value}
+            onClick={() => commit(season)}
+          >
+            {firstSeason == null
+              ? seasonCount(season)
+              : t('Through {{year}}', { year: firstSeason + season - 1 })}
+          </button>
+        ))}
+      </div>
+      <Typography.Text type="secondary" id={descriptionId} className="rotation-calculator-note">
+        {t('The planner compares crop rotations over the number of seasons you choose.')}
+      </Typography.Text>
     </div>
   );
 }

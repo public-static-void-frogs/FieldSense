@@ -32,6 +32,7 @@ export function FieldRecommendationPage() {
     error,
     retry,
     selectedCrop,
+    selectedSeasons,
     priorities,
     setCrop,
     setSeasons,
@@ -116,6 +117,7 @@ export function FieldRecommendationPage() {
             <RecommendationCalculator
               advice={advice}
               selectedCrop={selectedCrop}
+              selectedSeasons={selectedSeasons}
               priorities={priorities}
               isUpdating={isUpdating}
               onCropChange={setCrop}

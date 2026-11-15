@@ -194,14 +194,6 @@
   list-style: none;
 }
 
-.rotation-control-narrow {
-  flex: 0 1 180px;
-}
-
-.rotation-seasons-select {
-  width: 96px;
-}
-
 .rotation-plan-top {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
