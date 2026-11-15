@@ -21,7 +21,7 @@ export function FieldAssistant({ field }: FieldAssistantProps) {
   return (
     <>
       <Button icon={<Sparkles size={19} />} onClick={() => setOpen(true)}>
-        {t('Ask AI')}
+        {t('Ask SI')}
       </Button>
       <Drawer
         title={

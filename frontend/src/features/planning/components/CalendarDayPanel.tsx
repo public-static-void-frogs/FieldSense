@@ -40,7 +40,7 @@ export function CalendarDayPanel({
           label: (
             <span className="field-insights-crop-tab">
               <Sparkles size={16} aria-hidden="true" />
-              {t('AI assistant')}
+              {t('SI assistant')}
             </span>
           ),
           children: (
