@@ -17,6 +17,15 @@ except ModuleNotFoundError:  # the planner serves the exact plan without it
     torch = None
 
 
+class ScaleTests(unittest.TestCase):
+    def test_every_crop_the_policy_can_plan_has_a_yield_and_a_price_scale(self):
+        from rule_engine.planner.tables import CROPS
+        from rule_engine.planner.tabular import PRICE_SCALE, YIELD_SCALE
+
+        self.assertEqual(set(CROPS) - set(YIELD_SCALE), set())
+        self.assertEqual(set(CROPS) - set(PRICE_SCALE), set())
+
+
 class PolicyPlanTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):

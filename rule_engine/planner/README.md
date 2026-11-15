@@ -61,13 +61,17 @@ one-year scores, in milliseconds.
 ```sh
 python rule_engine/planner/scripts/build_tables.py \
     --fields data/local/usa_sample/fields.jsonl \
-    --summaries data/local/usa_sample/season_summary data/local/planner/season_summary \
-    --out data/local/planner/tables_1981 --workers 14
+    --summaries data/local/usa_sample/season_summary \
+    --climate data/local/usa_sample/climate_record \
+    --out data/local/planner/tables --workers 8
 python rule_engine/planner/scripts/train_policy.py \
-    --tables data/local/planner/tables_1981 --out data/local/planner/policy_1981 \
+    --tables data/local/planner/tables --out data/local/planner/policy \
     --iterations 1500 --hidden 512 --entropy 0.01
-python -m rule_engine.planner --field <id> ... --policy data/local/planner/policy_1981/policy.pt
+python -m rule_engine.planner --field <id> ... --policy data/local/planner/policy/policy.pt
 ```
+
+`--climate` gives the tables the same long weather record the backend plans with
+(`context.with_climate`), so the policy is trained on what it will be asked at serving time.
 
 - `tabular.py` turns each field's problem into arrays (reward of every action in every crop
   history and drawable year). Exact solving and scoring a policy then take milliseconds per field,
@@ -93,8 +97,23 @@ year-by-year rule on 47 % of them (by 92 USD on average), ties on 32 %, and trai
 it. With only the years 2015–2025 the same training closed 91 % of the gap (optimum 472.0,
 learned 467.5, year-by-year rule 421.0).
 
-The vocabulary is fixed at corn, soybeans, oats and alfalfa (`tabular.CROPS`), the crops with a
-cost budget. Adding a crop means retraining.
+The vocabulary is the 25 crops of `tables.CROPS`, in that order. A policy file stores the crop
+order it was trained with, and `learned.load_policy` refuses a file whose order or sizes differ
+(`policy_does_not_fit`). Adding a crop means adding it at the end of `CROPS` and retraining.
+
+### Serving the learned plan
+
+`GET /fields/{id}/rotation-advice?planner=learned` builds the plan with the policy;
+`planner=exact` (the default) keeps the exact calculation.
+
+- The backend reads the policy once from `ROTATION_POLICY_PATH` (default
+  `data/local/planner/policy/policy.pt`, which is not in git: copy the file to the server).
+- `plan.method` is `learned_policy` or `dynamic_programming_fixed_sequence`.
+- `plan.planner` reports what was asked for, what was used, and whether a policy is loaded
+  (`learnedAvailable`, with the reason code in `learnedUnavailable` when it is not).
+- Each plan crop of a learned plan has `belowOptimumUsdPerAcre`: how far it is below the exact
+  best plan that starts with the same crop.
+- Without a usable policy file, or without PyTorch installed, the exact plan is returned.
 
 ## Where each number comes from
 

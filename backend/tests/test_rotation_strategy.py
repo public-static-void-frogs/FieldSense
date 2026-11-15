@@ -63,6 +63,21 @@ class StrategyTests(unittest.TestCase):
         self.assertIn("soil results", by_title["Soil check before sowing Soybeans"])
         self.assertIn("sowing date", by_title["Sow Soybeans"])
 
+    def test_fit_follows_the_plan_objective_when_the_plan_ranks_the_candidates(self):
+        # the plan puts soybeans first on money although its risk score is the worse one
+        stages = {"planted": doy(5, 1), "flowering": doy(7, 20), "harvested": doy(10, 5)}
+        ranked = [candidate("soybeans", 1, False, 12.0, stages), candidate("corn", 2, True, 5.0)]
+        crops = [
+            {"crop": "soybeans", "planObjectiveUsdPerAcre": 300.0},
+            {"crop": "corn", "planObjectiveUsdPerAcre": 100.0},
+        ]
+        priced = advice(candidates=ranked, plan={"crops": crops})
+        (comparison,) = build_strategy(FIELD, priced, follow_advice(), TODAY)["comparison"]
+        self.assertEqual((comparison["current"], comparison["projected"]), (0, 100))
+        unpriced = advice(candidates=ranked, plan={"crops": crops[:1]})  # one crop: risk score
+        (comparison,) = build_strategy(FIELD, unpriced, follow_advice(), TODAY)["comparison"]
+        self.assertEqual((comparison["current"], comparison["projected"]), (100, 0))
+
     def test_fit_rescales_the_engine_scores_between_candidates(self):
         (comparison,) = self.strategy["comparison"]
         self.assertEqual((comparison["current"], comparison["projected"]), (0, 100))
