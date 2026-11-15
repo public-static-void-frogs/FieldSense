@@ -8,6 +8,30 @@ from app.repositories.maps import MapCell, MapDataset
 
 LEVELS = (4, 6, 8, 10, 12)
 MAX_FEATURES = 600
+LOCATE_DEGREES = 0.15  # search half-width for locate_county, about 15 km north-south
+
+
+def locate_county(session, row) -> None:
+    """Give a user's field the state and county of the nearest catalog field within about
+    15 km, so the rotation advice reads that state's crops, costs and prices instead of the
+    default region. Near a county line the neighbouring county may be taken. Nothing changes
+    when no catalog field is that close."""
+    from app.repositories.fields import FieldRecord as F
+
+    if row.state_fips:
+        return
+    d = LOCATE_DEGREES
+    bounds = (row.longitude - d, row.latitude - d, row.longitude + d, row.latitude + d)
+    east_west = math.cos(math.radians(row.latitude)) ** 2
+    dx, dy = F.longitude - row.longitude, F.latitude - row.latitude
+    query = select(F.state_fips, F.county_fips, F.county).where(
+        F.state_fips.is_not(None), spatial_filter(session, bounds)
+    )
+    if row.id is not None:
+        query = query.where(F.id != row.id)
+    near = session.execute(query.order_by(east_west * dx * dx + dy * dy).limit(1)).first()
+    if near is not None:
+        row.state_fips, row.county_fips, row.county = near
 
 
 def cell_key(longitude, latitude, level):

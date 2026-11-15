@@ -253,6 +253,83 @@
         ]
       }
     },
+    "/api/v1/assistant/contexts": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Contexts",
+        "description": "Names of the context providers that can be listed in chat `contexts`.",
+        "operationId": "contexts_api_v1_assistant_contexts_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array",
+                  "title": "Response Contexts Api V1 Assistant Contexts Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ]
+      }
+    },
+    "/api/v1/assistant/chat": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Chat",
+        "description": "Stateless chat with the farming assistant. Send the whole conversation each time. The system prompt comes from the server's prompt file and cannot be set by the client. Context sections (field, forecast, ML models) come from registered providers; with field_id they are grounded in that field. Streams NDJSON: {\"delta\": text} lines, then {\"done\": true}. A stream that ends without done failed.",
+        "operationId": "chat_api_v1_assistant_chat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "NDJSON text deltas followed by a done event on success.",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "422": {
+            "description": "Invalid conversation or unknown context name"
+          },
+          "503": {
+            "description": "Assistant or its prompt file is unavailable"
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ]
+      }
+    },
     "/api/v1/fields": {
       "get": {
         "tags": [
@@ -925,6 +1002,20 @@
               },
               "title": "Priorities"
             }
+          },
+          {
+            "name": "seasons",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "maximum": 5,
+              "minimum": 1,
+              "description": "Seasons the plan covers",
+              "default": 3,
+              "title": "Seasons"
+            },
+            "description": "Seasons the plan covers"
           }
         ],
         "responses": {
@@ -940,6 +1031,410 @@
           },
           "422": {
             "description": "Crop is not a candidate for this field"
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/economics": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Economics",
+        "description": "The calculator: the caller's own price, cost and rent, and the USDA averages behind them.",
+        "operationId": "economics_api_v1_fields__field_id__economics_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EconomicsView"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Save Economics",
+        "description": "Store the caller's own prices, costs and land rent. What is left out keeps the average.",
+        "operationId": "save_economics_api_v1_fields__field_id__economics_put",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FieldEconomics"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldEconomics"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Delete Economics",
+        "operationId": "delete_economics_api_v1_fields__field_id__economics_delete",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/soil-survey": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Soil Survey",
+        "description": "The caller's own soil test for the field, or null.",
+        "operationId": "soil_survey_api_v1_fields__field_id__soil_survey_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "anyOf": [
+                    {
+                      "$ref": "#/components/schemas/SoilSurvey"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ],
+                  "title": "Response Soil Survey Api V1 Fields  Field Id  Soil Survey Get"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Save Soil Survey",
+        "description": "Store the caller's soil test. Its pH and organic matter replace the soil survey estimate.",
+        "operationId": "save_soil_survey_api_v1_fields__field_id__soil_survey_put",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SoilSurvey"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SoilSurvey"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Delete Soil Survey",
+        "operationId": "delete_soil_survey_api_v1_fields__field_id__soil_survey_delete",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Successful Response"
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/season-results": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Season Results",
+        "description": "The caller's own record of past seasons on the field.",
+        "operationId": "season_results_api_v1_fields__field_id__season_results_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonResults"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "Save Season Results",
+        "description": "Replace the caller's past seasons. An empty list clears them.\n\nThe crop of a year replaces the satellite (CDL) label of that year; the yields set the\nfield's yield level against the county. The year after the last result becomes the first\nseason of the plan.",
+        "operationId": "save_season_results_api_v1_fields__field_id__season_results_put",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SeasonResults"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SeasonResults"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
           }
         }
       }
@@ -1609,7 +2104,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/RotationPlan"
+                  "$ref": "#/components/schemas/app__schemas__planning__RotationPlan"
                 }
               }
             }
@@ -2598,6 +3093,30 @@
             "type": "integer",
             "title": "Rank"
           },
+          "riskRank": {
+            "type": "integer",
+            "title": "Riskrank"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "top",
+              "alternative",
+              "not_modelled"
+            ],
+            "title": "Tier"
+          },
+          "notModelledCode": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Notmodelledcode"
+          },
           "isIntended": {
             "type": "boolean",
             "title": "Isintended"
@@ -2699,6 +3218,8 @@
           "label",
           "group",
           "rank",
+          "riskRank",
+          "tier",
           "isIntended",
           "score",
           "scoreBreakdown",
@@ -2712,6 +3233,85 @@
           "needsLocalReview"
         ],
         "title": "Candidate"
+      },
+      "ChatMessage": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatMessage"
+      },
+      "ChatRequest": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Messages",
+            "description": "Full conversation so far, oldest first. The server keeps no chat state. Must start and end with a user message."
+          },
+          "field_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Id",
+            "description": "Ground the answer in this field and its forecast. Omit for general questions."
+          },
+          "contexts": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Contexts",
+            "description": "Names of context providers to include (e.g. field, weather_forecast, or registered ML models). Omit to include all."
+          },
+          "locale": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$",
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "title": "ChatRequest"
       },
       "Comparison": {
         "properties": {
@@ -3310,6 +3910,118 @@
           "alerts"
         ],
         "title": "CropDayAssessment"
+      },
+      "CropEconomics": {
+        "properties": {
+          "crop": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Crop"
+          },
+          "priceUsd": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Priceusd"
+          },
+          "costUsdPerAcre": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Costusdperacre"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "crop"
+        ],
+        "title": "CropEconomics"
+      },
+      "CropEconomicsDefault": {
+        "properties": {
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "priceUsd": {
+            "type": "number",
+            "title": "Priceusd"
+          },
+          "priceUnit": {
+            "type": "string",
+            "title": "Priceunit"
+          },
+          "priceLevel": {
+            "type": "string",
+            "title": "Pricelevel"
+          },
+          "costUsdPerAcre": {
+            "type": "number",
+            "title": "Costusdperacre"
+          },
+          "costLevel": {
+            "type": "string",
+            "enum": [
+              "ers_region",
+              "national",
+              "state_budget"
+            ],
+            "title": "Costlevel"
+          },
+          "costYear": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Costyear"
+          },
+          "costItems": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "type": "number"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Costitems"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop",
+          "priceUsd",
+          "priceUnit",
+          "priceLevel",
+          "costUsdPerAcre",
+          "costLevel",
+          "costYear",
+          "costItems"
+        ],
+        "title": "CropEconomicsDefault"
       },
       "CropHistory": {
         "properties": {
@@ -4502,6 +5214,79 @@
         ],
         "title": "DetectedPolygon"
       },
+      "EconomicsDefaults": {
+        "properties": {
+          "costRegion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Costregion"
+          },
+          "landRent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LandRentDefault"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "irrigatedLandRent": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LandRentDefault"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "crops": {
+            "items": {
+              "$ref": "#/components/schemas/CropEconomicsDefault"
+            },
+            "type": "array",
+            "title": "Crops"
+          }
+        },
+        "type": "object",
+        "required": [
+          "costRegion",
+          "landRent",
+          "irrigatedLandRent",
+          "crops"
+        ],
+        "title": "EconomicsDefaults"
+      },
+      "EconomicsView": {
+        "properties": {
+          "inputs": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/FieldEconomics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "defaults": {
+            "$ref": "#/components/schemas/EconomicsDefaults"
+          }
+        },
+        "type": "object",
+        "required": [
+          "inputs",
+          "defaults"
+        ],
+        "title": "EconomicsView"
+      },
       "EventResponse": {
         "properties": {
           "status": {
@@ -4850,6 +5635,35 @@
         ],
         "title": "Field"
       },
+      "FieldEconomics": {
+        "properties": {
+          "landRentUsdPerAcre": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 2000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Landrentusdperacre"
+          },
+          "crops": {
+            "items": {
+              "$ref": "#/components/schemas/CropEconomics"
+            },
+            "type": "array",
+            "maxItems": 40,
+            "title": "Crops"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "FieldEconomics",
+        "description": "The farmer's own price, cost and rent. What is left out keeps the USDA average."
+      },
       "FieldHistory": {
         "properties": {
           "events": {
@@ -5148,7 +5962,7 @@
       "FieldStrategy": {
         "properties": {
           "plan": {
-            "$ref": "#/components/schemas/RotationPlan"
+            "$ref": "#/components/schemas/app__schemas__planning__RotationPlan"
           },
           "events": {
             "items": {
@@ -5436,6 +6250,11 @@
             "type": "integer",
             "title": "Seasons"
           },
+          "declaredSeasons": {
+            "type": "integer",
+            "title": "Declaredseasons",
+            "default": 0
+          },
           "firstYear": {
             "anyOf": [
               {
@@ -5600,6 +6419,43 @@
           "description"
         ],
         "title": "LandEvent"
+      },
+      "LandRentDefault": {
+        "properties": {
+          "usdPerAcre": {
+            "type": "number",
+            "title": "Usdperacre"
+          },
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "level": {
+            "type": "string",
+            "enum": [
+              "county",
+              "state",
+              "ers_region"
+            ],
+            "title": "Level"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "nass_cash_rents",
+              "ers_land_opportunity_cost"
+            ],
+            "title": "Source"
+          }
+        },
+        "type": "object",
+        "required": [
+          "usdPerAcre",
+          "year",
+          "level",
+          "source"
+        ],
+        "title": "LandRentDefault"
       },
       "LoginInput": {
         "properties": {
@@ -6814,6 +7670,66 @@
         ],
         "title": "Overview"
       },
+      "OwnYieldLevel": {
+        "properties": {
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "yieldUnit": {
+            "type": "string",
+            "title": "Yieldunit"
+          },
+          "ratio": {
+            "type": "number",
+            "title": "Ratio"
+          },
+          "expectedYieldPerAcre": {
+            "type": "number",
+            "title": "Expectedyieldperacre"
+          },
+          "points": {
+            "items": {
+              "$ref": "#/components/schemas/OwnYieldPoint"
+            },
+            "type": "array",
+            "title": "Points"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop",
+          "yieldUnit",
+          "ratio",
+          "expectedYieldPerAcre",
+          "points"
+        ],
+        "title": "OwnYieldLevel",
+        "description": "How the farmer's yields moved the expected yield of a crop."
+      },
+      "OwnYieldPoint": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "yieldPerAcre": {
+            "type": "number",
+            "title": "Yieldperacre"
+          },
+          "referenceYieldPerAcre": {
+            "type": "number",
+            "title": "Referenceyieldperacre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "yieldPerAcre",
+          "referenceYieldPerAcre"
+        ],
+        "title": "OwnYieldPoint"
+      },
       "Parcel": {
         "properties": {
           "id": {
@@ -6859,6 +7775,393 @@
           "area"
         ],
         "title": "Parcel"
+      },
+      "PlanAutumn": {
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": [
+              "none",
+              "sow_cover_crop",
+              "sow_winter_crop",
+              "keep_stand"
+            ],
+            "title": "Action"
+          },
+          "species": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Species"
+          },
+          "establishment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "reliable",
+                  "marginal",
+                  "unlikely"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Establishment"
+          },
+          "ryeCoverGainUsdPerAcre": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ryecovergainusdperacre"
+          },
+          "ryeCoverEstablishment": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "reliable",
+                  "marginal",
+                  "unlikely"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ryecoverestablishment"
+          }
+        },
+        "type": "object",
+        "required": [
+          "action",
+          "species",
+          "establishment",
+          "ryeCoverGainUsdPerAcre",
+          "ryeCoverEstablishment"
+        ],
+        "title": "PlanAutumn",
+        "description": "What the plan asks for between this harvest and winter."
+      },
+      "PlanCrop": {
+        "properties": {
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "rank": {
+            "type": "integer",
+            "title": "Rank"
+          },
+          "tier": {
+            "type": "string",
+            "enum": [
+              "top",
+              "alternative"
+            ],
+            "title": "Tier"
+          },
+          "demoted": {
+            "anyOf": [
+              {
+                "type": "string",
+                "const": "autumn_establishment_unlikely"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Demoted"
+          },
+          "planObjectiveUsdPerAcre": {
+            "type": "number",
+            "title": "Planobjectiveusdperacre"
+          },
+          "planNetUsdPerAcre": {
+            "type": "number",
+            "title": "Plannetusdperacre"
+          },
+          "autumn": {
+            "$ref": "#/components/schemas/PlanAutumn"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/components/schemas/PlanStep"
+            },
+            "type": "array",
+            "title": "Steps"
+          },
+          "simulation": {
+            "$ref": "#/components/schemas/PlanSimulation"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop",
+          "rank",
+          "tier",
+          "planObjectiveUsdPerAcre",
+          "planNetUsdPerAcre",
+          "autumn",
+          "steps",
+          "simulation"
+        ],
+        "title": "PlanCrop",
+        "description": "The best plan that starts with this crop."
+      },
+      "PlanCropEconomics": {
+        "properties": {
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "priceUsd": {
+            "type": "number",
+            "title": "Priceusd"
+          },
+          "priceSource": {
+            "type": "string",
+            "enum": [
+              "farmer",
+              "planning"
+            ],
+            "title": "Pricesource"
+          },
+          "costUsdPerAcre": {
+            "type": "number",
+            "title": "Costusdperacre"
+          },
+          "costSource": {
+            "type": "string",
+            "enum": [
+              "farmer",
+              "tables"
+            ],
+            "title": "Costsource"
+          },
+          "soilTestCostChangeUsdPerAcre": {
+            "type": "number",
+            "title": "Soiltestcostchangeusdperacre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop",
+          "priceUsd",
+          "priceSource",
+          "costUsdPerAcre",
+          "costSource",
+          "soilTestCostChangeUsdPerAcre"
+        ],
+        "title": "PlanCropEconomics"
+      },
+      "PlanEconomics": {
+        "properties": {
+          "landRentUsdPerAcre": {
+            "type": "number",
+            "title": "Landrentusdperacre"
+          },
+          "landRentSource": {
+            "type": "string",
+            "enum": [
+              "farmer",
+              "not_charged"
+            ],
+            "title": "Landrentsource"
+          },
+          "crops": {
+            "items": {
+              "$ref": "#/components/schemas/PlanCropEconomics"
+            },
+            "type": "array",
+            "title": "Crops"
+          }
+        },
+        "type": "object",
+        "required": [
+          "landRentUsdPerAcre",
+          "landRentSource",
+          "crops"
+        ],
+        "title": "PlanEconomics"
+      },
+      "PlanSimulation": {
+        "properties": {
+          "firstSeason": {
+            "$ref": "#/components/schemas/SimulatedFirstSeason"
+          },
+          "plan": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SimulatedPlan"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "firstSeason"
+        ],
+        "title": "PlanSimulation"
+      },
+      "PlanStep": {
+        "properties": {
+          "season": {
+            "type": "integer",
+            "title": "Season"
+          },
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "tillage": {
+            "type": "string",
+            "enum": [
+              "conventional",
+              "strip_till",
+              "no_till"
+            ],
+            "title": "Tillage"
+          },
+          "coverCrop": {
+            "type": "string",
+            "enum": [
+              "none",
+              "rye"
+            ],
+            "title": "Covercrop"
+          },
+          "autumnBefore": {
+            "type": "string",
+            "enum": [
+              "none",
+              "sow_cover_crop",
+              "sow_winter_crop",
+              "keep_stand"
+            ],
+            "title": "Autumnbefore"
+          },
+          "objectiveUsdPerAcre": {
+            "type": "number",
+            "title": "Objectiveusdperacre"
+          },
+          "netUsdPerAcre": {
+            "type": "number",
+            "title": "Netusdperacre"
+          },
+          "worstYearUsdPerAcre": {
+            "type": "number",
+            "title": "Worstyearusdperacre"
+          },
+          "bestYearUsdPerAcre": {
+            "type": "number",
+            "title": "Bestyearusdperacre"
+          },
+          "worstYear": {
+            "type": "integer",
+            "title": "Worstyear"
+          },
+          "revenueUsdPerAcre": {
+            "type": "number",
+            "title": "Revenueusdperacre"
+          },
+          "costUsdPerAcre": {
+            "type": "number",
+            "title": "Costusdperacre"
+          },
+          "riskPenaltyUsdPerAcre": {
+            "type": "number",
+            "title": "Riskpenaltyusdperacre"
+          },
+          "soilValueUsdPerAcre": {
+            "type": "number",
+            "title": "Soilvalueusdperacre"
+          },
+          "yieldPerAcre": {
+            "type": "number",
+            "title": "Yieldperacre"
+          },
+          "yieldUnit": {
+            "type": "string",
+            "title": "Yieldunit"
+          },
+          "rules": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Rules"
+          }
+        },
+        "type": "object",
+        "required": [
+          "season",
+          "crop",
+          "tillage",
+          "coverCrop",
+          "autumnBefore",
+          "objectiveUsdPerAcre",
+          "netUsdPerAcre",
+          "worstYearUsdPerAcre",
+          "bestYearUsdPerAcre",
+          "worstYear",
+          "revenueUsdPerAcre",
+          "costUsdPerAcre",
+          "riskPenaltyUsdPerAcre",
+          "soilValueUsdPerAcre",
+          "yieldPerAcre",
+          "yieldUnit",
+          "rules"
+        ],
+        "title": "PlanStep",
+        "description": "One season of a plan, USD per acre. `objective` = net - risk penalty + soil value."
+      },
+      "PlanYears": {
+        "properties": {
+          "source": {
+            "type": "string",
+            "enum": [
+              "climate_record",
+              "field_seasons",
+              "price_years"
+            ],
+            "title": "Source"
+          },
+          "count": {
+            "type": "integer",
+            "title": "Count"
+          },
+          "first": {
+            "type": "integer",
+            "title": "First"
+          },
+          "last": {
+            "type": "integer",
+            "title": "Last"
+          }
+        },
+        "type": "object",
+        "required": [
+          "source",
+          "count",
+          "first",
+          "last"
+        ],
+        "title": "PlanYears"
       },
       "PlannedEvent": {
         "properties": {
@@ -7310,6 +8613,16 @@
             "type": "array",
             "title": "Seasonsavailable"
           },
+          "summarySource": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SummarySource"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "weatherRecord": {
             "anyOf": [
               {
@@ -7359,6 +8672,17 @@
                 "type": "null"
               }
             ]
+          },
+          "soilInputs": {
+            "items": {
+              "$ref": "#/components/schemas/SoilInput"
+            },
+            "type": "array",
+            "title": "Soilinputs",
+            "default": []
+          },
+          "plan": {
+            "$ref": "#/components/schemas/app__schemas__rotation__RotationPlan"
           }
         },
         "type": "object",
@@ -7380,7 +8704,8 @@
           "seasonsAvailable",
           "scoring",
           "dataGaps",
-          "candidates"
+          "candidates",
+          "plan"
         ],
         "title": "RotationAdvice"
       },
@@ -7439,94 +8764,6 @@
         ],
         "title": "RotationMark"
       },
-      "RotationPlan": {
-        "properties": {
-          "id": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Id"
-          },
-          "nextCropId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Nextcropid"
-          },
-          "followingCropId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Followingcropid"
-          },
-          "fieldId": {
-            "type": "string",
-            "format": "uuid",
-            "title": "Fieldid"
-          },
-          "currentCrop": {
-            "type": "string",
-            "title": "Currentcrop"
-          },
-          "nextCrop": {
-            "type": "string",
-            "title": "Nextcrop"
-          },
-          "followingCrop": {
-            "type": "string",
-            "title": "Followingcrop"
-          },
-          "confidence": {
-            "type": "integer",
-            "title": "Confidence"
-          },
-          "sowingDate": {
-            "type": "string",
-            "title": "Sowingdate"
-          },
-          "windowEnd": {
-            "type": "string",
-            "title": "Windowend"
-          },
-          "followingDate": {
-            "type": "string",
-            "title": "Followingdate"
-          },
-          "dateExplanation": {
-            "type": "string",
-            "title": "Dateexplanation"
-          },
-          "reasons": {
-            "items": {
-              "type": "string"
-            },
-            "type": "array",
-            "title": "Reasons"
-          },
-          "inputs": {
-            "items": {
-              "$ref": "#/components/schemas/LabelValue"
-            },
-            "type": "array",
-            "title": "Inputs"
-          }
-        },
-        "type": "object",
-        "required": [
-          "id",
-          "nextCropId",
-          "followingCropId",
-          "fieldId",
-          "currentCrop",
-          "nextCrop",
-          "followingCrop",
-          "confidence",
-          "sowingDate",
-          "windowEnd",
-          "followingDate",
-          "dateExplanation",
-          "reasons",
-          "inputs"
-        ],
-        "title": "RotationPlan"
-      },
       "SaveCropAreas": {
         "properties": {
           "areas": {
@@ -7544,6 +8781,61 @@
           "areas"
         ],
         "title": "SaveCropAreas"
+      },
+      "SeasonResult": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "maximum": 2100.0,
+            "minimum": 1980.0,
+            "title": "Year"
+          },
+          "crop": {
+            "type": "string",
+            "maxLength": 64,
+            "minLength": 1,
+            "title": "Crop"
+          },
+          "yieldPerAcre": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000.0,
+                "exclusiveMinimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Yieldperacre"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "year",
+          "crop"
+        ],
+        "title": "SeasonResult",
+        "description": "What the farmer grew in one past season, and what it yielded."
+      },
+      "SeasonResults": {
+        "properties": {
+          "results": {
+            "items": {
+              "$ref": "#/components/schemas/SeasonResult"
+            },
+            "type": "array",
+            "maxItems": 60,
+            "title": "Results"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "results"
+        ],
+        "title": "SeasonResults"
       },
       "SeasonTiming": {
         "properties": {
@@ -7795,6 +9087,195 @@
         ],
         "title": "SettingsInput"
       },
+      "SimulatedFirstSeason": {
+        "properties": {
+          "lossProbability": {
+            "type": "number",
+            "title": "Lossprobability"
+          },
+          "meanUsdPerAcre": {
+            "type": "number",
+            "title": "Meanusdperacre"
+          },
+          "p10UsdPerAcre": {
+            "type": "number",
+            "title": "P10Usdperacre"
+          },
+          "p50UsdPerAcre": {
+            "type": "number",
+            "title": "P50Usdperacre"
+          },
+          "p90UsdPerAcre": {
+            "type": "number",
+            "title": "P90Usdperacre"
+          },
+          "worst": {
+            "$ref": "#/components/schemas/SimulatedYear"
+          },
+          "best": {
+            "$ref": "#/components/schemas/SimulatedYear"
+          },
+          "years": {
+            "type": "integer",
+            "title": "Years"
+          },
+          "yieldPerAcre": {
+            "$ref": "#/components/schemas/YieldSpread"
+          },
+          "planningPriceUsd": {
+            "type": "number",
+            "title": "Planningpriceusd"
+          },
+          "observedYieldYears": {
+            "type": "integer",
+            "title": "Observedyieldyears"
+          },
+          "beatsTopProbability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Beatstopprobability"
+          },
+          "outcomes": {
+            "items": {
+              "$ref": "#/components/schemas/SimulatedOutcome"
+            },
+            "type": "array",
+            "title": "Outcomes"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lossProbability",
+          "meanUsdPerAcre",
+          "p10UsdPerAcre",
+          "p50UsdPerAcre",
+          "p90UsdPerAcre",
+          "worst",
+          "best",
+          "years",
+          "yieldPerAcre",
+          "planningPriceUsd",
+          "observedYieldYears",
+          "outcomes"
+        ],
+        "title": "SimulatedFirstSeason",
+        "description": "The forecast for the coming season: each past year weighted by its odds of recurring."
+      },
+      "SimulatedOutcome": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "probability": {
+            "type": "number",
+            "title": "Probability"
+          },
+          "netUsdPerAcre": {
+            "type": "number",
+            "title": "Netusdperacre"
+          },
+          "yieldPerAcre": {
+            "type": "number",
+            "title": "Yieldperacre"
+          },
+          "priceUsd": {
+            "type": "number",
+            "title": "Priceusd"
+          },
+          "yieldMode": {
+            "type": "string",
+            "enum": [
+              "observed",
+              "modelled",
+              "none"
+            ],
+            "title": "Yieldmode"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "probability",
+          "netUsdPerAcre",
+          "yieldPerAcre",
+          "priceUsd",
+          "yieldMode"
+        ],
+        "title": "SimulatedOutcome",
+        "description": "The first season if this past year's weather and (inflation-adjusted) price came again."
+      },
+      "SimulatedPlan": {
+        "properties": {
+          "lossProbability": {
+            "type": "number",
+            "title": "Lossprobability"
+          },
+          "meanUsdPerAcre": {
+            "type": "number",
+            "title": "Meanusdperacre"
+          },
+          "p10UsdPerAcre": {
+            "type": "number",
+            "title": "P10Usdperacre"
+          },
+          "p50UsdPerAcre": {
+            "type": "number",
+            "title": "P50Usdperacre"
+          },
+          "p90UsdPerAcre": {
+            "type": "number",
+            "title": "P90Usdperacre"
+          },
+          "worst": {
+            "$ref": "#/components/schemas/SimulatedYear"
+          },
+          "best": {
+            "$ref": "#/components/schemas/SimulatedYear"
+          },
+          "runs": {
+            "type": "integer",
+            "title": "Runs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "lossProbability",
+          "meanUsdPerAcre",
+          "p10UsdPerAcre",
+          "p50UsdPerAcre",
+          "p90UsdPerAcre",
+          "worst",
+          "best",
+          "runs"
+        ],
+        "title": "SimulatedPlan",
+        "description": "The whole plan started in each past year and run through the years that followed it."
+      },
+      "SimulatedYear": {
+        "properties": {
+          "year": {
+            "type": "integer",
+            "title": "Year"
+          },
+          "netUsdPerAcre": {
+            "type": "number",
+            "title": "Netusdperacre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "year",
+          "netUsdPerAcre"
+        ],
+        "title": "SimulatedYear"
+      },
       "SkippedPoint": {
         "properties": {
           "pointId": {
@@ -8030,6 +9511,53 @@
           "value"
         ],
         "title": "SoilIndicator"
+      },
+      "SoilInput": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "enum": [
+              "ph",
+              "organicMatterPct",
+              "phosphorusPpm",
+              "potassiumPpm"
+            ],
+            "title": "Id"
+          },
+          "value": {
+            "type": "number",
+            "title": "Value"
+          },
+          "source": {
+            "type": "string",
+            "enum": [
+              "survey",
+              "ssurgo"
+            ],
+            "title": "Source"
+          },
+          "usedIn": {
+            "items": {
+              "type": "string",
+              "enum": [
+                "rules",
+                "soil_carbon",
+                "fertilizer_cost"
+              ]
+            },
+            "type": "array",
+            "title": "Usedin"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "value",
+          "source",
+          "usedIn"
+        ],
+        "title": "SoilInput",
+        "description": "A soil value the advice used, and whether it is the farmer's test or the soil survey."
       },
       "SoilMetrics": {
         "properties": {
@@ -8569,6 +10097,268 @@
         ],
         "title": "SoilMoistureHistory"
       },
+      "SoilSurvey": {
+        "properties": {
+          "sampledOn": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Sampledon"
+          },
+          "ph": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 10.0,
+                "minimum": 3.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Ph"
+          },
+          "organicMatterPct": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 30.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Organicmatterpct"
+          },
+          "phosphorusPpm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 1000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phosphorusppm"
+          },
+          "potassiumPpm": {
+            "anyOf": [
+              {
+                "type": "number",
+                "maximum": 5000.0,
+                "minimum": 0.0
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Potassiumppm"
+          },
+          "phosphorusTest": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "bray_p1",
+                  "mehlich3_colorimetric",
+                  "mehlich3_icp",
+                  "olsen"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Phosphorustest"
+          },
+          "potassiumSample": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "dried",
+                  "moist"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Potassiumsample"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "title": "SoilSurvey",
+        "description": "The farmer's own soil test. pH and organic matter replace the soil survey estimate."
+      },
+      "SoilTestCrop": {
+        "properties": {
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "rateLbPerAcre": {
+            "type": "number",
+            "title": "Ratelbperacre"
+          },
+          "maintenanceRateLbPerAcre": {
+            "type": "number",
+            "title": "Maintenanceratelbperacre"
+          },
+          "costChangeUsdPerAcre": {
+            "type": "number",
+            "title": "Costchangeusdperacre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop",
+          "rateLbPerAcre",
+          "maintenanceRateLbPerAcre",
+          "costChangeUsdPerAcre"
+        ],
+        "title": "SoilTestCrop"
+      },
+      "SoilTestEffect": {
+        "properties": {
+          "nutrient": {
+            "type": "string",
+            "enum": [
+              "phosphorus",
+              "potassium"
+            ],
+            "title": "Nutrient"
+          },
+          "ppm": {
+            "type": "number",
+            "title": "Ppm"
+          },
+          "test": {
+            "type": "string",
+            "title": "Test"
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "very_low",
+              "low",
+              "optimum",
+              "high",
+              "very_high"
+            ],
+            "title": "Category"
+          },
+          "yieldResponseProbability": {
+            "type": "number",
+            "title": "Yieldresponseprobability"
+          },
+          "fertilizerUnit": {
+            "type": "string",
+            "title": "Fertilizerunit"
+          },
+          "fertilizerUsdPerLb": {
+            "type": "number",
+            "title": "Fertilizerusdperlb"
+          },
+          "calibration": {
+            "type": "string",
+            "enum": [
+              "iowa",
+              "iowa_applied_elsewhere"
+            ],
+            "title": "Calibration"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          },
+          "crops": {
+            "items": {
+              "$ref": "#/components/schemas/SoilTestCrop"
+            },
+            "type": "array",
+            "title": "Crops"
+          }
+        },
+        "type": "object",
+        "required": [
+          "nutrient",
+          "ppm",
+          "test",
+          "category",
+          "yieldResponseProbability",
+          "fertilizerUnit",
+          "fertilizerUsdPerLb",
+          "calibration",
+          "verified",
+          "crops"
+        ],
+        "title": "SoilTestEffect",
+        "description": "A soil-test nutrient: its category and what the recommended rate does to the cost."
+      },
+      "SoilYieldLevel": {
+        "properties": {
+          "crop": {
+            "type": "string",
+            "title": "Crop"
+          },
+          "index": {
+            "type": "string",
+            "enum": [
+              "nccpi_corn",
+              "nccpi_soy"
+            ],
+            "title": "Index"
+          },
+          "fieldIndex": {
+            "type": "number",
+            "title": "Fieldindex"
+          },
+          "countyIndex": {
+            "type": "number",
+            "title": "Countyindex"
+          },
+          "countyFields": {
+            "type": "integer",
+            "title": "Countyfields"
+          },
+          "ratio": {
+            "type": "number",
+            "title": "Ratio"
+          },
+          "expectedYieldPerAcre": {
+            "type": "number",
+            "title": "Expectedyieldperacre"
+          },
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          }
+        },
+        "type": "object",
+        "required": [
+          "crop",
+          "index",
+          "fieldIndex",
+          "countyIndex",
+          "countyFields",
+          "ratio",
+          "expectedYieldPerAcre",
+          "verified"
+        ],
+        "title": "SoilYieldLevel",
+        "description": "How the soil productivity index moved the expected yield of a crop within the county."
+      },
       "StrategyResponse": {
         "properties": {
           "status": {
@@ -8604,6 +10394,37 @@
           "checkpoint"
         ],
         "title": "StrategyStep"
+      },
+      "SummarySource": {
+        "properties": {
+          "kind": {
+            "type": "string",
+            "enum": [
+              "own",
+              "weather_cell",
+              "nearby_cell",
+              "none"
+            ],
+            "title": "Kind"
+          },
+          "distanceKm": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distancekm"
+          }
+        },
+        "type": "object",
+        "required": [
+          "kind"
+        ],
+        "title": "SummarySource",
+        "description": "Whose weather, drought and county record the field's seasons are read from."
       },
       "TeamMember": {
         "properties": {
@@ -9176,6 +10997,48 @@
         ],
         "title": "WeatherUnits"
       },
+      "YearOdds": {
+        "properties": {
+          "method": {
+            "type": "string",
+            "enum": [
+              "analog_years",
+              "equal"
+            ],
+            "title": "Method"
+          },
+          "effectiveYears": {
+            "type": "number",
+            "title": "Effectiveyears"
+          },
+          "startsAfter": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Startsafter"
+          },
+          "signals": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Signals",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "method",
+          "effectiveYears"
+        ],
+        "title": "YearOdds",
+        "description": "How the past years are weighted for the coming season."
+      },
       "YieldEstimate": {
         "properties": {
           "low": {
@@ -9256,6 +11119,281 @@
           "unit"
         ],
         "title": "YieldEstimate"
+      },
+      "YieldSpread": {
+        "properties": {
+          "unit": {
+            "type": "string",
+            "title": "Unit"
+          },
+          "meanPerAcre": {
+            "type": "number",
+            "title": "Meanperacre"
+          },
+          "p10PerAcre": {
+            "type": "number",
+            "title": "P10Peracre"
+          },
+          "p50PerAcre": {
+            "type": "number",
+            "title": "P50Peracre"
+          },
+          "p90PerAcre": {
+            "type": "number",
+            "title": "P90Peracre"
+          }
+        },
+        "type": "object",
+        "required": [
+          "unit",
+          "meanPerAcre",
+          "p10PerAcre",
+          "p50PerAcre",
+          "p90PerAcre"
+        ],
+        "title": "YieldSpread"
+      },
+      "app__schemas__planning__RotationPlan": {
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Id"
+          },
+          "nextCropId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Nextcropid"
+          },
+          "followingCropId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Followingcropid"
+          },
+          "fieldId": {
+            "type": "string",
+            "format": "uuid",
+            "title": "Fieldid"
+          },
+          "currentCrop": {
+            "type": "string",
+            "title": "Currentcrop"
+          },
+          "nextCrop": {
+            "type": "string",
+            "title": "Nextcrop"
+          },
+          "followingCrop": {
+            "type": "string",
+            "title": "Followingcrop"
+          },
+          "confidence": {
+            "type": "integer",
+            "title": "Confidence"
+          },
+          "sowingDate": {
+            "type": "string",
+            "title": "Sowingdate"
+          },
+          "windowEnd": {
+            "type": "string",
+            "title": "Windowend"
+          },
+          "followingDate": {
+            "type": "string",
+            "title": "Followingdate"
+          },
+          "dateExplanation": {
+            "type": "string",
+            "title": "Dateexplanation"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Reasons"
+          },
+          "inputs": {
+            "items": {
+              "$ref": "#/components/schemas/LabelValue"
+            },
+            "type": "array",
+            "title": "Inputs"
+          }
+        },
+        "type": "object",
+        "required": [
+          "id",
+          "nextCropId",
+          "followingCropId",
+          "fieldId",
+          "currentCrop",
+          "nextCrop",
+          "followingCrop",
+          "confidence",
+          "sowingDate",
+          "windowEnd",
+          "followingDate",
+          "dateExplanation",
+          "reasons",
+          "inputs"
+        ],
+        "title": "RotationPlan"
+      },
+      "app__schemas__rotation__RotationPlan": {
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok",
+              "no_modellable_crop"
+            ],
+            "title": "Status"
+          },
+          "objective": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Objective"
+          },
+          "method": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Method"
+          },
+          "seasons": {
+            "type": "integer",
+            "title": "Seasons"
+          },
+          "firstSeason": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Firstseason"
+          },
+          "weights": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Weights",
+            "default": {}
+          },
+          "years": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanYears"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "costRegion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Costregion"
+          },
+          "yearOdds": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/YearOdds"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ownYields": {
+            "items": {
+              "$ref": "#/components/schemas/OwnYieldLevel"
+            },
+            "type": "array",
+            "title": "Ownyields",
+            "default": []
+          },
+          "soilYield": {
+            "items": {
+              "$ref": "#/components/schemas/SoilYieldLevel"
+            },
+            "type": "array",
+            "title": "Soilyield",
+            "default": []
+          },
+          "economics": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanEconomics"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "soilTest": {
+            "items": {
+              "$ref": "#/components/schemas/SoilTestEffect"
+            },
+            "type": "array",
+            "title": "Soiltest",
+            "default": []
+          },
+          "crops": {
+            "items": {
+              "$ref": "#/components/schemas/PlanCrop"
+            },
+            "type": "array",
+            "title": "Crops"
+          },
+          "notModelled": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Notmodelled",
+            "default": []
+          },
+          "gaps": {
+            "items": {
+              "additionalProperties": true,
+              "type": "object"
+            },
+            "type": "array",
+            "title": "Gaps",
+            "default": []
+          }
+        },
+        "type": "object",
+        "required": [
+          "status",
+          "seasons",
+          "crops"
+        ],
+        "title": "RotationPlan"
       },
       "app__schemas__rotation__WeatherRecord": {
         "properties": {

@@ -153,6 +153,38 @@ class MapTests(unittest.TestCase):
         )
         self.assertEqual(self.client.get(BASE + f"/fields/{fid}/properties").status_code, 404)
 
+    def test_user_fields_take_the_county_of_the_nearest_catalog_field(self):
+        catalog = dict(
+            name="CSB",
+            crop=None,
+            area=1,
+            attributes={},
+            location_kind="interior_point",
+            state_fips="19",
+            county_fips="169",
+            county="Story",
+        )
+        with self.app.state.engine.begin() as connection:
+            connection.execute(
+                insert(FieldRecord),
+                [
+                    dict(catalog, id=str(uuid4()), longitude=-93.70, latitude=42.04),
+                    dict(
+                        catalog,
+                        id=str(uuid4()),
+                        longitude=-93.60,
+                        latitude=42.04,
+                        county_fips="015",
+                    ),
+                ],
+            )
+        near = create_field(self.client)  # at -93.745, 42.045
+        self.assertEqual(
+            (near["stateFips"], near["countyFips"], near["county"]), ("19", "169", "Story")
+        )
+        far = create_field(self.client, geometry={"type": "Point", "coordinates": [30, 50]})
+        self.assertIsNone(far["stateFips"])
+
     def test_manual_additions_update_imported_summary_and_every_aggregate_level(self):
         with self.app.state.sessions() as session:
             session.add(

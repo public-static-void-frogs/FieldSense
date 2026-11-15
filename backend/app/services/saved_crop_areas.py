@@ -11,6 +11,7 @@ from sqlalchemy import delete, select, update
 
 from app.repositories.fields import FieldRecord, UserField, field_view
 from app.repositories.users import User
+from app.services.maps import locate_county
 
 GEOD = Geod(ellps="WGS84")
 
@@ -71,7 +72,10 @@ def save_crop_areas(store, areas):
             session.add(UserField(user_id=store.user_id, field_id=row.id))
         row.boundary = mapping(boundary)
         row.area = hectares
+        if (row.longitude, row.latitude) != (point.x, point.y):
+            row.state_fips = row.county_fips = row.county = None  # located again below
         row.longitude, row.latitude = point.x, point.y
+        locate_county(session, row)
         # Legacy point selections have no boundary to union. Keep the shared source rows.
         session.execute(
             delete(UserField).where(
