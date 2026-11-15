@@ -5,7 +5,7 @@ import { useLocation } from 'react-router-dom';
 import { CropIcon } from '../../../components/common/CropIcon';
 import { RouterButton } from '../../../components/common/RouterButton';
 import type { RotationAdvice, RotationCandidate } from '../../../types/rotation/rotation.types.ts';
-import { levelColors, levelLabels } from '../constants/rotationLabels.ts';
+import { levelLabels } from '../constants/rotationLabels.ts';
 import {
   formatNumber,
   formatUsd,
@@ -70,11 +70,15 @@ function CandidateSummary({ candidate }: CandidateSummaryProps) {
         <Typography.Text strong className="rotation-candidate-name">
           {t(candidate.label)}
         </Typography.Text>
-        {candidate.isIntended && <Tag color="green">{t('Your crop')}</Tag>}
-        {level ? (
-          <Tag color={levelColors[level]}>{t(levelLabels[level])}</Tag>
-        ) : (
-          <Tag>{t('No risks found')}</Tag>
+        {candidate.isIntended && (
+          <Tag className="rotation-candidate-badge" data-tone="intended">
+            {t('Your crop')}
+          </Tag>
+        )}
+        {level && (
+          <Tag className="rotation-candidate-badge" data-tone={level}>
+            {t(levelLabels[level])}
+          </Tag>
         )}
         <Tooltip
           trigger={['hover', 'focus', 'click']}
