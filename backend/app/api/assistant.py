@@ -61,7 +61,6 @@ def chat(request: Request, body: ChatRequest, user: CurrentUser, store: Store):
             state.config.gemini_enabled,
             bool(state.config.gemini_api_key.strip()),
         )
-    if user.is_demo or not llm_available(state.config):
         raise HTTPException(503, "Assistant is unavailable")
     registry = state.assistant_tools
     unknown = sorted(set(body.tools or []) - set(registry.names()))

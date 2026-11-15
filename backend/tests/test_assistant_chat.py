@@ -72,8 +72,10 @@ class StubRotation:
         def candidate(name, rank):
             return {
                 "crop": name, "label": name.title(), "group": "g", "rank": rank,
-                "isIntended": rank == 2, "score": rank * 10.0, "scoreBreakdown": [],
-                "risks": [{"ruleId": "r1", "title": "Repeat crop", "trigger": {"big": 1},
+                "isIntended": rank == 2, "score": rank * 10.0,
+                "scoreBreakdown": [{"ruleId": "r1", "kind": "risk", "points": 5.0}],
+                "risks": [{"ruleId": "r1", "title": "Repeat crop",
+                           "trigger": {"type": "conditions", "conditions": [{"actual": 1}]},
                            "points": 5.0, "kind": "risk", "category": "rotation"}],
                 "benefits": [], "advisories": [], "yield": {"mid": 9.0},
                 "revenue": {"midUsd": 100.0}, "calendar": {"stages": {}}, "soil": [],
@@ -84,7 +86,7 @@ class StubRotation:
             "intendedCrop": crop or "corn", "intendedCropSource": "requested", "region": "us",
             "asOf": "2026-01-01", "areaHa": 5.0, "units": units, "priorities": priorities,
             "historySource": {"kind": "cdl"}, "history": [], "weatherRecord": None,
-            "offSeason": None, "scoring": {}, "dataGaps": [],
+            "offSeason": None, "scoring": {"priorityMultiplier": 2}, "dataGaps": [],
             "cropOptions": [{"id": "corn", "label": "Corn", "group": "g"}],
             "candidates": [candidate(n, i + 1) for i, n in enumerate(["a", "b", "c", "d", "e"])],
             "seasonTiming": {"big": "block"}, "resultVersion": "v",
@@ -382,7 +384,12 @@ class AssistantChatTests(unittest.TestCase):
 
     def test_rotation_advice_explanation_is_added_only_when_asked(self):
         field = self.login_with_field()
-        rule = SimpleNamespace(id="r1", sources=("Repeat-crop rule reference",))
+        rule = SimpleNamespace(
+            id="r1",
+            title="Repeat crop",
+            sources=("Repeat-crop rule reference",),
+            evidence_strength="strong",
+        )
         self.rotation.advisor = SimpleNamespace(rules=SimpleNamespace(rules=(rule,)))
         gemini = FakeGemini(
             call("get_rotation_advice"),
@@ -397,10 +404,14 @@ class AssistantChatTests(unittest.TestCase):
         recommended = explanation["why"]["recommended"]
         self.assertEqual(recommended["crop"], "a")
         self.assertEqual(explanation["why"]["intended"]["crop"], "b")
-        self.assertEqual(recommended["risks"][0]["points"], 5.0)
-        self.assertEqual(recommended["risks"][0]["trigger"], {"big": 1})
-        self.assertEqual(explanation["method"]["scoring"], explained["scoring"])
-        self.assertEqual(explanation["sources"]["ruleReferences"], {"r1": [rule.sources[0]]})
+        risk = recommended["addedRisk"][0]
+        self.assertEqual(risk["points"], 5.0)
+        self.assertEqual(risk["basedOn"]["conditions"], [{"actual": 1}])
+        self.assertEqual(explanation["method"]["weights"]["priorityMultiplier"], 2)
+        self.assertEqual(
+            explanation["sources"]["ruleReferences"],
+            [{"ruleId": "r1", "title": rule.title, "references": list(rule.sources)}],
+        )
 
     def test_rotation_advice_tool_trims_detail_and_helps_with_a_bad_crop(self):
         field = self.login_with_field()
