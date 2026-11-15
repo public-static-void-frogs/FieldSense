@@ -11,6 +11,7 @@ import { request } from '../core/http.ts';
 type StrategyResponseInput = {
   fieldId: string;
   status: EventDecision;
+  eventIds?: string[];
 };
 
 type EventResponseInput = StrategyResponseInput & { eventId: string };
@@ -43,11 +44,15 @@ export const planningApi = {
     }),
   getResponses: (signal?: AbortSignal): Promise<EventResponses> =>
     request('/planning/responses', { signal }),
-  respondToStrategy: ({ fieldId, status }: StrategyResponseInput): Promise<EventResponses> =>
+  respondToStrategy: ({
+    fieldId,
+    status,
+    eventIds,
+  }: StrategyResponseInput): Promise<EventResponses> =>
     request(`/fields/${fieldId}/strategy/response`, {
       method: 'PUT',
-      // Events that were already decided keep their decision.
-      body: JSON.stringify({ status, onlyProposed: true }),
+      body: JSON.stringify({ status, onlyProposed: !eventIds, eventIds }),
+      timeoutMs: COMPUTE_TIMEOUT_MS,
     }),
   respondToEvent: ({ fieldId, eventId, status }: EventResponseInput): Promise<EventResponses> =>
     request(`/fields/${fieldId}/events/${eventId}/response`, {

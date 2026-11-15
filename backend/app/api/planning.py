@@ -64,6 +64,10 @@ def respond(
 
     With ``onlyProposed`` the events that already have a decision keep it.
     """
+    if input.eventIds is not None:
+        return service.respond_to_schedule(
+            store, responses, field_id, input, request.app.state.strategy, user.settings
+        )
     return service.respond(
         store,
         responses,

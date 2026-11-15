@@ -53,6 +53,18 @@ def respond(store, responses, field_id, status, calendar, preferences, only_prop
     )
 
 
+def respond_to_schedule(store, responses, field_id, input, strategies, preferences):
+    """Record a decision for the strategy events the user reviewed."""
+    current = strategy(store, field_id, strategies, preferences)["events"]
+    requested = {str(event_id) for event_id in input.eventIds}
+    selected = {str(e["id"]): fingerprint(e) for e in current if str(e["id"]) in requested}
+    if selected.keys() != requested:
+        raise ResourceNotFound("Strategy events have changed")
+    return responses.replace_for_field(
+        str(field_id), input.status, selected, input.onlyProposed, preserve_other_events=True
+    )
+
+
 def respond_to_event(store, responses, field_id, event_id, status, calendar, preferences):
     """Record one decision for a single calendar event of the field."""
     field = store.require_field(field_id)

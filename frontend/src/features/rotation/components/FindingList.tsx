@@ -88,7 +88,8 @@ function FindingReason({ finding, cropLabels }: FindingReasonProps) {
   const { trigger } = finding;
   if (trigger.type === 'hazard') {
     return (
-      <div className="rotation-finding-weather">
+      <details className="strategy-disclosure rotation-finding-weather">
+        <summary>{t('Details')}</summary>
         <p>
           {t(
             'In {{hit}} of {{total}} recent seasons, around {{stage}} ({{start}} – {{end}}): {{metric}}.',
@@ -113,7 +114,7 @@ function FindingReason({ finding, cropLabels }: FindingReasonProps) {
             })}
           </Typography.Text>
         )}
-      </div>
+      </details>
     );
   }
 
@@ -127,13 +128,16 @@ function FindingReason({ finding, cropLabels }: FindingReasonProps) {
   }
 
   return (
-    <dl className="rotation-finding-facts">
-      {[...facts].map(([fact, value]) => (
-        <div key={fact}>
-          <dt>{t(factLabels[fact] ?? fact)}: </dt>
-          <dd>{formatValue(value, t, i18n.language, cropLabels)}</dd>
-        </div>
-      ))}
-    </dl>
+    <details className="strategy-disclosure">
+      <summary>{t('Details')}</summary>
+      <dl className="rotation-finding-facts">
+        {[...facts].map(([fact, value]) => (
+          <div key={fact}>
+            <dt>{t(factLabels[fact] ?? fact)}: </dt>
+            <dd>{formatValue(value, t, i18n.language, cropLabels)}</dd>
+          </div>
+        ))}
+      </dl>
+    </details>
   );
 }

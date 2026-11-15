@@ -47,18 +47,21 @@ export function LocalTiming({ timing, crop, year }: LocalTimingProps) {
     <section>
       <Typography.Title level={5}>{t('Local timing and weather risk')}</Typography.Title>
       <Descriptions column={1} size="small" items={[...dates, ...riskItems(crop, t, language)]} />
-      <Typography.Text type="secondary">
-        {timing.matchLevel === 'field'
-          ? t('From past weather around this field, not a forecast for this season.')
-          : t(
-              'From past weather for the wider area (about 50 km), not a forecast for this season.',
-            )}{' '}
-        {errors.length > 0 &&
-          t('Dates can be off by about {{days}} days against USDA crop progress reports.', {
-            days: formatNumber(Math.max(...errors), language, 0),
-          })}{' '}
-        {t('Only the sowing date is used in the ranking; the rest is for information.')}
-      </Typography.Text>
+      <details className="strategy-disclosure">
+        <summary>{t('How the date was calculated')}</summary>
+        <Typography.Text type="secondary">
+          {timing.matchLevel === 'field'
+            ? t('From past weather around this field, not a forecast for this season.')
+            : t(
+                'From past weather for the wider area (about 50 km), not a forecast for this season.',
+              )}{' '}
+          {errors.length > 0 &&
+            t('Dates can be off by about {{days}} days against USDA crop progress reports.', {
+              days: formatNumber(Math.max(...errors), language, 0),
+            })}{' '}
+          {t('Only the sowing date is used in the ranking; the rest is for information.')}
+        </Typography.Text>
+      </details>
     </section>
   );
 }

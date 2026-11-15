@@ -100,7 +100,7 @@ export function FieldRecommendationCropPage() {
             <PlanForecast advice={advice} plan={plan} entry={entry} />
           </Card>
         )}
-        <Card>
+        <Card title={t('Crop details')}>
           <CandidateDetails advice={advice} candidate={candidate} />
         </Card>
         <FieldStrategySection fieldId={fieldId} cropLabel={candidate.label} />

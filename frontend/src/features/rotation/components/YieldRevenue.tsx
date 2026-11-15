@@ -64,9 +64,12 @@ export function YieldRevenue({ candidate }: YieldRevenueProps) {
         </div>
       )}
       {revenue && (
-        <Typography.Text type="secondary">
-          {t('Gross revenue only: seed, fertiliser, fuel and other costs are not subtracted.')}
-        </Typography.Text>
+        <details className="strategy-disclosure">
+          <summary>{t('About {{label}}', { label: title })}</summary>
+          <Typography.Text type="secondary">
+            {t('Gross revenue only: seed, fertiliser, fuel and other costs are not subtracted.')}
+          </Typography.Text>
+        </details>
       )}
     </section>
   );

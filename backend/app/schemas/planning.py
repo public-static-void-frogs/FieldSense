@@ -1,7 +1,7 @@
 from typing import Literal
 from uuid import UUID
 
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 
 class StrategyResponse(BaseModel):
@@ -9,6 +9,7 @@ class StrategyResponse(BaseModel):
     status: Literal["proposed", "accepted", "declined"]
     # Leave events that already have a decision as they are.
     onlyProposed: bool = False
+    eventIds: list[UUID] | None = Field(default=None, min_length=1)
 
 
 class EventResponse(BaseModel):

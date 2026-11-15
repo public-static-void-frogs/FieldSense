@@ -111,12 +111,23 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
           </ForecastMetric>
         )}
       </dl>
-      <Typography.Paragraph type="secondary">
-        {t(
-          'Yields in {{observed}} of {{years}} years are county or state records; the others are modelled from that year’s weather. "Poor" and "good" mean one year in ten is worse or better.',
-          { observed: firstSeason.observedYieldYears, years: firstSeason.years },
+      <details className="strategy-disclosure rotation-forecast-note">
+        <summary>{t('How the forecast is made')}</summary>
+        <Typography.Paragraph type="secondary">
+          {t(
+            'Yields in {{observed}} of {{years}} years are county or state records; the others are modelled from that year’s weather. "Poor" and "good" mean one year in ten is worse or better.',
+            { observed: firstSeason.observedYieldYears, years: firstSeason.years },
+          )}
+        </Typography.Paragraph>
+        {wholePlan && plan.seasons > 1 && (
+          <Typography.Paragraph type="secondary">
+            {t(
+              'The whole plan was started in each of {{runs}} past years and run through the years that really followed.',
+              { runs: wholePlan.runs },
+            )}
+          </Typography.Paragraph>
         )}
-      </Typography.Paragraph>
+      </details>
       <SeasonForecast advice={advice} steps={entry.steps} />
       {wholePlan && plan.seasons > 1 && (
         <>
@@ -154,12 +165,6 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
               </dd>
             </div>
           </dl>
-          <Typography.Paragraph type="secondary">
-            {t(
-              'The whole plan was started in each of {{runs}} past years and run through the years that really followed.',
-              { runs: wholePlan.runs },
-            )}
-          </Typography.Paragraph>
         </>
       )}
     </section>

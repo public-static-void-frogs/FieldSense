@@ -51,12 +51,14 @@ class EventResponses:
         status: str,
         fingerprints: dict[str, str],
         only_proposed: bool = False,
+        preserve_other_events: bool = False,
     ) -> dict[str, dict[str, str]]:
         """Set one decision for the given events of a field and drop its older responses.
 
         ``proposed`` clears the decisions. With ``only_proposed`` the events that already have a
         valid decision keep it and only the others get ``status``. Responses to events that no
-        longer exist are removed so the table does not grow with every changed date.
+        longer exist are removed so the table does not grow with every changed date. Scoped
+        decisions preserve responses outside the supplied events.
         """
         rows = self._field_rows(field_id)
         keep = {
@@ -67,6 +69,8 @@ class EventResponses:
             and fingerprints.get(event_id) == row.fingerprint
         }
         for event_id, row in rows.items():
+            if preserve_other_events and event_id not in fingerprints:
+                continue
             if event_id not in keep:
                 self.session.delete(row)
         self.session.flush()

@@ -525,28 +525,43 @@
   }
 }
 
-.strategy-sections,
-.strategy-sidebar {
+.strategy-sections {
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
-.strategy-demo-note.ant-typography {
-  margin: 16px 0 0;
-  font-size: 12px;
+.strategy-disclosure {
+  min-width: 0;
 }
 
-.strategy-content-grid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(300px, 1fr);
-  align-items: start;
-  gap: 24px;
-}
-
-.strategy-step-content .ant-typography {
+.strategy-disclosure > summary {
+  color: #35532c;
+  cursor: pointer;
   font-size: 14px;
-  margin-block: 10px;
+  font-weight: 600;
+}
+
+.strategy-disclosure[open] > summary {
+  margin-bottom: 12px;
+}
+
+.strategy-disclosure + .strategy-disclosure {
+  margin-top: 8px;
+}
+
+.strategy-action-plan .ant-steps-item-title .ant-typography,
+.strategy-step-content .ant-typography,
+.strategy-step-content .strategy-disclosure > summary {
+  font-size: 13px;
+}
+
+.strategy-step-content .ant-typography.ant-typography-secondary {
+  margin-bottom: 6px;
+}
+
+.strategy-step-content .strategy-disclosure[open] {
+  margin-top: 4px;
 }
 
 .strategy-contingency + .strategy-contingency {
@@ -561,62 +576,58 @@
   margin: 6px 0 0;
 }
 
-.strategy-forecast-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px;
+.strategy-table-card > .ant-card-body {
+  padding: 0;
 }
 
-.strategy-forecast-grid > .ant-card {
-  min-width: 0;
+.strategy-schedule-details > summary {
+  padding: 12px 24px;
 }
 
-.strategy-chart {
-  height: 300px;
-  min-width: 0;
-}
-
-.strategy-forecast-summary {
+.strategy-acceptance {
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   flex-wrap: wrap;
-  gap: 16px;
-  padding-bottom: 16px;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #dfe5d5;
+  background: #f3f6ed;
 }
 
-.strategy-forecast-summary > div {
+.strategy-acceptance .ant-btn {
+  height: auto;
+  min-height: 44px;
+  padding-block: 6px;
+  white-space: normal;
+}
+
+.strategy-acceptance-action {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.strategy-acceptance-status {
   display: flex;
   flex-direction: column;
   gap: 4px;
 }
 
-.strategy-forecast-summary > div > .ant-typography:first-child {
-  font-size: 12px;
+.strategy-acceptance-note.ant-typography {
+  font-size: 13px;
 }
 
-.strategy-forecast-summary > div > .ant-typography:last-child {
-  font-size: 23px;
+.strategy-accepted.ant-typography {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #315327;
 }
 
-.strategy-chart-caption.ant-typography {
-  display: block;
-  margin-top: 12px;
-  font-size: 12px;
-}
-
-.strategy-table-card > .ant-card-body {
-  padding: 0;
-}
-
-.strategy-proposal-intro.ant-typography {
-  padding: 20px 24px;
-  margin: 0;
-  font-size: 14px;
-}
-
-.strategy-event-rationale.ant-typography {
-  font-size: 12px;
-  margin: 6px 0 0;
+.strategy-accepted svg {
+  flex-shrink: 0;
 }
 
 .event-response-controls .ant-tag {
@@ -641,13 +652,6 @@
 .event-response-panel .ant-typography {
   display: block;
   margin-bottom: 10px;
-}
-
-@media (max-width: 1050px) {
-  .strategy-content-grid,
-  .strategy-forecast-grid {
-    grid-template-columns: 1fr;
-  }
 }
 
 .plan-event-response-tag.ant-tag {

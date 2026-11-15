@@ -1,5 +1,7 @@
 import unittest
 from datetime import date
+from unittest.mock import patch
+from uuid import uuid4
 
 from fastapi.testclient import TestClient
 from support import create_field, isolated_app, register
@@ -206,6 +208,29 @@ class StrategyEndpointTests(unittest.TestCase):
         self.assertEqual(self.client.put(missing, json={"status": "accepted"}).status_code, 404)
         self.assertEqual(self.other.put(url, json={"status": "accepted"}).status_code, 404)
         self.assertEqual(self.client.put(url, json={"status": "later"}).status_code, 422)
+
+    def test_accepting_the_strategy_adds_all_schedule_events_and_preserves_other_decisions(self):
+        events = self.client.get(f"{self.base}/strategy").json()["events"]
+        calendar = self.app.state.calendar
+        calendar_events = self.client.get(f"{self.base}/events").json()
+        event_ids = [event["id"] for event in events]
+        self.assertTrue(set(event_ids) <= {event["id"] for event in calendar_events})
+        other_id = str(uuid4())
+        other_event = {**events[0], "id": other_id, "title": "Weather alert"}
+        url = f"{self.base}/strategy/response"
+        with patch.object(calendar, "for_field", return_value=[*calendar_events, other_event]):
+            for event_id in (other_id, event_ids[0]):
+                response = self.client.put(
+                    f"{self.base}/events/{event_id}/response", json={"status": "declined"}
+                )
+                self.assertEqual(response.status_code, 200, response.text)
+            invalid = self.client.put(url, json={"status": "accepted", "eventIds": [other_id]})
+            self.assertEqual(invalid.status_code, 404, invalid.text)
+            accepted = self.client.put(url, json={"status": "accepted", "eventIds": event_ids})
+            self.assertEqual(accepted.status_code, 200, accepted.text)
+            saved = accepted.json()
+            self.assertEqual({saved[event_id]["status"] for event_id in event_ids}, {"accepted"})
+            self.assertEqual(saved[other_id]["status"], "declined")
 
     def test_stale_responses_are_replaced_when_the_events_change(self):
         self.client.put(f"{self.base}/strategy/response", json={"status": "accepted"})

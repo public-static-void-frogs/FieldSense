@@ -196,6 +196,14 @@
   font-weight: 600;
 }
 
+.rotation-strategy-page .rotation-stages .ant-typography {
+  font-size: 13px;
+}
+
+.rotation-forecast-note {
+  margin-bottom: 20px;
+}
+
 .rotation-gaps ul {
   display: flex;
   flex-direction: column;

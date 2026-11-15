@@ -18,9 +18,12 @@ export function SoilEffects({ indicators }: SoilEffectsProps) {
   return (
     <section>
       <Typography.Title level={5}>{t('Effect on the soil')}</Typography.Title>
-      <p className="rotation-soil-note">
-        {t('The scale shows how each indicator compares with its own reference point.')}
-      </p>
+      <details className="strategy-disclosure">
+        <summary>{t('About this score')}</summary>
+        <p className="rotation-soil-note">
+          {t('The scale shows how each indicator compares with its own reference point.')}
+        </p>
+      </details>
       <dl className="rotation-soil-rows">
         {indicators.map(({ id, value, direction, threshold, verified }) => {
           const rating =
