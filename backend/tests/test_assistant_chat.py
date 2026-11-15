@@ -217,7 +217,7 @@ class AssistantChatTests(unittest.TestCase):
         return [json.loads(line) for line in response.iter_lines()]
 
     # ------------------------------------------------------------------ basics
-    def test_requires_auth_and_configuration_and_valid_conversation(self):
+    def test_requires_configuration_and_valid_conversation(self):
         body = {"messages": MESSAGES}
         self.assertEqual(self.client.post(PATH, json=body).status_code, 503)
         self.assertEqual(register(self.client).status_code, 201)
@@ -233,6 +233,17 @@ class AssistantChatTests(unittest.TestCase):
             self.assertEqual(
                 self.client.post(PATH, json={"messages": messages}).status_code, 422, messages
             )
+
+    def test_demo_chat_streams_without_login_and_cannot_access_private_fields(self):
+        private_field = self.login_with_field()
+        self.client.cookies.clear()
+        response = self.client.post(
+            PATH, json={"messages": MESSAGES, "field_id": private_field["id"]}
+        )
+        self.assertEqual(response.status_code, 404)
+
+        events = self.chat(FakeGemini(text("Hello from the assistant.")))
+        self.assertEqual(events, [{"delta": "Hello from the assistant."}, {"done": True}])
 
     def test_unknown_field_is_404(self):
         self.assertEqual(register(self.client).status_code, 201)
