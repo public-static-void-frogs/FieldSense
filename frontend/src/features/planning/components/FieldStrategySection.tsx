@@ -39,6 +39,7 @@ import { useStrategyReview } from '../hooks/useStrategyReview.ts';
 import { countEventDecisions } from '../utils/eventPresentation.ts';
 import { formatPlanDate } from '../utils/planningDates.ts';
 import { calendarEventPath, calendarPath } from '../utils/planningRoutes.ts';
+import { EventDecisionControls } from './EventDecisionControls';
 import { EventResponseControls } from './EventResponseControls';
 
 const tooltipStyle = {
@@ -368,7 +369,7 @@ function StrategySections({ field, strategy, eventResponses }: StrategySectionsP
           rowKey="id"
           dataSource={events}
           pagination={false}
-          scroll={{ x: 560 }}
+          scroll={{ x: 760 }}
           columns={[
             {
               title: t('Date'),
@@ -387,6 +388,12 @@ function StrategySections({ field, strategy, eventResponses }: StrategySectionsP
                   </Typography.Paragraph>
                 </div>
               ),
+            },
+            {
+              title: t('Status'),
+              key: 'response',
+              width: 250,
+              render: (_, event) => <EventDecisionControls event={event} />,
             },
           ]}
         />

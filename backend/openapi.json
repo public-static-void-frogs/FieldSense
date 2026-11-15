@@ -1807,7 +1807,7 @@
           "planning"
         ],
         "summary": "Respond",
-        "description": "Accept or decline every calendar event of the field; ``proposed`` clears the decisions.",
+        "description": "Accept or decline the calendar events of the field; ``proposed`` clears the decisions.\n\nWith ``onlyProposed`` the events that already have a decision keep it.",
         "operationId": "respond_api_v1_fields__field_id__strategy_response_put",
         "security": [
           {
@@ -1850,6 +1850,82 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/events/{event_id}/response": {
+      "put": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "Respond To Event",
+        "description": "Accept or decline one calendar event of the field; ``proposed`` clears its decision.",
+        "operationId": "respond_to_event_api_v1_fields__field_id__events__event_id__response_put",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          },
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StrategyResponse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/EventResponse"
+                  },
+                  "title": "Response Respond To Event Api V1 Fields  Field Id  Events  Event Id  Response Put"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Field or event not found"
           },
           "422": {
             "description": "Validation Error",
@@ -9045,6 +9121,11 @@
               "declined"
             ],
             "title": "Status"
+          },
+          "onlyProposed": {
+            "type": "boolean",
+            "title": "Onlyproposed",
+            "default": false
           }
         },
         "additionalProperties": false,

@@ -110,7 +110,9 @@ backend requirements.
 - `GET /api/v1/fields/{id}/rotation` and `/strategy` build the rotation plan and strategy from the
   ranked rotation advice (next crop, following crop, dates, steps, contingencies); `404` when the
   advice cannot be computed. `PUT /api/v1/fields/{id}/strategy/response` saves one decision
-  (`accepted`, `declined` or `proposed` to clear) for every calendar event of the field, and
+  (`accepted`, `declined` or `proposed` to clear) for every calendar event of the field (with
+  `onlyProposed: true` events that already have a decision keep it), `PUT
+  /api/v1/fields/{id}/events/{event_id}/response` saves one for a single event, and
   `GET /api/v1/planning/responses` lists them. A response stores a fingerprint of the reviewed event,
   so it stops applying when the event's date or text changes. Migration `0007_event_responses`.
 - `GET /api/v1/planning/events` and `GET /api/v1/fields/{id}/events` return calendar events built

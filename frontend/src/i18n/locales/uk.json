@@ -1434,5 +1434,14 @@
   "Ask a follow-up question…": "Поставте уточнювальне запитання…",
   "Ask a follow-up": "Поставити уточнювальне запитання",
   "Looking up crop production…": "Шукаю дані про врожайність…",
-  "Estimating crop revenue…": "Оцінюю дохід від культур…"
+  "Estimating crop revenue…": "Оцінюю дохід від культур…",
+  "Rejected": "Відхилено",
+  "Accept": "Прийняти",
+  "Reject": "Відхилити",
+  "Accept remaining": "Прийняти решту",
+  "Reject remaining": "Відхилити решту",
+  "All reviewed": "Усе розглянуто",
+  "This action": "Ця дія",
+  "Accept event: {{value0}}": "Прийняти подію: {{value0}}",
+  "Reject event: {{value0}}": "Відхилити подію: {{value0}}"
 }

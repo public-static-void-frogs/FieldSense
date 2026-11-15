@@ -183,6 +183,30 @@ class StrategyEndpointTests(unittest.TestCase):
         invalid = self.client.put(f"{self.base}/strategy/response", json={"status": "later"})
         self.assertEqual(invalid.status_code, 422)
 
+    def test_one_event_can_be_decided_and_bulk_can_keep_decisions(self):
+        events = self.client.get(f"{self.base}/events").json()
+        self.assertGreater(len(events), 1)
+        first, rest = events[0], events[1:]
+        url = f"{self.base}/events/{first['id']}/response"
+        saved = self.client.put(url, json={"status": "declined"})
+        self.assertEqual(saved.status_code, 200, saved.text)
+        self.assertEqual(set(saved.json()), {first["id"]})
+        self.assertEqual(saved.json()[first["id"]]["fingerprint"], fingerprint(first))
+        bulk = self.client.put(
+            f"{self.base}/strategy/response", json={"status": "accepted", "onlyProposed": True}
+        )
+        self.assertEqual(bulk.json()[first["id"]]["status"], "declined")
+        self.assertEqual({bulk.json()[e["id"]]["status"] for e in rest}, {"accepted"})
+        overwritten = self.client.put(f"{self.base}/strategy/response", json={"status": "accepted"})
+        self.assertEqual({r["status"] for r in overwritten.json().values()}, {"accepted"})
+        cleared = self.client.put(url, json={"status": "proposed"})
+        self.assertNotIn(first["id"], cleared.json())
+        self.assertEqual(set(cleared.json()), {e["id"] for e in rest})
+        missing = f"{self.base}/events/00000000-0000-4000-8000-000000000000/response"
+        self.assertEqual(self.client.put(missing, json={"status": "accepted"}).status_code, 404)
+        self.assertEqual(self.other.put(url, json={"status": "accepted"}).status_code, 404)
+        self.assertEqual(self.client.put(url, json={"status": "later"}).status_code, 422)
+
     def test_stale_responses_are_replaced_when_the_events_change(self):
         self.client.put(f"{self.base}/strategy/response", json={"status": "accepted"})
         first = self.client.get("/api/v1/planning/responses").json()

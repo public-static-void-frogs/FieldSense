@@ -1434,5 +1434,14 @@
   "Ask a follow-up question…": "Ask a follow-up question…",
   "Ask a follow-up": "Ask a follow-up",
   "Looking up crop production…": "Looking up crop production…",
-  "Estimating crop revenue…": "Estimating crop revenue…"
+  "Estimating crop revenue…": "Estimating crop revenue…",
+  "Rejected": "Rejected",
+  "Accept": "Accept",
+  "Reject": "Reject",
+  "Accept remaining": "Accept remaining",
+  "Reject remaining": "Reject remaining",
+  "All reviewed": "All reviewed",
+  "This action": "This action",
+  "Accept event: {{value0}}": "Accept event: {{value0}}",
+  "Reject event: {{value0}}": "Reject event: {{value0}}"
 }

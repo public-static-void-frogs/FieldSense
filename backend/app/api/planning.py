@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from fastapi import APIRouter, Request
 
 from app.api.auth import CurrentUser
@@ -54,7 +56,42 @@ def respond(
     request: Request,
     user: CurrentUser,
 ):
-    """Accept or decline every calendar event of the field; ``proposed`` clears the decisions."""
+    """Accept or decline the calendar events of the field; ``proposed`` clears the decisions.
+
+    With ``onlyProposed`` the events that already have a decision keep it.
+    """
     return service.respond(
-        store, responses, field_id, input.status, request.app.state.calendar, user.settings
+        store,
+        responses,
+        field_id,
+        input.status,
+        request.app.state.calendar,
+        user.settings,
+        input.onlyProposed,
+    )
+
+
+@router.put(
+    "/fields/{field_id}/events/{event_id}/response",
+    response_model=dict[str, EventResponse],
+    responses={404: {"description": "Field or event not found"}},
+)
+def respond_to_event(
+    field_id: FieldId,
+    event_id: UUID,
+    input: StrategyResponse,
+    store: Store,
+    responses: Responses,
+    request: Request,
+    user: CurrentUser,
+):
+    """Accept or decline one calendar event of the field; ``proposed`` clears its decision."""
+    return service.respond_to_event(
+        store,
+        responses,
+        field_id,
+        event_id,
+        input.status,
+        request.app.state.calendar,
+        user.settings,
     )

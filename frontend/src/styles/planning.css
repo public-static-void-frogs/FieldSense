@@ -660,3 +660,14 @@
 .plan-event-response-actions {
   margin-top: 8px;
 }
+
+.event-decision-tag.ant-tag {
+  margin: 0;
+  padding: 0 6px;
+  font-size: 11px;
+  line-height: 18px;
+}
+
+.event-response-panel-group.ant-typography {
+  margin-top: 14px;
+}

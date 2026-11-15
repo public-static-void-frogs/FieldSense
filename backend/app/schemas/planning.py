@@ -7,6 +7,8 @@ from pydantic import BaseModel, ConfigDict
 class StrategyResponse(BaseModel):
     model_config = ConfigDict(extra="forbid")
     status: Literal["proposed", "accepted", "declined"]
+    # Leave events that already have a decision as they are.
+    onlyProposed: bool = False
 
 
 class EventResponse(BaseModel):

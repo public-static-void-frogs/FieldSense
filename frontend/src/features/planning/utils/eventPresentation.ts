@@ -15,6 +15,7 @@ export const priorityColors: Record<PlanPriority, string> = {
 export const decisionPresentation = {
   accepted: { color: 'success', label: 'All accepted' },
   declined: { color: 'default', label: 'All rejected' },
+  reviewed: { color: 'default', label: 'All reviewed' },
   proposed: { color: 'processing', label: '{{value0}} proposed events' },
 };
 export function getStrategyDecision(

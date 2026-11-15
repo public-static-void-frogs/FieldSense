@@ -4,8 +4,11 @@ import { useEffect, useRef } from 'react';
 export function useScrollToEnd(watch: unknown[]) {
   const end = useRef<HTMLDivElement>(null);
 
-  // oxlint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => end.current?.scrollIntoView({ block: 'end' }), watch);
+  useEffect(() => {
+    // The effect must not return anything: React treats a returned value as its cleanup function.
+    end.current?.scrollIntoView({ block: 'end' });
+    // oxlint-disable-next-line react-hooks/exhaustive-deps
+  }, watch);
 
   return end;
 }
