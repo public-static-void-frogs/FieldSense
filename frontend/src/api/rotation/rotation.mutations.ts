@@ -8,6 +8,12 @@ const refresh = (client: QueryClient, fieldId: string) =>
   client.invalidateQueries({ queryKey: rotationQueryKeys.field(fieldId) });
 
 export const rotationMutations = {
+  resetInputs: (client: QueryClient, fieldId: string) =>
+    mutationOptions({
+      mutationKey: ['rotation', 'reset-inputs', fieldId],
+      mutationFn: rotationApi.resetInputs,
+      onSuccess: () => refresh(client, fieldId),
+    }),
   saveSeasonResults: (client: QueryClient, fieldId: string) =>
     mutationOptions({
       mutationKey: ['rotation', 'season-results', fieldId],

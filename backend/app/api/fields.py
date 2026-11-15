@@ -171,6 +171,12 @@ def rotation_advice(
     )
 
 
+@router.delete("/fields/{field_id}/rotation-inputs", status_code=204)
+def reset_rotation_inputs(field_id: FieldId, store: Store):
+    """Clear the caller's overrides together so the advice returns to field defaults."""
+    store.reset_rotation_inputs(field_id)
+
+
 @router.get("/fields/{field_id}/economics", response_model=EconomicsView)
 def economics(field_id: FieldId, store: Store, request: Request):
     """The calculator: the caller's own price, cost and rent, and the USDA averages behind them."""

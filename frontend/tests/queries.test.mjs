@@ -192,6 +192,41 @@ test('saving prices and costs keeps calculator defaults available throughout the
   }
 });
 
+test('canceling custom metrics clears all saved inputs for that field and invalidates its advice', async () => {
+  const cache = client();
+  const fieldId = second.id;
+  const execute = (options, input) => cache.getMutationCache().build(cache, options).execute(input);
+  const adviceOptions = rotationQueries.advice({ fieldId, priorities: [], seasons: 1 });
+
+  try {
+    await execute(rotationMutations.saveSeasonResults(cache, fieldId), {
+      fieldId,
+      results: [{ year: 2025, crop: 'corn', yieldPerAcre: 200 }],
+    });
+    await execute(rotationMutations.saveSoilSurvey(cache, fieldId), { fieldId, survey: { ph: 6 } });
+    await execute(rotationMutations.saveEconomics(cache, fieldId), {
+      fieldId,
+      inputs: { landRentUsdPerAcre: 0, crops: [] },
+    });
+    cache.setQueryData(adviceOptions.queryKey, null);
+
+    await execute(rotationMutations.resetInputs(cache, fieldId), fieldId);
+
+    assert.equal(cache.getQueryState(adviceOptions.queryKey).isInvalidated, true);
+    const [seasons, soil, economics] = await Promise.all([
+      cache.fetchQuery(rotationQueries.seasonResults(fieldId)),
+      cache.fetchQuery(rotationQueries.soilSurvey(fieldId)),
+      cache.fetchQuery(rotationQueries.economics(fieldId)),
+    ]);
+    assert.deepEqual(seasons.results, []);
+    assert.equal(soil, null);
+    assert.equal(economics.inputs, null);
+    assert.ok(economics.defaults.crops.length > 0);
+  } finally {
+    cache.clear();
+  }
+});
+
 test('map links restore valid positions while invalid query values use the default view', () => {
   assert.deepEqual(parseMapPosition(new URLSearchParams('lat=42.05&lon=-93.87&zoom=14')), {
     center: [42.05, -93.87],

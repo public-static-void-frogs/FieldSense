@@ -1,3 +1,14 @@
+.main-content.ant-layout-content:has(> .rotation-page) {
+  max-width: none;
+  padding: 0;
+}
+
+.rotation-page-content {
+  max-width: 1900px;
+  margin-inline: auto;
+  padding: 8px var(--workspace-gutter) 20px;
+}
+
 .rotation-stack {
   display: flex;
   flex-direction: column;
@@ -497,6 +508,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 16px;
+  scroll-margin-top: 40px;
 }
 
 .rotation-inputs-heading {

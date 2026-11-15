@@ -267,6 +267,13 @@ class FieldRepository:
         self.session.commit()
         return economics
 
+    def reset_rotation_inputs(self, field_id) -> None:
+        selection = self._selection(field_id)
+        selection.season_results = None
+        selection.soil_survey = None
+        selection.economics = None
+        self.session.commit()
+
     def remove(self, field_id):
         self.require_field(field_id)
         row = self.session.get(FieldRecord, str(field_id))
