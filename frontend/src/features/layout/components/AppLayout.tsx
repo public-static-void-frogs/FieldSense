@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { Avatar, Badge, Button, Layout, Menu, Tooltip } from 'antd';
+import { Avatar, Button, Layout, Menu, Tooltip } from 'antd';
 import {
-  Bell,
   CalendarDays,
   CircleHelp,
   CloudSun,
@@ -115,15 +114,6 @@ export function AppLayout() {
                     },
                   ]
                 : []),
-              {
-                key: '/notifications',
-                label: <NavLink to="/notifications">{t('Notifications')}</NavLink>,
-                icon: (
-                  <Badge dot color="#b8954d">
-                    <Bell size={21} />
-                  </Badge>
-                ),
-              },
               {
                 key: '/help',
                 label: <NavLink to="/help">{t('Help & resources')}</NavLink>,

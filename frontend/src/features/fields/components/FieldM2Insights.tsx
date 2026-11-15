@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
-import { Alert, Button, Card, Empty, Skeleton, Tabs, Tag } from 'antd';
+import { Alert, Button, Card, Empty, Skeleton, Tabs, Tag, Tooltip } from 'antd';
+import { TriangleAlert } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { fieldInsightsQueries } from '../../../api/fields/field-insights.queries.ts';
 import type {
@@ -21,6 +22,7 @@ import {
   m2Verdicts,
 } from '../constants/m2Insights.constants.ts';
 import { insightNumber, insightSigned } from '../utils/fieldInsightFormats.ts';
+import { m2Range } from '../utils/m2Range.ts';
 import { InsightHelpLabel } from './InsightHelpLabel';
 import './FieldInsights.css';
 
@@ -87,11 +89,6 @@ function M2Results({ insights }: M2ResultsProps) {
 
   return (
     <div className="field-insights-panel">
-      <p className="field-insights-muted">
-        {t(
-          'Compares fields in drought years that were managed differently under the same weather. This is an adjusted association from satellite data, not a guaranteed effect.',
-        )}
-      </p>
       {cropKeys.length === 0 ? (
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description={t('No evidence to show.')} />
       ) : (
@@ -108,6 +105,11 @@ function M2Results({ insights }: M2ResultsProps) {
           }))}
         />
       )}
+      <p className="field-insights-muted">
+        {t(
+          'Compares fields in drought years that were managed differently under the same weather. This is an adjusted association from satellite data, not a guaranteed effect.',
+        )}
+      </p>
       {insights.warnings.length > 0 && (
         <details>
           <summary>{t('Evidence notes')}</summary>
@@ -147,125 +149,188 @@ function EvidenceNote({ text }: EvidenceNoteProps) {
 type M2CropPanelProps = { crop: M2Crop; insights: M2Insights };
 
 function M2CropPanel({ crop, insights }: M2CropPanelProps) {
-  const treatments = insights.region?.[crop] ?? {};
-
-  return (
-    <div className="field-insights-grid">
-      {(Object.keys(m2Treatments) as M2Treatment[])
-        .filter((treatment) => treatments[treatment])
-        .map((treatment) => (
-          <M2TreatmentCard
-            key={treatment}
-            treatment={treatment}
-            region={treatments[treatment] as M2Region}
-            field={insights.field?.[crop]?.[treatment]}
-            neighbourhood={insights.neighbourhood?.[crop]?.[treatment]}
-          />
-        ))}
-    </div>
-  );
-}
-
-type M2TreatmentCardProps = {
-  treatment: M2Treatment;
-  region: M2Region;
-  field: Record<string, M2FieldEffect> | undefined;
-  neighbourhood: Record<string, M2NeighbourEffect> | undefined;
-};
-
-function M2TreatmentCard({ treatment, region, field, neighbourhood }: M2TreatmentCardProps) {
   const { t, i18n } = useTranslation();
   const signed = (value: number | null | undefined) => insightSigned(value, i18n.language);
-  const headline = region.headline;
-  const tier = region.evidence_tier;
-  const lowerTier = tier != null && tier !== 'full' && tier !== 'limited';
-  const verdictKey = region.verdict.replace('small sample: ', '');
-  const verdict = m2Verdicts[verdictKey] ?? { label: verdictKey, tone: 'default' };
-  const outcomeKey = headline?.outcome;
-  const outcomeName = outcomeKey
-    ? t(m2Outcomes[outcomeKey as keyof typeof m2Outcomes] ?? outcomeKey)
-    : null;
-  const fieldEffect = outcomeKey ? field?.[outcomeKey] : undefined;
-  const hoodEffect = outcomeKey ? neighbourhood?.[outcomeKey] : undefined;
+  const treatments = insights.region?.[crop] ?? {};
+  const rows = (Object.keys(m2Treatments) as M2Treatment[]).flatMap((treatment) => {
+    const region = treatments[treatment];
+    if (!region) {
+      return [];
+    }
+
+    const headline = region.abstain ? null : region.headline;
+    const outcome = headline?.outcome;
+
+    return [
+      {
+        treatment,
+        region,
+        headline,
+        outcomeName: outcome ? t(m2Outcomes[outcome as keyof typeof m2Outcomes] ?? outcome) : null,
+        fieldEffect: outcome ? insights.field?.[crop]?.[treatment]?.[outcome] : undefined,
+        hoodEffect: outcome ? insights.neighbourhood?.[crop]?.[treatment]?.[outcome] : undefined,
+      },
+    ];
+  });
 
   return (
-    <div className="field-m2-card">
-      <div className="field-m2-card-heading">
-        <h4>{t(m2Treatments[treatment])}</h4>
-        {lowerTier ? (
-          <Tag>{t(m2Tiers[tier])}</Tag>
-        ) : (
-          <Tag color={verdict.tone === 'default' ? undefined : verdict.tone}>
-            {t(verdict.label)}
-          </Tag>
-        )}
-      </div>
-      {region.abstain || !headline ? (
-        <p className="field-insights-muted">{t('Not enough comparable fields for an estimate.')}</p>
-      ) : (
-        <>
-          <M2Headline headline={headline} outcomeName={outcomeName} signed={signed} />
-          {tier === 'limited' && (
-            <p className="field-insights-muted">{t('Small sample: read as indicative.')}</p>
-          )}
-          {fieldEffect && <M2FieldLine effect={fieldEffect} signed={signed} />}
-          {hoodEffect && <M2NeighbourLine effect={hoodEffect} signed={signed} />}
-          {headline.outcome_sees_drought === false && (
-            <p className="field-insights-muted">
-              {t('This measure does not respond to drought in the data.')}
-            </p>
-          )}
-        </>
-      )}
+    <div className="field-m2-treatments">
+      {rows.map(({ treatment, region, headline, outcomeName, fieldEffect, hoodEffect }) => (
+        <section className="field-m2-treatment" key={treatment}>
+          <h4>
+            <span>{t(m2Treatments[treatment])}</span>
+            {headline?.outcome_sees_drought === false && <M2DroughtWarning />}
+            <M2Verdict region={region} />
+          </h4>
+          <M2Range headline={headline} signed={signed} />
+          <div className="field-m2-description">
+            {headline && <M2OutcomeDescription headline={headline} outcomeName={outcomeName} />}
+            {region.evidence_tier === 'limited' && headline && (
+              <p className="field-insights-muted">{t('Small sample: read as indicative.')}</p>
+            )}
+            {fieldEffect && <M2FieldLine effect={fieldEffect} signed={signed} />}
+            {hoodEffect && <M2NeighbourLine effect={hoodEffect} signed={signed} />}
+          </div>
+        </section>
+      ))}
     </div>
   );
 }
 
-type M2HeadlineProps = {
+function M2DroughtWarning() {
+  const { t } = useTranslation();
+  const warning = t('This measure does not respond to drought in the data.');
+
+  return (
+    <Tooltip title={warning} trigger={['hover', 'focus', 'click']}>
+      <button
+        type="button"
+        className="field-insights-help-button field-m2-warning"
+        aria-label={warning}
+      >
+        <TriangleAlert size={16} aria-hidden="true" />
+      </button>
+    </Tooltip>
+  );
+}
+
+function M2OutcomeDescription({
+  headline,
+  outcomeName,
+}: {
   headline: M2Outcome;
   outcomeName: string | null;
-  signed: (value: number | null | undefined) => string;
-};
-
-function M2Headline({ headline, outcomeName, signed }: M2HeadlineProps) {
+}) {
   const { t } = useTranslation();
-  if (headline.gamma == null) {
-    const basis = headline.headline_basis ?? 'effect';
-
-    return (
-      <>
-        <p className="field-m2-value">
-          <strong>
-            {signed(headline.headline_effect)} [{signed(headline.headline_lo)},{' '}
-            {signed(headline.headline_hi)}]
-          </strong>{' '}
-          <span className="field-insights-muted">
-            {t('{{basis}} on {{outcome}}', {
-              basis: t(basis, { defaultValue: basis }),
-              outcome: outcomeName,
-            })}
-          </span>
-        </p>
-        <p className="field-insights-muted">
-          {t('Not a drought-specific effect: the data do not separate drought seasons.')}
-        </p>
-      </>
-    );
-  }
+  const basis = headline.headline_basis ?? 'effect';
+  const drought = headline.gamma != null;
+  const outcome = drought
+    ? t('extra effect in drought on {{outcome}}', { outcome: outcomeName })
+    : t('{{basis}} on {{outcome}}', {
+        basis: t(basis, { defaultValue: basis }),
+        outcome: outcomeName,
+      });
 
   return (
     <>
-      <p className="field-m2-value">
-        <strong>
-          {signed(headline.gamma)} [{signed(headline.gamma_lo)}, {signed(headline.gamma_hi)}]
-        </strong>{' '}
-        <span className="field-insights-muted">
-          {t('extra effect in drought on {{outcome}}', { outcome: outcomeName })}
-        </span>
-      </p>
-      <p className="field-insights-muted">
-        {t('Gap in normal seasons: {{value}}', { value: signed(headline.theta_normal) })}
-      </p>
+      <p className="field-insights-muted">{outcome}</p>
+      {!drought && (
+        <p className="field-insights-muted">
+          {t('Not a drought-specific effect: the data do not separate drought seasons.')}
+        </p>
+      )}
+    </>
+  );
+}
+
+function M2Verdict({ region }: { region: M2Region }) {
+  const { t } = useTranslation();
+  const tier = region.evidence_tier;
+  const verdictKey = region.verdict.replace('small sample: ', '');
+  const lowerTier = tier != null && tier !== 'full' && tier !== 'limited';
+  const verdict = lowerTier
+    ? { label: m2Tiers[tier], tone: 'default' as const }
+    : (m2Verdicts[verdictKey] ?? { label: verdictKey, tone: 'default' as const });
+
+  return (
+    <Tag className="field-m2-verdict" color={verdict.tone === 'default' ? undefined : verdict.tone}>
+      {t(verdict.label)}
+    </Tag>
+  );
+}
+
+type M2RangeProps = {
+  headline: M2Outcome | null;
+  signed: (value: number | null | undefined) => string;
+};
+
+function M2Range({ headline, signed }: M2RangeProps) {
+  const { t } = useTranslation();
+  const range = headline && m2Range(headline);
+  if (!headline || !range) {
+    return (
+      <p className="field-insights-muted">{t('Not enough comparable fields for an estimate.')}</p>
+    );
+  }
+
+  const { estimate, interval, normalGap, limit, position } = range;
+  const normalGapLabel = t('Gap in normal seasons: {{value}}', { value: signed(normalGap) });
+  const normalPosition = position(normalGap ?? 0);
+
+  return (
+    <>
+      <div className="field-insights-season-dates">
+        <span>{signed(estimate)}</span>
+        {interval && (
+          <small>
+            [{signed(interval.low)}, {signed(interval.high)}]
+          </small>
+        )}
+      </div>
+      <div className="field-insights-season-chart">
+        <div className="field-insights-season-track">
+          {interval && (
+            <span
+              className="field-insights-season-range"
+              style={{
+                left: `${position(interval.low)}%`,
+                width: `${position(interval.high) - position(interval.low)}%`,
+              }}
+            />
+          )}
+          {limit > 0 && <span className="field-m2-zero-marker" />}
+          <span
+            className="field-insights-season-marker"
+            style={{ left: `${position(estimate)}%` }}
+          />
+          {normalGap != null && (
+            <>
+              <span
+                className="field-m2-normal-gap"
+                style={{
+                  left: `${Math.min(50, normalPosition)}%`,
+                  width: `${Math.abs(normalPosition - 50)}%`,
+                }}
+              />
+              <Tooltip title={normalGapLabel} trigger={['hover', 'focus', 'click']}>
+                <button
+                  type="button"
+                  className="field-m2-normal-marker"
+                  style={{ left: `${normalPosition}%` }}
+                  aria-label={normalGapLabel}
+                />
+              </Tooltip>
+            </>
+          )}
+        </div>
+        {limit > 0 && (
+          <div className="field-insights-season-axis field-m2-axis" aria-hidden="true">
+            <span>{signed(-limit)}</span>
+            <span>{signed(0)}</span>
+            <span>{signed(limit)}</span>
+          </div>
+        )}
+      </div>
     </>
   );
 }

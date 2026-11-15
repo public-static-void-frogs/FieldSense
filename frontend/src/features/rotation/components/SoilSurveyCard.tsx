@@ -1,16 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
-import {
-  Alert,
-  Button,
-  Card,
-  Flex,
-  Form,
-  Input,
-  InputNumber,
-  Select,
-  Tag,
-  Typography,
-} from 'antd';
+import { Alert, Button, Card, Flex, Form, Input, InputNumber, Select, Tag, Typography } from 'antd';
 import { useTranslation } from 'react-i18next';
 import { rotationMutations } from '../../../api/rotation/rotation.mutations.ts';
 import { rotationQueries } from '../../../api/rotation/rotation.queries.ts';

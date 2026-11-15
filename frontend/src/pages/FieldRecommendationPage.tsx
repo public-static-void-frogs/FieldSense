@@ -9,7 +9,6 @@ import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
-import { CropHistoryStrip } from '../features/rotation/components/CropHistoryStrip';
 import { InformationGaps } from '../features/rotation/components/InformationGaps';
 import { OffSeasonCard } from '../features/rotation/components/OffSeasonCard';
 import { EconomicsCard } from '../features/rotation/components/EconomicsCard';
@@ -130,7 +129,6 @@ export function FieldRecommendationPage() {
                 <SoilSurveyCard advice={advice} />
                 <EconomicsCard advice={advice} />
               </div>
-              <CropHistoryStrip advice={advice} />
               <OffSeasonCard advice={advice} />
               {advice.dataGaps.length > 0 && (
                 <Card>

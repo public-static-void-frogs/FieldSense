@@ -312,48 +312,105 @@
   margin: 0;
 }
 
-.field-m2-card {
+.field-m2-zero-marker {
+  position: absolute;
+  left: 50%;
+  inset-block: 0;
+  border-inline-start: 1px dashed #52624a;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.field-m2-treatments {
   display: grid;
-  align-content: start;
+  gap: 20px;
+}
+
+.field-m2-treatment {
+  --field-m2-normal-color: #4b527d;
+
+  display: grid;
   gap: 8px;
   min-width: 0;
-  padding: 12px 14px;
-  border-radius: 8px;
-  background: #f3f6ef;
-  overflow-wrap: anywhere;
 }
 
-.field-m2-card-heading {
-  display: grid;
-  justify-items: start;
-  gap: 6px;
+.field-m2-treatment + .field-m2-treatment {
+  padding-top: 20px;
+  border-top: 1px solid #e2e7df;
 }
 
-.field-m2-card-heading h4 {
-  margin: 0;
-  color: #52624a;
-  font-size: 13px;
-  font-weight: 500;
-  line-height: 1.35;
+.field-m2-treatment h4 {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px 8px;
+  font-size: 1rem;
 }
 
-.field-m2-card-heading .ant-tag {
+.field-m2-verdict.ant-tag {
   max-width: 100%;
   margin: 0;
+  padding-inline: 6px;
+  font-size: 11px;
+  line-height: 16px;
   white-space: normal;
 }
 
-.field-m2-card p {
-  margin: 0;
+.field-m2-warning.field-insights-help-button {
+  color: #8a5700;
 }
 
-.field-m2-value strong {
-  display: block;
-  color: var(--field-insights-green);
-  font-size: 20px;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  line-height: 1.3;
+.field-m2-warning.field-insights-help-button:hover,
+.field-m2-warning.field-insights-help-button:focus-visible {
+  background: #fff3d9;
+}
+
+.field-m2-description {
+  display: grid;
+  justify-items: start;
+  gap: 4px;
+}
+
+.field-m2-normal-gap {
+  position: absolute;
+  top: 13px;
+  height: 2px;
+  background: var(--field-m2-normal-color);
+}
+
+.field-m2-normal-marker {
+  position: absolute;
+  top: 6px;
+  z-index: 1;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: var(--field-m2-normal-color);
+  cursor: help;
+  transform: translateX(-50%);
+}
+
+.field-m2-normal-marker::after {
+  position: absolute;
+  top: 4px;
+  left: 8px;
+  width: 8px;
+  height: 8px;
+  background: currentColor;
+  content: '';
+  transform: rotate(45deg);
+}
+
+.field-m2-normal-marker:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: -2px;
+}
+
+.field-m2-axis {
+  margin-top: 16px;
 }
 
 .field-insights-muted {
