@@ -26,6 +26,7 @@ from functools import cached_property
 
 from fastapi import HTTPException
 
+from app.services import rotation_explainer
 from app.services.crop_conditions import assessment_context, field_location
 from app.services.rotation_advice import InvalidAdviceRequest
 from app.services.weather_insight import forecast_insight_input
@@ -421,12 +422,22 @@ def rotation_advice_tool(ctx: ChatContext, args: dict) -> dict | None:
         "scoring",
         "dataGaps",
     )
-    return {
+    result = {
         "status": "ready",
         **{key: advice[key] for key in keep if advice.get(key) is not None},
         "cropOptions": [option["id"] for option in advice["cropOptions"]],
         "candidates": candidates,
     }
+    topics = rotation_explainer.explanation_topics(args)
+    if topics:
+        # Built from the engine's own result and rule references; the engine is not changed.
+        try:
+            rules = rotation_explainer.rule_index(ctx.state.rotation.advisor.rules)
+        except Exception:
+            logger.warning("Rule references unavailable for the explanation", exc_info=True)
+            rules = {}
+        result["explanation"] = rotation_explainer.explain(advice, topics, rules)
+    return result
 
 
 def default_registry() -> ToolRegistry:
@@ -493,7 +504,8 @@ def default_registry() -> ToolRegistry:
             "(continuous cropping, diverse rotation, small grain or hay, winter cover, "
             "host-crop return interval) changed drought resilience, measured from satellite "
             "greenness under the same weather. Returns a verdict, the extra effect in drought "
-            "with intervals, and a what-if for this field or the fields within 30 km. It is an "
+            "with intervals, and a what-if for this field or nearby fields. Report the evidence tier "
+            "and confidence; below the full tier there is no drought-specific number. It is an "
             "adjusted association, not a guaranteed effect: state that and any warnings. Use "
             "for questions about rotation, drought resilience or what neighbours' practices "
             "suggest. Needs a selected field.",
@@ -574,7 +586,12 @@ def default_registry() -> ToolRegistry:
             "crop history it used (satellite-estimated, not farmer records) and the data gaps. "
             "This is what the crop recommendation page shows for a crop. Use it to explain why a "
             "crop ranks where it does, to compare crops, or to suggest what to grow next. "
-            "Explain rankings from the returned findings only. Needs a selected field.",
+            "Explain rankings from the returned findings only. Set explain to get a structured "
+            "explanation: why (what added or removed points for the top crop and for the "
+            "intended crop, what each finding was based on, and the data used), method (how "
+            "the ranking algorithm works, with its weights and limits) and sources (data "
+            "sources, project documents and the literature behind each rule). Needs a "
+            "selected field.",
             rotation_advice_tool,
             {
                 "type": "object",
@@ -590,6 +607,14 @@ def default_registry() -> ToolRegistry:
                         "items": {"type": "string", "enum": list(PRIORITIES)},
                         "description": "What the user cares about most; it reweights the "
                         "scores. Set only when the user states priorities.",
+                    },
+                    "explain": {
+                        "type": "array",
+                        "items": {"type": "string", "enum": ["why", "method", "sources"]},
+                        "description": "Add an explanation. why: the reasons behind this "
+                        "recommendation; method: how the algorithm works; sources: where to "
+                        "read more. Set only when the user asks why, how it works or for "
+                        "sources.",
                     },
                 },
             },

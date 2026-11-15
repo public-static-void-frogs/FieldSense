@@ -5,7 +5,7 @@ import time
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import httpx
 from fastapi.testclient import TestClient
@@ -141,8 +141,9 @@ class FakeGemini:
         events = self.rounds[index] if index < len(self.rounds) else self.rounds[-1]
         if callable(events):
             events = events(self.requests[-1])
-        if events == 500:
-            return httpx.Response(500, text="boom")
+        if isinstance(events, int):
+            body = {"error": {"message": "The model is overloaded"}}
+            return httpx.Response(events, json=body)
         return httpx.Response(
             200, text="".join(f"data: {json.dumps(event)}\n\n" for event in events)
         )
@@ -286,6 +287,16 @@ class AssistantChatTests(unittest.TestCase):
             [{"delta": "Hi"}, {"done": True}],
         )
 
+    def test_overloaded_model_is_retried_once_and_the_status_is_logged(self):
+        self.login_with_field()
+        with patch("app.services.llm.asyncio.sleep", new=AsyncMock()):
+            retried = FakeGemini(503, text("Hi"))
+            self.assertEqual(self.chat(retried), [{"delta": "Hi"}, {"done": True}])
+            self.assertEqual(len(retried.requests), 2)
+            with self.assertLogs("app.services.assistant", "WARNING") as logs:
+                self.assertEqual(self.chat(FakeGemini(400)), [])
+        self.assertIn("HTTP 400: The model is overloaded", logs.output[0])
+
     # ------------------------------------------------------------------ tool loop
     def test_weather_tool_round_trip(self):
         field = self.login_with_field()
@@ -357,6 +368,19 @@ class AssistantChatTests(unittest.TestCase):
         self.chat(gemini, field_id=field["id"])
         (response,) = [r["response"] for r in tool_responses(gemini.requests[1])]
         self.assertEqual(response["status"], "unavailable")
+
+    def test_rotation_advice_explanation_is_added_only_when_asked(self):
+        field = self.login_with_field()
+        gemini = FakeGemini(
+            call("get_rotation_advice"),
+            call("get_rotation_advice", explain=["why", "method", "sources", "luck"]),
+            text("done"),
+        )
+        self.chat(gemini, field_id=field["id"])
+        plain, explained = [r["response"] for r in tool_responses(gemini.requests[2])]
+        self.assertNotIn("explanation", plain)
+        self.assertEqual(set(explained["explanation"]), {"why", "method", "sources"})
+        self.assertEqual(explained["explanation"]["why"]["recommended"]["crop"], "a")
 
     def test_rotation_advice_tool_trims_detail_and_helps_with_a_bad_crop(self):
         field = self.login_with_field()

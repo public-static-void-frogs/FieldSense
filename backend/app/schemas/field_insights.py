@@ -140,6 +140,7 @@ class M2Match(BaseModel):
     csbid: str | None = None
     distance_km: float | None = None
     n_neighbour_fields: int | None = None
+    radius_km: float | None = None
 
 
 class M2Error(BaseModel):

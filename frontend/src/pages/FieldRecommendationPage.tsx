@@ -8,6 +8,7 @@ import type { FieldRouteData } from '../app/route-loaders.ts';
 import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
+import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
 import { CropHistoryStrip } from '../features/rotation/components/CropHistoryStrip';
 import { InformationGaps } from '../features/rotation/components/InformationGaps';
 import { OffSeasonCard } from '../features/rotation/components/OffSeasonCard';
@@ -60,6 +61,7 @@ export function FieldRecommendationPage() {
           </>
         }
         eyebrow=""
+        actions={<FieldAssistant key={field.id} field={field} />}
         titlePrefix={
           <>
             <RouterButton

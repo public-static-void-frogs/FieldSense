@@ -13,6 +13,7 @@ import {
   CalendarDayPanel,
   type CalendarDayTab,
 } from '../features/planning/components/CalendarDayPanel';
+import { useResizableDrawer } from '../hooks/useResizableDrawer.ts';
 import { CalendarDrawerContent } from '../features/planning/components/CalendarDrawerContent.tsx';
 import { SystemCalendar } from '../features/planning/components/SystemCalendar';
 import { calendarAssistantPlaceholder } from '../features/planning/constants/calendarAssistant.constants.ts';
@@ -23,7 +24,7 @@ import { useCalendarFilters } from '../features/planning/hooks/useCalendarFilter
 import { useCalendarRoute } from '../features/planning/hooks/useCalendarRoute.ts';
 import { useCalendarView } from '../features/planning/hooks/useCalendarView.ts';
 import { getCalendarEvents, getEventDecision } from '../features/planning/utils/eventResponses.ts';
-import { formatPlanDate } from '../features/planning/utils/planningDates.ts';
+import { defaultCalendarDate, formatPlanDate } from '../features/planning/utils/planningDates.ts';
 import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
 import type { PlannedEvent } from '../types/planning/planning.types.ts';
 
@@ -34,9 +35,17 @@ export function CalendarPage() {
   const { data: eventResponses } = useSuspenseQuery(planningQueries.responses());
   const { data: context } = useSuspenseQuery(planningQueries.context());
   const planningToday = context.today;
-  const route = useCalendarRoute(planningToday);
-  const filters = useCalendarFilters(getCalendarEvents(allEvents, eventResponses), route.fieldId);
+  const calendarEvents = getCalendarEvents(allEvents, eventResponses);
+  const route = useCalendarRoute(
+    planningToday,
+    defaultCalendarDate(
+      calendarEvents.map((event) => event.date),
+      planningToday,
+    ),
+  );
+  const filters = useCalendarFilters(calendarEvents, route.fieldId);
   const drawer = useCalendarDrawer(route.eventId, route);
+  const drawerSize = useResizableDrawer('calendar-drawer-width');
   const view = useCalendarView();
   const selectedEvents = filters.visible.filter((event) => event.date === route.selectedDate);
   const selectedEvent = allEvents.find((event) => event.id === route.eventId);
@@ -121,6 +130,14 @@ export function CalendarPage() {
         />
         <Button
           onClick={() => {
+            view.setMode('month');
+            route.changeDate(planningToday);
+          }}
+        >
+          {t('Current month')}
+        </Button>
+        <Button
+          onClick={() => {
             filters.reset();
             view.reset();
             drawer.reset();
@@ -167,7 +184,8 @@ export function CalendarPage() {
         placement="right"
         open={drawer.isOpen}
         onClose={drawer.close}
-        styles={{ wrapper: { width: 'min(480px, 100vw)' } }}
+        {...drawerSize}
+        styles={{ wrapper: { maxWidth: '100vw' } }}
         footer={
           selectedEvent ? (
             <Flex gap={8}>

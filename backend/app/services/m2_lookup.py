@@ -4,10 +4,16 @@ The batch job ``ml/field-prediction-model/neighbour-evidence-engine/m2_neighbour
 writes the tables below. This module reads them once (cached, thread-safe) and answers
 "what does the evidence say here" for a coordinate. Call ``reload()`` after a new batch run.
 
-Matching: nearest analysed field within FIELD_RADIUS_KM gives level "field"; else at least
-MIN_NEIGHBOURS fields within NEIGHBOUR_RADIUS_KM give "neighbourhood"; farther than COVERAGE_KM
-from every analysed field gives ok=False. Without field_effects.parquet the answer is "region"
-(study-wide only).
+Matching: the nearest analysed field within FIELD_RADIUS_KM gives level "field". Otherwise the
+analysed fields within a radius that is widened 30 -> 60 -> 120 km until MIN_NEIGHBOURS are inside;
+at least MIN_NEIGHBOURS_SOFT of them give "neighbourhood" (with a warning when widened). Farther
+than COVERAGE_KM from every analysed field gives ok=False. Without field_effects.parquet, or with
+too few fields nearby, the answer is "region" (study-wide only).
+
+Thin data: the batch job labels weak evidence instead of abstaining (evidence_tier: full > limited >
+one season type > pooled > descriptive, plus confidence and tier_note). Anything below "full" has no
+drought-specific gamma; ``headline_effect`` and ``headline_basis`` say what the number is. An older
+effects.csv without these columns is read as all full tier.
 
 Files read from the output folder (a missing optional file is listed in meta["missing_files"]):
   effects.csv              required  crop x treatment x outcome: gamma, thetas, intervals, checks
@@ -28,9 +34,11 @@ import numpy as np
 import pandas as pd
 
 FIELD_RADIUS_KM = 1.0  # a point this close to an analysed field centroid is treated as "that field"
-NEIGHBOUR_RADIUS_KM = 30.0  # same radius as the comparable-field count of the batch job
-MIN_NEIGHBOURS = 20  # fewer fields than this -> no neighbourhood summary
-COVERAGE_KM = 50.0  # farther than this from every analysed field = outside coverage
+NEIGHBOUR_RADIUS_KM = 30.0  # first radius of the neighbourhood search, same as the comparable-field count of the batch job
+NEIGHBOUR_MAX_KM = 120.0  # the radius is doubled (30 -> 60 -> 120 km) until MIN_NEIGHBOURS analysed fields are inside
+MIN_NEIGHBOURS = 20  # this many analysed fields: normal neighbourhood summary
+MIN_NEIGHBOURS_SOFT = 5  # 5-19 fields: summary with a "few fields, indicative" caveat; fewer -> study-wide result only
+COVERAGE_KM = 120.0  # farther than this from every analysed field = outside coverage
 VERDICT_RANK = {
     "supported (all checks pass)": 0,
     "supported by the DML model; matched baseline not fully balanced": 1,
@@ -38,6 +46,21 @@ VERDICT_RANK = {
     "no detectable drought-specific effect": 3,
     "arm gap only (drought effect not identified)": 4,
     "abstain": 5,
+}
+TIER_RANK = {
+    "full": 0,
+    "limited": 1,
+    "one season type": 2,
+    "pooled": 3,
+    "descriptive": 4,
+    "none": 5,
+}
+TIER_TEXT = {
+    "full": "full evidence",
+    "limited": "small sample",
+    "one season type": "one season type only",
+    "pooled": "all seasons pooled",
+    "descriptive": "descriptive only",
 }
 SUPPORTED = (
     "supported (all checks pass)",
@@ -64,6 +87,19 @@ CHECK_KEYS = (
     "gamma_identified",
 )
 OUT_KEYS = (
+    "evidence_tier",
+    "confidence",
+    "tier_note",
+    "method",
+    "headline_basis",
+    "headline_effect",
+    "headline_lo",
+    "headline_hi",
+    "headline_sign_agrees",
+    "theta_pooled",
+    "lo_pooled",
+    "hi_pooled",
+    "n_pooled",
     "outcome_label",
     "gamma",
     "gamma_lo",
@@ -97,6 +133,20 @@ def _py(v):
     if isinstance(v, str):
         return None if v in ("nan", "") else v
     return v
+
+
+def _vrank(v):
+    """rank of a verdict; the 'small sample: ' prefix of the limited tier is ignored"""
+    v = str(v or "").replace("small sample: ", "")
+    if v in VERDICT_RANK:
+        return VERDICT_RANK[v]
+    return (
+        4
+        if v.startswith("drought-specific effect not identified")
+        else 6
+        if v.startswith("descriptive")
+        else 9
+    )
 
 
 def _hav_km(lat, lon, lats, lons):
@@ -141,6 +191,37 @@ class M2Evidence:
             self.missing = []
             eff = self._read("effects.csv", True)
             eff["abstain"] = eff["abstain"].astype(bool)
+            if (
+                "evidence_tier" not in eff
+            ):  # effects.csv of an older batch run: every estimate was a full-tier one
+                eff["evidence_tier"] = np.where(eff["abstain"], "none", "full")
+            for c in (
+                "confidence",
+                "tier_note",
+                "method",
+                "headline_basis",
+                "headline_sign_agrees",
+            ):
+                if c not in eff:
+                    eff[c] = pd.Series([None] * len(eff), dtype=object, index=eff.index)
+            for c in (
+                "headline_effect",
+                "headline_lo",
+                "headline_hi",
+                "theta_pooled",
+                "lo_pooled",
+                "hi_pooled",
+                "n_pooled",
+            ):
+                if c not in eff:
+                    eff[c] = np.nan
+            eff["headline_basis"] = eff["headline_basis"].astype(object)
+            old = eff["headline_effect"].isna() & ~eff["abstain"]
+            if old.any():  # older table: headline = the drought-season effect
+                eff.loc[old, ["headline_effect", "headline_lo", "headline_hi"]] = eff.loc[
+                    old, ["theta_drought", "lo_drought", "hi_drought"]
+                ].to_numpy()
+                eff.loc[old, "headline_basis"] = "effect in drought seasons"
             self.eff = eff
             self.limits = (
                 [x.strip() for x in str(eff["limits"].iloc[0]).split("|")]
@@ -197,14 +278,19 @@ class M2Evidence:
         ok = g[~g["abstain"]]
         if ok.empty:
             return None
-        ok = ok.assign(
-            _rank=ok["verdict"].map(VERDICT_RANK).fillna(9),
-            _sees=~ok["outcome_sees_drought"].fillna(False).astype(bool),
-            _snr=(ok["gamma"].abs() / (ok["gamma_hi"] - ok["gamma_lo"]).replace(0, np.nan)).fillna(
-                0
-            ),
+        snr_g = ok["gamma"].abs() / (ok["gamma_hi"] - ok["gamma_lo"]).replace(0, np.nan)
+        snr_h = ok["headline_effect"].abs() / (ok["headline_hi"] - ok["headline_lo"]).replace(
+            0, np.nan
         )
-        r = ok.sort_values(["_rank", "_sees", "_snr"], ascending=[True, True, False]).iloc[0]
+        ok = ok.assign(
+            _tier=ok["evidence_tier"].map(TIER_RANK).fillna(5),
+            _rank=ok["verdict"].map(_vrank),
+            _sees=~ok["outcome_sees_drought"].fillna(False).astype(bool),
+            _snr=snr_g.fillna(snr_h).fillna(0),
+        )
+        r = ok.sort_values(
+            ["_tier", "_rank", "_sees", "_snr"], ascending=[True, True, True, False]
+        ).iloc[0]
         return dict(outcome=r["outcome"], **self._outcome_row(r))
 
     def _region(self, crops, treatments):
@@ -223,9 +309,11 @@ class M2Evidence:
                 n_treated_drought=_py(first["n_treated_drought"]),
                 n_control_drought=_py(first["n_control_drought"]),
                 overlap_share_drought=_py(first["overlap_share_drought"]),
-                verdict="abstain"
+                verdict="abstain" if ab else min(g.loc[~g["abstain"], "verdict"], key=_vrank),
+                evidence_tier=None
                 if ab
-                else min(g.loc[~g["abstain"], "verdict"], key=lambda v: VERDICT_RANK.get(v, 9)),
+                else min(g.loc[~g["abstain"], "evidence_tier"], key=lambda t: TIER_RANK.get(t, 5)),
+                confidence=None if ab else _py(self._headline(g).get("confidence")),
                 headline=self._headline(g),
                 outcomes={
                     r["outcome"]: self._outcome_row(r) for _, r in g[~g["abstain"]].iterrows()
@@ -238,41 +326,74 @@ class M2Evidence:
         out = {}
         for r in rows.itertuples():
             exp = self.expected.get((r.crop, r.treatment))
-            ok = r.status == "ok"
+            st = r.status
+            usable = st in ("ok", "limited evidence")
             e, lo, hi = _py(r.effect_drought), _py(r.lo95), _py(r.hi95)
+            nt = _py(
+                getattr(r, "n_comparable_treated_used", None)
+                if hasattr(r, "n_comparable_treated_used")
+                else r.n_comparable_treated_30km
+            )
+            nc = _py(
+                getattr(r, "n_comparable_control_used", None)
+                if hasattr(r, "n_comparable_control_used")
+                else r.n_comparable_control_30km
+            )
             d = dict(
-                usable=ok,
-                status=r.status,
-                note=_py(r.note) if not ok else None,
-                n_comparable_treated=_py(r.n_comparable_treated_30km),
-                n_comparable_control=_py(r.n_comparable_control_30km),
+                usable=usable,
+                status=st,
+                note=_py(r.note) if st != "ok" else None,
+                n_comparable_treated=nt,
+                n_comparable_control=nc,
+                radius_km=_py(getattr(r, "radius_used_km", None)) or NEIGHBOUR_RADIUS_KM,
                 scenario_d2_weeks=_py(r.scenario_d2_weeks),
                 forest_mean_effect=_py(r.forest_mean_effect),
                 heterogeneity_vars=_py(r.heterogeneity_vars),
             )
-            if ok:
-                d.update(
-                    effect=e,
-                    lo95=lo,
-                    hi95=hi,
-                    effect_agrees=bool(
-                        exp and e is not None and np.sign(e) == exp and (lo > 0 or hi < 0)
-                    ),
-                    vs_study_mean=None
-                    if d["forest_mean_effect"] is None
-                    else round(e - d["forest_mean_effect"], 6),
+            vals = dict(
+                effect=e,
+                lo95=lo,
+                hi95=hi,
+                effect_agrees=bool(
+                    exp
+                    and e is not None
+                    and lo is not None
+                    and hi is not None
+                    and np.sign(e) == exp
+                    and (lo > 0 or hi < 0)
+                ),
+                vs_study_mean=None
+                if d["forest_mean_effect"] is None or e is None
+                else round(e - d["forest_mean_effect"], 6),
+            )
+            if usable:
+                d.update(vals)
+                d["caveat"] = (
+                    None
+                    if st == "ok"
+                    else "limited evidence: fewer comparable fields than the full threshold, read as indicative"
                 )
+            else:
+                d["indicative"] = (
+                    vals  # shown only as an indicative value with the note, never as a finding
+                )
+                d["caveat"] = "insufficient evidence: indicative only"
             out.setdefault(r.crop, {}).setdefault(r.treatment, {})[r.outcome] = d
         return out
 
-    def _neighbourhood(self, ids):
+    def _neighbourhood(self, ids, radius):
         rows = pd.concat([self.fe_by_id[i] for i in ids], ignore_index=True)
         out = {}
         for (crop, tr, oc), g in rows.groupby(["crop", "treatment", "outcome"]):
-            ok = g[g["status"] == "ok"]
+            ok = g[g["status"].isin(["ok", "limited evidence"])]
             exp = self.expected.get((crop, tr))
-            d = dict(n_fields=int(len(g)), n_usable=int(len(ok)))
-            if len(ok) >= MIN_NEIGHBOURS:
+            d = dict(
+                n_fields=int(len(g)),
+                n_usable=int(len(ok)),
+                n_full_evidence=int((g["status"] == "ok").sum()),
+                radius_km=radius,
+            )
+            if len(ok) >= MIN_NEIGHBOURS_SOFT:
                 e = ok["effect_drought"].to_numpy(float)
                 d.update(
                     median=_py(float(np.median(e))),
@@ -283,15 +404,23 @@ class M2Evidence:
                     share_expected_sign=_py(float((np.sign(e) == exp).mean())) if exp else None,
                     scenario_d2_weeks=_py(ok["scenario_d2_weeks"].iloc[0]),
                 )
+                if len(ok) < MIN_NEIGHBOURS:
+                    d["note"] = (
+                        f"only {len(ok)} fields with a usable estimate (< {MIN_NEIGHBOURS}): indicative"
+                    )
+                elif d["n_full_evidence"] < len(ok) / 2:
+                    d["note"] = (
+                        "most of these estimates are 'limited evidence' (few comparable fields each): read as indicative"
+                    )
             else:
                 d["note"] = (
-                    f"fewer than {MIN_NEIGHBOURS} fields with enough comparable fields: no summary"
+                    f"fewer than {MIN_NEIGHBOURS_SOFT} fields with a usable estimate: no summary"
                 )
             out.setdefault(crop, {}).setdefault(tr, {})[oc] = d
         return out
 
     # -------------------------------------------------------------- text
-    def _summary_and_warnings(self, region, field, hood, level):
+    def _summary_and_warnings(self, region, field, hood, level, radius):
         S, W = [], []
         for crop, trs in region.items():
             for tr, b in trs.items():
@@ -300,42 +429,67 @@ class M2Evidence:
                     W.append(f"{nm}: no estimate - {b['abstain_reason']}")
                     continue
                 h = b["headline"]
+                tier = h.get("evidence_tier") or "full"
                 exp = {-1: "negative", 1: "positive"}.get(b["expected_sign"], "?")
-                s = (
-                    f"{nm}: in drought seasons the practice changed {h['outcome']} by {_fmt(h['gamma'])} [{_fmt(h['gamma_lo'])}, {_fmt(h['gamma_hi'])}] "
-                    f"beyond its normal-season gap of {_fmt(h['theta_normal'])} (expected sign {exp}); verdict: {b['verdict']}."
-                )
+                if h.get("gamma") is not None:
+                    s = (
+                        f"{nm}: in drought seasons the practice changed {h['outcome']} by {_fmt(h['gamma'])} [{_fmt(h['gamma_lo'])}, {_fmt(h['gamma_hi'])}] "
+                        f"beyond its normal-season gap of {_fmt(h['theta_normal'])} (expected sign {exp}); verdict: {b['verdict']}."
+                    )
+                else:  # lower tiers: no drought-specific effect, only the arm gap that the data support
+                    ci = (
+                        ""
+                        if h.get("headline_lo") is None or h.get("headline_hi") is None
+                        else f" [{_fmt(h['headline_lo'])}, {_fmt(h['headline_hi'])}]"
+                    )
+                    s = (
+                        f"{nm}: {h.get('headline_basis') or 'arm gap'} on {h['outcome']}: {_fmt(h.get('headline_effect'))}{ci} (treated minus control, "
+                        f"expected sign {exp}); {TIER_TEXT.get(tier, tier)}, {h.get('confidence') or 'low'} confidence. Not a drought-specific effect."
+                    )
                 loc = None
                 if level == "field":
                     f = field.get(crop, {}).get(tr, {}).get(h["outcome"])
                     if f:
-                        loc = (
-                            (
+                        if f["usable"]:
+                            loc = (
                                 f"At this field: drought-season gap {_fmt(f['effect'])} [{_fmt(f['lo95'])}, {_fmt(f['hi95'])}] "
-                                f"({f['n_comparable_treated']} treated / {f['n_comparable_control']} control comparable fields within 30 km)"
+                                f"({f['n_comparable_treated']} treated / {f['n_comparable_control']} control comparable fields within {f['radius_km']:.0f} km"
+                                + ("" if f["status"] == "ok" else "; limited evidence, indicative")
+                                + ")"
                             )
-                            if f["usable"]
-                            else "At this field: insufficient evidence (too few comparable fields), no number given"
-                        )
+                        else:
+                            ind = f["indicative"]
+                            loc = (
+                                f"At this field: insufficient comparable fields; indicative drought-season gap {_fmt(ind['effect'])} "
+                                f"[{_fmt(ind['lo95'])}, {_fmt(ind['hi95'])}], not a finding"
+                            )
                 elif level == "neighbourhood":
                     f = hood.get(crop, {}).get(tr, {}).get(h["outcome"])
                     if f and "median" in f:
                         loc = (
-                            f"Fields within {NEIGHBOUR_RADIUS_KM:.0f} km: median drought-season gap {_fmt(f['median'])} (p10 {_fmt(f['p10'])}, p90 {_fmt(f['p90'])}, "
-                            f"{f['n_usable']} fields)"
+                            f"Fields within {radius:.0f} km: median drought-season gap {_fmt(f['median'])} (p10 {_fmt(f['p10'])}, p90 {_fmt(f['p90'])}, "
+                            f"{f['n_usable']} fields"
+                            + ("; indicative" if f.get("note") else "")
+                            + ")"
                         )
                 if loc:
                     s += " " + loc + "."
                 S.append(s)
-                if b["verdict"] not in SUPPORTED:
-                    W.append(f"{nm}: {b['verdict']} - do not present as a finding")
-                elif b["verdict"].startswith("supported by the DML"):
-                    sm = h["checks"].get("max_smd_after")
+                if tier != "full":
                     W.append(
-                        f"{nm}: matched baseline not fully balanced"
-                        + ("" if sm is None else f" (max |SMD| {sm:.2f})")
-                        + "; read it as supported by the model only"
+                        f"{nm}: evidence tier '{tier}' ({h.get('confidence') or 'low'} confidence): {h.get('tier_note') or 'thin data'}"
                     )
+                if tier in ("full", "limited"):
+                    v = str(b["verdict"]).replace("small sample: ", "")
+                    if v not in SUPPORTED:
+                        W.append(f"{nm}: {v} - do not present as a finding")
+                    elif v.startswith("supported by the DML"):
+                        sm = h["checks"].get("max_smd_after")
+                        W.append(
+                            f"{nm}: matched baseline not fully balanced"
+                            + ("" if sm is None else f" (max |SMD| {sm:.2f})")
+                            + "; read it as supported by the model only"
+                        )
                 if h["outcome_sees_drought"] is False:
                     W.append(
                         f"{nm}: outcome {h['outcome']} does not respond to drought in this data; it cannot show a drought effect"
@@ -385,21 +539,26 @@ class M2Evidence:
                 rows = self.fe_by_id[self.fld_id[i]]
                 field = self._field_rows(rows[rows["crop"].isin(crops)] if crops else rows)
             else:
-                ids = self.fld_id[d <= NEIGHBOUR_RADIUS_KM]
-                if len(ids) >= MIN_NEIGHBOURS:
+                radius = NEIGHBOUR_RADIUS_KM  # widen 30 -> 60 -> 120 km until enough analysed fields are inside
+                while radius < NEIGHBOUR_MAX_KM and (d <= radius).sum() < MIN_NEIGHBOURS:
+                    radius = min(radius * 2, NEIGHBOUR_MAX_KM)
+                ids = self.fld_id[d <= radius]
+                if len(ids) >= MIN_NEIGHBOURS_SOFT:
                     match = dict(
                         level="neighbourhood",
                         csbid=None,
                         distance_km=round(float(d[i]), 3),
                         n_neighbour_fields=int(len(ids)),
+                        radius_km=radius,
                     )
-                    hood = self._neighbourhood(ids)
+                    hood = self._neighbourhood(ids, radius)
                 else:
                     match = dict(
                         level="region",
                         csbid=None,
                         distance_km=round(float(d[i]), 3),
                         n_neighbour_fields=int(len(ids)),
+                        radius_km=radius,
                     )
         region = self._region(crops, trs)
         if hood is not None and crops:
@@ -409,8 +568,17 @@ class M2Evidence:
         if field is not None and trs:
             field = {c: {t: v for t, v in tt.items() if t in trs} for c, tt in field.items()}
         summary, warnings = self._summary_and_warnings(
-            region, field or {}, hood or {}, match["level"]
+            region,
+            field or {},
+            hood or {},
+            match["level"],
+            match.get("radius_km") or NEIGHBOUR_RADIUS_KM,
         )
+        if match["level"] == "neighbourhood" and match["radius_km"] > NEIGHBOUR_RADIUS_KM:
+            warnings.insert(
+                0,
+                f"fewer than {MIN_NEIGHBOURS} analysed fields within {NEIGHBOUR_RADIUS_KM:.0f} km: neighbourhood widened to {match['radius_km']:.0f} km",
+            )
         if match["level"] == "region":
             warnings.insert(
                 0,

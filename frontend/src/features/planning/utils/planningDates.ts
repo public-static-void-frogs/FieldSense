@@ -10,6 +10,19 @@ export function getEventStatus(date: string, planningToday: string): EventStatus
   }
   return date <= dayjs(planningToday).add(7, 'day').format('YYYY-MM-DD') ? 'Due soon' : 'Planned';
 }
+/**
+ * The day the calendar opens on. Today when the current month has actions; otherwise the next
+ * upcoming action, so a farmer whose plan starts in a later month does not see an empty grid.
+ */
+export function defaultCalendarDate(dates: string[], planningToday: string): string {
+  const month = planningToday.slice(0, 7);
+  if (dates.some((date) => date.startsWith(month))) {
+    return planningToday;
+  }
+  const upcoming = dates.filter((date) => date > planningToday).sort();
+
+  return upcoming[0] ?? planningToday;
+}
 export function isPlanDate(date?: string): boolean {
   return (
     !!date &&

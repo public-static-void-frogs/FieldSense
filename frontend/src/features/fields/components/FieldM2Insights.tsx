@@ -7,6 +7,7 @@ import type {
   M2FieldEffect,
   M2Insights,
   M2NeighbourEffect,
+  M2Outcome,
   M2Region,
   M2Treatment,
 } from '../../../types/fields/field-insights.types.ts';
@@ -15,6 +16,7 @@ import type { Field } from '../../../types/fields/field.types.ts';
 import {
   m2Crops,
   m2Outcomes,
+  m2Tiers,
   m2Treatments,
   m2Verdicts,
 } from '../constants/m2Insights.constants.ts';
@@ -57,8 +59,9 @@ export function FieldM2Insights({ field }: FieldM2InsightsProps) {
       distance: insightNumber(match.distance_km, i18n.language),
     });
   } else if (match?.level === 'neighbourhood') {
-    help = t('Summarises {{fields}} analysed fields within 30 km', {
+    help = t('Summarises {{fields}} analysed fields within {{radius}} km', {
       fields: insightNumber(match.n_neighbour_fields, i18n.language),
+      radius: insightNumber(match.radius_km ?? 30, i18n.language),
     });
   } else if (match) {
     help = t('Study-wide result: no analysed fields close enough to this one');
@@ -110,13 +113,34 @@ function M2Results({ insights }: M2ResultsProps) {
           <summary>{t('Evidence notes')}</summary>
           <ul className="field-insights-notes">
             {insights.warnings.map((warning) => (
-              <li key={warning}>{t(warning, { defaultValue: warning })}</li>
+              <li key={warning}>
+                <EvidenceNote text={t(warning, { defaultValue: warning })} />
+              </li>
             ))}
           </ul>
         </details>
       )}
       <small>{t('Neighbour Evidence Engine (CropTwin Detective + CausalSoil)')}</small>
     </div>
+  );
+}
+
+type EvidenceNoteProps = { text: string };
+
+/** Shows the part before the first colon, and the colon, in bold italics. */
+function EvidenceNote({ text }: EvidenceNoteProps) {
+  const split = text.indexOf(': ');
+  if (split < 0) {
+    return text;
+  }
+
+  return (
+    <>
+      <strong>
+        <em>{text.slice(0, split + 1)}</em>
+      </strong>
+      {text.slice(split + 1)}
+    </>
   );
 }
 
@@ -152,8 +176,11 @@ type M2TreatmentCardProps = {
 function M2TreatmentCard({ treatment, region, field, neighbourhood }: M2TreatmentCardProps) {
   const { t, i18n } = useTranslation();
   const signed = (value: number | null | undefined) => insightSigned(value, i18n.language);
-  const verdict = m2Verdicts[region.verdict] ?? { label: region.verdict, tone: 'default' };
   const headline = region.headline;
+  const tier = region.evidence_tier;
+  const lowerTier = tier != null && tier !== 'full' && tier !== 'limited';
+  const verdictKey = region.verdict.replace('small sample: ', '');
+  const verdict = m2Verdicts[verdictKey] ?? { label: verdictKey, tone: 'default' };
   const outcomeKey = headline?.outcome;
   const outcomeName = outcomeKey
     ? t(m2Outcomes[outcomeKey as keyof typeof m2Outcomes] ?? outcomeKey)
@@ -162,29 +189,25 @@ function M2TreatmentCard({ treatment, region, field, neighbourhood }: M2Treatmen
   const hoodEffect = outcomeKey ? neighbourhood?.[outcomeKey] : undefined;
 
   return (
-    <Card
-      size="small"
-      className="field-insights-metric"
-      title={t(m2Treatments[treatment])}
-      extra={
-        <Tag color={verdict.tone === 'default' ? undefined : verdict.tone}>{t(verdict.label)}</Tag>
-      }
-    >
+    <div className="field-m2-card">
+      <div className="field-m2-card-heading">
+        <h4>{t(m2Treatments[treatment])}</h4>
+        {lowerTier ? (
+          <Tag>{t(m2Tiers[tier])}</Tag>
+        ) : (
+          <Tag color={verdict.tone === 'default' ? undefined : verdict.tone}>
+            {t(verdict.label)}
+          </Tag>
+        )}
+      </div>
       {region.abstain || !headline ? (
         <p className="field-insights-muted">{t('Not enough comparable fields for an estimate.')}</p>
       ) : (
         <>
-          <p>
-            <strong>
-              {signed(headline.gamma)} [{signed(headline.gamma_lo)}, {signed(headline.gamma_hi)}]
-            </strong>{' '}
-            <span className="field-insights-muted">
-              {t('extra effect in drought on {{outcome}}', { outcome: outcomeName })}
-            </span>
-          </p>
-          <p className="field-insights-muted">
-            {t('Gap in normal seasons: {{value}}', { value: signed(headline.theta_normal) })}
-          </p>
+          <M2Headline headline={headline} outcomeName={outcomeName} signed={signed} />
+          {tier === 'limited' && (
+            <p className="field-insights-muted">{t('Small sample: read as indicative.')}</p>
+          )}
           {fieldEffect && <M2FieldLine effect={fieldEffect} signed={signed} />}
           {hoodEffect && <M2NeighbourLine effect={hoodEffect} signed={signed} />}
           {headline.outcome_sees_drought === false && (
@@ -194,7 +217,56 @@ function M2TreatmentCard({ treatment, region, field, neighbourhood }: M2Treatmen
           )}
         </>
       )}
-    </Card>
+    </div>
+  );
+}
+
+type M2HeadlineProps = {
+  headline: M2Outcome;
+  outcomeName: string | null;
+  signed: (value: number | null | undefined) => string;
+};
+
+function M2Headline({ headline, outcomeName, signed }: M2HeadlineProps) {
+  const { t } = useTranslation();
+  if (headline.gamma == null) {
+    const basis = headline.headline_basis ?? 'effect';
+
+    return (
+      <>
+        <p className="field-m2-value">
+          <strong>
+            {signed(headline.headline_effect)} [{signed(headline.headline_lo)},{' '}
+            {signed(headline.headline_hi)}]
+          </strong>{' '}
+          <span className="field-insights-muted">
+            {t('{{basis}} on {{outcome}}', {
+              basis: t(basis, { defaultValue: basis }),
+              outcome: outcomeName,
+            })}
+          </span>
+        </p>
+        <p className="field-insights-muted">
+          {t('Not a drought-specific effect: the data do not separate drought seasons.')}
+        </p>
+      </>
+    );
+  }
+
+  return (
+    <>
+      <p className="field-m2-value">
+        <strong>
+          {signed(headline.gamma)} [{signed(headline.gamma_lo)}, {signed(headline.gamma_hi)}]
+        </strong>{' '}
+        <span className="field-insights-muted">
+          {t('extra effect in drought on {{outcome}}', { outcome: outcomeName })}
+        </span>
+      </p>
+      <p className="field-insights-muted">
+        {t('Gap in normal seasons: {{value}}', { value: signed(headline.theta_normal) })}
+      </p>
+    </>
   );
 }
 
@@ -206,13 +278,20 @@ function M2FieldLine({ effect, signed }: LineProps<M2FieldEffect>) {
     return <p className="field-insights-muted">{t('This field: not enough comparable fields.')}</p>;
   }
 
+  const indicative = effect.status !== 'ok';
+
   return (
     <p className="field-insights-muted">
-      {t('This field in drought: {{value}} [{{low}}, {{high}}]', {
-        value: signed(effect.effect),
-        low: signed(effect.lo95),
-        high: signed(effect.hi95),
-      })}
+      {t(
+        indicative
+          ? 'This field in drought (indicative): {{value}} [{{low}}, {{high}}]'
+          : 'This field in drought: {{value}} [{{low}}, {{high}}]',
+        {
+          value: signed(effect.effect),
+          low: signed(effect.lo95),
+          high: signed(effect.hi95),
+        },
+      )}
     </p>
   );
 }
@@ -225,10 +304,12 @@ function M2NeighbourLine({ effect, signed }: LineProps<M2NeighbourEffect>) {
 
   return (
     <p className="field-insights-muted">
-      {t('Fields within 30 km in drought: median {{value}} ({{fields}} fields)', {
+      {t('Fields within {{radius}} km in drought: median {{value}} ({{fields}} fields)', {
+        radius: insightNumber(effect.radius_km, i18n.language),
         value: signed(effect.median),
         fields: insightNumber(effect.n_usable, i18n.language),
       })}
+      {effect.note ? ` ${t('indicative')}` : ''}
     </p>
   );
 }

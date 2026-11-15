@@ -20,10 +20,10 @@ The chat assistant does not get field data in its prompt. It calls these tools w
 | --- | --- | --- |
 | `get_weather_forecast` | `weather.py`, `crop_conditions.py`, `weather_insight.py` (formatter only) | Next 3 days of weather plus crop-risk alerts for the selected field, or for the saved location when no field is selected. |
 | `get_m3_insights` | `m3_lookup.py` | Sowing, harvest and frost windows, heat and frost risk, Fallow-Zero water estimates. Optional delayed-sowing scan. |
-| `get_neighbour_evidence` | `m2_lookup.py` | Whether rotation practices changed drought resilience for neighbouring fields: verdict, extra drought effect with intervals, what-if for the field or fields within 30 km. An adjusted association, not a guaranteed effect. |
+| `get_neighbour_evidence` | `m2_lookup.py` | Whether rotation practices changed drought resilience for neighbouring fields: verdict, extra drought effect with intervals, what-if for the field or nearby fields (30 km, widened to 120 km when thin), with the evidence tier and confidence. An adjusted association, not a guaranteed effect. |
 | `get_calendar_events` | `calendar_events.py` | Planned events on a day or short range for the selected field (or all fields): rotation dates and weather or drought warnings with the reason each is scheduled. Used by the calendar page assistant. |
 | `get_soil_moisture` | `soil_moisture.py` | Latest modelled soil moisture per layer and profile mean at the field point. Optional comparison with past years. |
-| `get_rotation_advice` | `rotation_advice.py` (with `season_timing.py` and the `rule_engine/`) | Ranked next-crop advice behind the crop recommendation page: score breakdown, risks, benefits, advisories, yield and revenue estimates, sowing calendar, off-season options, history and data gaps. |
+| `get_rotation_advice` | `rotation_advice.py` (with `season_timing.py` and the `rule_engine/`) | Ranked next-crop advice behind the crop recommendation page: score breakdown, risks, benefits, advisories, yield and revenue estimates, sowing calendar, off-season options, history and data gaps. With `explain` (`why`, `method`, `sources`) it also explains the recommendation: the rules behind the score and what each rests on, how the ranking works, and the data sources and literature to read more (`rotation_explainer.py`). |
 | `get_crop_production` | `crop_production.py` (with `nass.py`) | What the selected field, given counties or a state produced in a past year: field area x county-average NASS yield (an expected value, not a harvest record), or NASS production totals for a region. Crop from the CDL at the field point unless named. | USDA NASS Quick Stats (`NASS_API_KEY`), FCC, CropScape | Infrastructure: tool; services are new |
 | `get_crop_revenue` | `crop_revenue.py` (with `nass.py`) | Expected gross revenue (low / base / high) and optional ROI of a crop plan on the selected field: yield trend x median price received from NASS. No costs other than the given investment. | USDA NASS Quick Stats (`NASS_API_KEY`) | Infrastructure: tool; services are new |
 | `get_soil_depletion` | `soil_depletion.py` via `field_insights.py`, using `crop_history.py` and `ml/greenness.py` | Soil depletion screening index, or `pending` while it is still being computed. |
@@ -37,7 +37,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Weather and soil moisture
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `weather.py` | Weather adapter with a bounded in-memory cache and request de-duplication. Serves current conditions, the daily forecast and historical daily weather. No demo fallback: provider failure is an error. | **Open-Meteo** forecast and archive APIs, for the field point or the account's saved location. | Yes: `get_weather_forecast` |
 | `soil_moisture.py` | Modelled soil moisture at a parcel's analysis point: current value, history over a date range, and a comparison with the same time of year in past years. | **Open-Meteo** hourly soil-moisture layers (forecast and archive) and **NASA POWER** daily wetness (`GWETTOP`, `GWETROOT`, `GWETPROF`). Reuses the `weather.py` fetcher and cache. | Yes: `get_soil_moisture` |
@@ -46,7 +46,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Crop history and soil
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `crop_history.py` | Annual crop class (2008-2025) at a field point, and rendered crop-map layers for the map. | **USDA Cropland Data Layer** image service (`pdi.scinet.usda.gov`). | Indirect: `get_soil_depletion` uses its point and history lookups |
 | `cdl_classes.py` | Lookup table from CDL class codes to crop names. | Static table, no retrieval. | No |
@@ -55,16 +55,17 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Climate timing and rotation advice
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `m3_lookup.py` | Reader for the precomputed **M3** model output. Matches a point to the nearest indexed field (within 1 km) or weather cell (within 45 km) and returns sowing/harvest/frost date windows, heat and frost risk, delayed-sowing scan, and Fallow-Zero cover-crop water estimates. Runs no models and calls no external service. | Local parquet/CSV/JSON files in the M3 output folder (`M3_OUT`, default `data/m3_out`): field index, cell windows and risks, 2040 risks, delay scan, Fallow-Zero units and calibration, NASS validation. | Yes: `get_m3_insights` |
-| `m2_lookup.py` | Reader for the precomputed **M2** neighbour-evidence output. Matches a point to the nearest analysed field (within 1 km), or to the fields within 30 km (at least 20), or falls back to the study-wide result. Returns how rotation practices (continuous cropping, diverse rotation, small grain/hay, winter cover, host-crop return interval) changed drought resilience against neighbours under the same weather, with intervals, validation checks and a verdict. An adjusted association, not a guaranteed effect. Runs no models and calls no external service. | Local CSV/parquet files in the M2 output folder (`M2_OUT`, default `data/m2_out`), written by `ml/field-prediction-model/neighbour-evidence-engine/m2_neighbour_evidence.py`: `effects.csv` (required), `field_effects.parquet`, `outcome_diagnostics.csv`, `county_check_<crop>.csv`. Served by `GET /fields/{id}/m2-insights`. | Yes: `get_neighbour_evidence` |
+| `m2_lookup.py` | Reader for the precomputed **M2** neighbour-evidence output. Matches a point to the nearest analysed field (within 1 km), or to the analysed fields nearby (radius widened 30 → 60 → 120 km until 20 are inside, at least 5), or falls back to the study-wide result. Thin data is labelled with an evidence tier and confidence instead of being dropped. Returns how rotation practices (continuous cropping, diverse rotation, small grain/hay, winter cover, host-crop return interval) changed drought resilience against neighbours under the same weather, with intervals, validation checks and a verdict. An adjusted association, not a guaranteed effect. Runs no models and calls no external service. | Local CSV/parquet files in the M2 output folder (`M2_OUT`, default `data/m2_out`), written by `ml/field-prediction-model/neighbour-evidence-engine/m2_neighbour_evidence.py`: `effects.csv` (required), `field_effects.parquet`, `outcome_diagnostics.csv`, `county_check_<crop>.csv`. Served by `GET /fields/{id}/m2-insights`. | Yes: `get_neighbour_evidence` |
 | `season_timing.py` | Picks the values the recommendation page shows from the M3 output (early/typical/late sowing window, heat and frost risk per climate scenario) and renames them to the API contract. Adds no modelling. | The same M3 output files, through `m3_lookup.py`. | No |
+| `rotation_explainer.py` | Explains a rotation recommendation on top of `rotation_advice.py`: reshapes the engine result into the rules that added or removed points, what each was based on (history years, past seasons a weather threshold was crossed), how the algorithm works and where to read more. Adds no scoring logic. | The engine result and the rules' own references. | Yes: `get_rotation_advice` (`explain`) |
 | `rotation_advice.py` | Adapts a stored field to the standalone `rule_engine/` (repository root) and returns ranked next-crop advice with data gaps. | Local files under `ROTATION_DATA_ROOT` (default `data/local/usa_sample`): season summaries, weekly climate record, soil of sampled fields, CDL history (read with DuckDB); local timing from `season_timing.py`; **USDA Soil Data Access** for fields without stored soil (`ROTATION_SOIL_LOOKUP`). | Yes: `get_rotation_advice` |
 
 ### Map sections and ML
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `section_analysis.py` | Analyses a section of the map: SAM2 segments fields on the submitted map image and a trained TempCNN classifies each field's crop. Fields without enough clear observations are reported as skipped. | The submitted map PNG and point prompts; **Sentinel-2** time series through `ml/greenness.py`; local model weights (`ml/` folder, `SAM2_CHECKPOINT`, `TEMPCNN_CHECKPOINT`). | No |
 | `ml/greenness.py` | Builds 16-observation Sentinel-2 sequences per point for the crop classifier, skipping cloudy pixels. | **Sentinel-2 L2A** scenes via the Earth Search STAC API (AWS). | Indirect: `get_soil_depletion` uses its Sentinel-2 reader |
@@ -73,7 +74,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Stored data (database)
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `maps.py` | Viewport queries for the field map: indexed point lookups when zoomed in, pre-aggregated clusters when zoomed out, at most 600 features per response. Rebuilds the cluster cells. | Database tables `field_map_cells` and `map_datasets`, plus the account's selected fields. | No |
 | `saved_crop_areas.py` | Saves one merged boundary per account and crop from analysed map zones. | Writes to the database (fields and the user's selections); computes area from the submitted polygons. | No |
@@ -89,7 +90,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### LLM assistant
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `llm.py` | Streaming client for **Google Gemini**. `stream_gemini` serves the weather outlook; `gemini_round` serves chat, with tool calls. | Model text from the Gemini API (`GEMINI_API_KEY`, `GEMINI_ENABLED`). | Infrastructure: model client for chat |
 | `assistant.py` | Chat orchestration: loads the system prompt from `app/prompts/assistant.txt`, runs the model, executes the tools it asks for (up to 4 rounds), and streams the answer. | None itself; it calls the tools below. | Infrastructure: runs the tool loop |
