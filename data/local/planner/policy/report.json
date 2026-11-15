@@ -1,0 +1,126 @@
+{
+  "trainingFields": 2254,
+  "heldOutFields": 289,
+  "trainingMinutes": 9.0,
+  "plansSampled": 10141696,
+  "config": {
+    "envs": 8192,
+    "iterations": 1238,
+    "minutes": 9.0,
+    "epochs": 4,
+    "minibatches": 8,
+    "lr": 0.0003,
+    "clip": 0.2,
+    "gae_lambda": 0.95,
+    "entropy": 0.01,
+    "entropy_end": 0.001,
+    "value_weight": 0.5,
+    "max_grad_norm": 0.5,
+    "hidden": 512,
+    "seed": 0
+  },
+  "heldOut": {
+    "fields": 289,
+    "optimumUsdPerAcre": 611.5,
+    "learnedUsdPerAcre": 600.8,
+    "myopicUsdPerAcre": 547.6,
+    "gapClosed": 0.833,
+    "meanRegretUsdPerAcre": 10.7,
+    "worseThanMyopicShare": 0.183,
+    "within1PctOfOptimumShare": 0.689,
+    "byCropCount": {
+      "2": {
+        "fields": 1,
+        "optimumUsdPerAcre": -322.8,
+        "learnedUsdPerAcre": -322.8,
+        "myopicUsdPerAcre": -322.8,
+        "gapClosed": 0.781,
+        "meanRegretUsdPerAcre": 0.0,
+        "worseThanMyopicShare": 0.0,
+        "within1PctOfOptimumShare": 1.0
+      },
+      "3": {
+        "fields": 16,
+        "optimumUsdPerAcre": 834.1,
+        "learnedUsdPerAcre": 833.2,
+        "myopicUsdPerAcre": 714.4,
+        "gapClosed": 0.992,
+        "meanRegretUsdPerAcre": 0.9,
+        "worseThanMyopicShare": 0.0,
+        "within1PctOfOptimumShare": 0.938
+      },
+      "4": {
+        "fields": 10,
+        "optimumUsdPerAcre": 488.6,
+        "learnedUsdPerAcre": 463.4,
+        "myopicUsdPerAcre": 441.8,
+        "gapClosed": 0.461,
+        "meanRegretUsdPerAcre": 25.2,
+        "worseThanMyopicShare": 0.5,
+        "within1PctOfOptimumShare": 0.5
+      },
+      "5": {
+        "fields": 262,
+        "optimumUsdPerAcre": 606.2,
+        "learnedUsdPerAcre": 595.4,
+        "myopicUsdPerAcre": 544.8,
+        "gapClosed": 0.824,
+        "meanRegretUsdPerAcre": 10.8,
+        "worseThanMyopicShare": 0.183,
+        "within1PctOfOptimumShare": 0.679
+      }
+    }
+  },
+  "training": {
+    "fields": 2000,
+    "optimumUsdPerAcre": 734.6,
+    "learnedUsdPerAcre": 730.4,
+    "myopicUsdPerAcre": 669.4,
+    "gapClosed": 0.935,
+    "meanRegretUsdPerAcre": 4.2,
+    "worseThanMyopicShare": 0.098,
+    "within1PctOfOptimumShare": 0.803,
+    "byCropCount": {
+      "2": {
+        "fields": 6,
+        "optimumUsdPerAcre": -398.6,
+        "learnedUsdPerAcre": -400.8,
+        "myopicUsdPerAcre": -400.1,
+        "gapClosed": -0.407,
+        "meanRegretUsdPerAcre": 2.2,
+        "worseThanMyopicShare": 0.333,
+        "within1PctOfOptimumShare": 0.667
+      },
+      "3": {
+        "fields": 160,
+        "optimumUsdPerAcre": 869.9,
+        "learnedUsdPerAcre": 867.9,
+        "myopicUsdPerAcre": 749.7,
+        "gapClosed": 0.984,
+        "meanRegretUsdPerAcre": 2.0,
+        "worseThanMyopicShare": 0.05,
+        "within1PctOfOptimumShare": 0.938
+      },
+      "4": {
+        "fields": 112,
+        "optimumUsdPerAcre": 807.6,
+        "learnedUsdPerAcre": 804.8,
+        "myopicUsdPerAcre": 681.8,
+        "gapClosed": 0.978,
+        "meanRegretUsdPerAcre": 2.8,
+        "worseThanMyopicShare": 0.054,
+        "within1PctOfOptimumShare": 0.875
+      },
+      "5": {
+        "fields": 1722,
+        "optimumUsdPerAcre": 721.3,
+        "learnedUsdPerAcre": 716.8,
+        "myopicUsdPerAcre": 664.8,
+        "gapClosed": 0.92,
+        "meanRegretUsdPerAcre": 4.5,
+        "worseThanMyopicShare": 0.104,
+        "within1PctOfOptimumShare": 0.786
+      }
+    }
+  }
+}

@@ -108,7 +108,9 @@ order it was trained with, and `learned.load_policy` refuses a file whose order 
 `planner=exact` (the default) keeps the exact calculation.
 
 - The backend reads the policy once from `ROTATION_POLICY_PATH` (default
-  `data/local/planner/policy/policy.pt`, which is not in git: copy the file to the server).
+  `data/local/planner/policy/policy.pt`). The policy of the run above and its `report.json` are
+  committed at that path, although the rest of `data/local/` is ignored: a retrained file
+  replaces them with `git add -f`.
 - `plan.method` is `learned_policy` or `dynamic_programming_fixed_sequence`.
 - `plan.planner` reports what was asked for, what was used, and whether a policy is loaded
   (`learnedAvailable`, with the reason code in `learnedUnavailable` when it is not).
