@@ -9,7 +9,6 @@ import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
-import { CropHistoryStrip } from '../features/rotation/components/CropHistoryStrip';
 import { InformationGaps } from '../features/rotation/components/InformationGaps';
 import { OffSeasonCard } from '../features/rotation/components/OffSeasonCard';
 import { RecommendationCalculator } from '../features/rotation/components/RecommendationCalculator';
@@ -112,7 +111,6 @@ export function FieldRecommendationPage() {
               onPriorityToggle={togglePriority}
             />
             <div className="rotation-stack" aria-busy={isUpdating}>
-              <CropHistoryStrip advice={advice} />
               <OffSeasonCard advice={advice} />
               {advice.dataGaps.length > 0 && (
                 <Card>
