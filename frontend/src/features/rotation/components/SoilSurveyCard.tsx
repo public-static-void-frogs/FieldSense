@@ -54,7 +54,11 @@ export function SoilSurveyCard({ advice }: SoilSurveyCardProps) {
   };
 
   return (
-    <Card className="rotation-input-card" title={t('Your soil test')} loading={isPending}>
+    <Card
+      className="rotation-input-card"
+      title={<h3>{t('Your soil test')}</h3>}
+      loading={isPending}
+    >
       <Typography.Paragraph type="secondary">
         {t(
           'pH and organic matter from your test replace the soil map estimate. Phosphorus and potassium change the fertilizer cost of corn and soybeans.',

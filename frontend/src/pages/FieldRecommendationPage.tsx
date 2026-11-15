@@ -126,11 +126,19 @@ export function FieldRecommendationPage() {
             />
             <div className="rotation-stack" aria-busy={isUpdating}>
               {plan && <PlanOverview advice={advice} plan={plan} />}
-              <div className="rotation-inputs">
+              <section className="rotation-inputs" aria-labelledby="rotation-inputs-heading">
+                <header className="rotation-inputs-heading">
+                  <h2 id="rotation-inputs-heading">{t('Recalculate with your own data')}</h2>
+                  <p>
+                    {t(
+                      'Use your harvest records, soil test, prices, or costs to update this field’s recommendations. Select Save and recalculate in any section to apply your changes.',
+                    )}
+                  </p>
+                </header>
                 <SeasonResultsCard advice={advice} />
                 <SoilSurveyCard advice={advice} />
                 <EconomicsCard advice={advice} />
-              </div>
+              </section>
               <OffSeasonCard advice={advice} />
               {advice.dataGaps.length > 0 && (
                 <Card>

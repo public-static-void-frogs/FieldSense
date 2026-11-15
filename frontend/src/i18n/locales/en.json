@@ -1530,6 +1530,8 @@
   "Years that resemble the current drought and price situation count more.": "Years that resemble the current drought and price situation count more.",
   "Every past year counts equally.": "Every past year counts equally.",
   "The chances are how often it happened, not a promise for next year.": "The chances are how often it happened, not a promise for next year.",
+  "Recalculate with your own data": "Recalculate with your own data",
+  "Use your harvest records, soil test, prices, or costs to update this field’s recommendations. Select Save and recalculate in any section to apply your changes.": "Use your harvest records, soil test, prices, or costs to update this field’s recommendations. Select Save and recalculate in any section to apply your changes.",
   "Your past seasons": "Your past seasons",
   "Paste one season per line: year, crop, yield per acre (bushels; hay in tons). Rows copied from a spreadsheet work. Your crops replace the satellite estimate for those years, and your yields set this field’s level against the county.": "Paste one season per line: year, crop, yield per acre (bushels; hay in tons). Rows copied from a spreadsheet work. Your crops replace the satellite estimate for those years, and your yields set this field’s level against the county.",
   "Save and recalculate": "Save and recalculate",

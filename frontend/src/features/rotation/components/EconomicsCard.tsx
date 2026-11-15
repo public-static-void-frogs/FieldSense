@@ -1,6 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Alert, Button, Card, Flex, Form, InputNumber, Typography } from 'antd';
-import { Fragment } from 'react';
 import { useTranslation } from 'react-i18next';
 import { rotationMutations } from '../../../api/rotation/rotation.mutations.ts';
 import { rotationQueries } from '../../../api/rotation/rotation.queries.ts';
@@ -63,7 +62,11 @@ export function EconomicsCard({ advice }: EconomicsCardProps) {
   const rent = economics?.defaults.landRent;
 
   return (
-    <Card className="rotation-input-card" title={t('Your prices and costs')} loading={isPending}>
+    <Card
+      className="rotation-input-card"
+      title={<h3>{t('Your prices and costs')}</h3>}
+      loading={isPending}
+    >
       <Typography.Paragraph type="secondary">
         {t(
           'Price, cost and rent decide most of the dollar result. Each field shows the USDA average; type your own number to replace it.',
@@ -78,12 +81,16 @@ export function EconomicsCard({ advice }: EconomicsCardProps) {
           onFinish={(values) => save.mutate({ fieldId, inputs: toInputs(values, economics) })}
         >
           <div className="rotation-economics-grid">
-            <Typography.Text strong>{t('Crop')}</Typography.Text>
-            <Typography.Text strong>{t('Price')}</Typography.Text>
-            <Typography.Text strong>{t('Cost per acre, without land')}</Typography.Text>
+            <div className="rotation-economics-row rotation-economics-heading" aria-hidden="true">
+              <Typography.Text strong>{t('Crop')}</Typography.Text>
+              <Typography.Text strong>{t('Price')}</Typography.Text>
+              <Typography.Text strong>{t('Cost per acre, without land')}</Typography.Text>
+            </div>
             {economics.defaults.crops.map((crop) => (
-              <Fragment key={crop.crop}>
-                <Typography.Text>{name(crop.crop)}</Typography.Text>
+              <div className="rotation-economics-row" key={crop.crop}>
+                <Typography.Text strong className="rotation-economics-crop">
+                  {t(name(crop.crop))}
+                </Typography.Text>
                 <Form.Item name={['price', crop.crop]}>
                   <InputNumber
                     min={0.01}
@@ -92,7 +99,7 @@ export function EconomicsCard({ advice }: EconomicsCardProps) {
                     prefix="$"
                     suffix={`/ ${crop.priceUnit}`}
                     placeholder={crop.priceUsd.toFixed(2)}
-                    aria-label={`${name(crop.crop)}: ${t('Price')}`}
+                    aria-label={`${t(name(crop.crop))}: ${t('Price')}`}
                   />
                 </Form.Item>
                 <Form.Item name={['cost', crop.crop]}>
@@ -102,10 +109,10 @@ export function EconomicsCard({ advice }: EconomicsCardProps) {
                     step={5}
                     prefix="$"
                     placeholder={crop.costUsdPerAcre.toFixed(0)}
-                    aria-label={`${name(crop.crop)}: ${t('Cost per acre, without land')}`}
+                    aria-label={`${t(name(crop.crop))}: ${t('Cost per acre, without land')}`}
                   />
                 </Form.Item>
-              </Fragment>
+              </div>
             ))}
           </div>
           <Form.Item

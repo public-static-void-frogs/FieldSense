@@ -45,7 +45,11 @@ export function SeasonResultsCard({ advice }: SeasonResultsCardProps) {
     save.mutate({ fieldId, results: next }, { onSuccess: () => setDraft(null) });
 
   return (
-    <Card className="rotation-input-card" title={t('Your past seasons')} loading={isPending}>
+    <Card
+      className="rotation-input-card"
+      title={<h3>{t('Your past seasons')}</h3>}
+      loading={isPending}
+    >
       <Typography.Paragraph type="secondary">
         {t(
           'Paste one season per line: year, crop, yield per acre (bushels; hay in tons). Rows copied from a spreadsheet work. Your crops replace the satellite estimate for those years, and your yields set this field’s level against the county.',
