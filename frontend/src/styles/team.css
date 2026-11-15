@@ -127,6 +127,21 @@
   margin: 0;
 }
 
+.team-portrait-frame {
+  position: relative;
+}
+
+.team-portrait-badge {
+  position: absolute;
+  right: 8px;
+  bottom: 8px;
+  box-sizing: border-box;
+  padding: 5px;
+  border-radius: 50%;
+  background: #fff;
+  color-scheme: only light;
+}
+
 .team-card.ant-card .team-portrait {
   display: block;
   width: 100%;

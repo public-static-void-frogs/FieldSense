@@ -144,17 +144,6 @@
   gap: 8px 20px;
   font-size: 14px;
 }
-.product-notice {
-  padding: 18px 22px;
-  border: 1px solid #dfe5d5;
-  background: #fdfefb;
-  border-radius: 12px;
-  margin-bottom: 24px;
-}
-.product-notice p {
-  margin: 0 0 10px;
-  color: #5d6d54;
-}
 .login-clearing .legal-links {
   margin-top: 24px;
   justify-content: center;

@@ -27,14 +27,24 @@ export function TeamSection() {
             key={frog.id}
             className="team-card"
             cover={
-              <img
-                className="team-portrait"
-                src={`/images/team/${frog.id}.webp`}
-                alt={frog.alt}
-                width={768}
-                height={512}
-                decoding="async"
-              />
+              <div className="team-portrait-frame">
+                <img
+                  className="team-portrait"
+                  src={`/images/team/${frog.id}.webp`}
+                  alt={frog.alt}
+                  width={768}
+                  height={512}
+                  decoding="async"
+                />
+                <img
+                  className="team-portrait-badge"
+                  src="/images/team/chatgpt.svg"
+                  alt={t('Made with ChatGPT')}
+                  title={t('Made with ChatGPT')}
+                  width={30}
+                  height={30}
+                />
+              </div>
             }
           >
             <Typography.Title level={4}>{frog.name}</Typography.Title>
