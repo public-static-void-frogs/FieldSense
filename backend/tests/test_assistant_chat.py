@@ -371,6 +371,8 @@ class AssistantChatTests(unittest.TestCase):
 
     def test_rotation_advice_explanation_is_added_only_when_asked(self):
         field = self.login_with_field()
+        rule = SimpleNamespace(id="r1", sources=("Repeat-crop rule reference",))
+        self.rotation.advisor = SimpleNamespace(rules=SimpleNamespace(rules=(rule,)))
         gemini = FakeGemini(
             call("get_rotation_advice"),
             call("get_rotation_advice", explain=["why", "method", "sources", "luck"]),
@@ -379,8 +381,15 @@ class AssistantChatTests(unittest.TestCase):
         self.chat(gemini, field_id=field["id"])
         plain, explained = [r["response"] for r in tool_responses(gemini.requests[2])]
         self.assertNotIn("explanation", plain)
-        self.assertEqual(set(explained["explanation"]), {"why", "method", "sources"})
-        self.assertEqual(explained["explanation"]["why"]["recommended"]["crop"], "a")
+        explanation = explained["explanation"]
+        self.assertEqual(set(explanation), {"why", "method", "sources"})
+        recommended = explanation["why"]["recommended"]
+        self.assertEqual(recommended["crop"], "a")
+        self.assertEqual(explanation["why"]["intended"]["crop"], "b")
+        self.assertEqual(recommended["risks"][0]["points"], 5.0)
+        self.assertEqual(recommended["risks"][0]["trigger"], {"big": 1})
+        self.assertEqual(explanation["method"]["scoring"], explained["scoring"])
+        self.assertEqual(explanation["sources"]["ruleReferences"], {"r1": [rule.sources[0]]})
 
     def test_rotation_advice_tool_trims_detail_and_helps_with_a_bad_crop(self):
         field = self.login_with_field()
