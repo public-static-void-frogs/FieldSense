@@ -1427,5 +1427,12 @@
   "Is the weather suitable for this work?": "Чи підходить погода для цієї роботи?",
   "Reading calendar events…": "Читаю події календаря…",
   "AI assistant": "ШІ-помічник",
-  "Actions": "Дії"
+  "Actions": "Дії",
+  "Is today a good day for field work?": "Чи сприятливий цей день для польових робіт?",
+  "What should I watch for in the next days?": "На що звернути увагу в найближчі дні?",
+  "How does this weather affect my crops?": "Як ця погода впливає на мої культури?",
+  "Ask a follow-up question…": "Поставте уточнювальне запитання…",
+  "Ask a follow-up": "Поставити уточнювальне запитання",
+  "Looking up crop production…": "Шукаю дані про врожайність…",
+  "Estimating crop revenue…": "Оцінюю дохід від культур…"
 }

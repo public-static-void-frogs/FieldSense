@@ -15,6 +15,7 @@ from app.services.drought import DroughtMonitor
 from app.services.field_insights import SoilAssessments
 from app.services.m2_lookup import M2Evidence
 from app.services.m3_lookup import M3Advice
+from app.services.nass import Nass
 from app.services.rotation_advice import InvalidAdviceRequest, RotationAdvice
 from app.services.rotation_strategy import AdviceCache, RotationStrategy
 from app.services.season_timing import SeasonTiming
@@ -34,6 +35,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
         finally:
             app.state.weather.close()
             app.state.drought.close()
+            app.state.nass.close()
             app.state.soil_assessments.close()
             engine.dispose()
 
@@ -60,6 +62,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
     )
     app.state.soil_assessments = SoilAssessments(config.nass_api_key)
     app.state.drought = DroughtMonitor()
+    app.state.nass = Nass(config.nass_api_key)
     app.state.advice = AdviceCache(app.state.rotation)
     app.state.calendar = CalendarEvents(
         app.state.weather, app.state.crop_model, app.state.advice, app.state.drought

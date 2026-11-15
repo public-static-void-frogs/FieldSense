@@ -1427,5 +1427,12 @@
   "Is the weather suitable for this work?": "Is the weather suitable for this work?",
   "Reading calendar events…": "Reading calendar events…",
   "AI assistant": "AI assistant",
-  "Actions": "Actions"
+  "Actions": "Actions",
+  "Is today a good day for field work?": "Is today a good day for field work?",
+  "What should I watch for in the next days?": "What should I watch for in the next days?",
+  "How does this weather affect my crops?": "How does this weather affect my crops?",
+  "Ask a follow-up question…": "Ask a follow-up question…",
+  "Ask a follow-up": "Ask a follow-up",
+  "Looking up crop production…": "Looking up crop production…",
+  "Estimating crop revenue…": "Estimating crop revenue…"
 }

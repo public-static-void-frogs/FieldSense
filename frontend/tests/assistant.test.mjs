@@ -21,6 +21,10 @@ import { buildHistory } from '../src/features/assistant/utils/chatHistory.ts';
 import { progressLabel } from '../src/features/assistant/utils/chatProgress.ts';
 import { i18nOptions } from '../src/i18n/options.ts';
 import {
+  weatherChatPlaceholder,
+  weatherChatSuggestions,
+} from '../src/features/weather/constants/weatherChat.constants.ts';
+import {
   calendarAssistantIntro,
   calendarAssistantPlaceholder,
   calendarAssistantPrompt,
@@ -314,4 +318,33 @@ test('calendar assistant phrases exist in both catalogs and the chat list can sh
   assert.match(html, /Ask about the actions and warnings planned for this day\./);
   assert.match(html, /What could delay these actions\?/);
   assert.doesNotMatch(html, /Is there a frost risk this week\?/);
+});
+
+test('a weather day is sent as weather_date and the weather chat phrases are translated', async (t) => {
+  configure(t);
+  let body;
+  t.mock.method(globalThis, 'fetch', async (url, options) => {
+    body = JSON.parse(options.body);
+    return stream('{"done":true}\n');
+  });
+  await chat({ fieldId: undefined, weatherDate: '2026-11-17' }).promise;
+  assert.equal(body.weather_date, '2026-11-17');
+  assert.equal('calendar_date' in body, false);
+  const en = readLocale('en');
+  const uk = readLocale('uk');
+  for (const phrase of [weatherChatPlaceholder, 'Ask a follow-up', ...weatherChatSuggestions]) {
+    assert.equal(en[phrase], phrase, `English catalog: ${phrase}`);
+    assert.ok(uk[phrase]?.trim() && uk[phrase] !== phrase, `Ukrainian catalog: ${phrase}`);
+  }
+});
+
+test('crop production and revenue tools have translated progress labels', () => {
+  const en = readLocale('en');
+  const uk = readLocale('uk');
+  for (const tool of ['get_crop_production', 'get_crop_revenue']) {
+    const phrase = toolProgressLabels[tool];
+    assert.equal(progressLabel(tool), phrase);
+    assert.equal(en[phrase], phrase);
+    assert.ok(uk[phrase]?.trim() && uk[phrase] !== phrase);
+  }
 });

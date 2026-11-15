@@ -761,3 +761,14 @@
   white-space: pre-line;
   overflow-wrap: anywhere;
 }
+
+.weather-day-chat,
+.weather-day-chat-toggle {
+  margin-top: 16px;
+}
+
+.weather-day-chat {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}

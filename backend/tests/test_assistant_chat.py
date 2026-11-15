@@ -271,6 +271,8 @@ class AssistantChatTests(unittest.TestCase):
                 "get_calendar_events",
                 "get_soil_moisture",
                 "get_rotation_advice",
+                "get_crop_production",
+                "get_crop_revenue",
             ],
         )
         self.assertEqual((self.m3.calls, self.soil.calls), ([], []))
@@ -306,6 +308,31 @@ class AssistantChatTests(unittest.TestCase):
         self.assertEqual(forecast["crop"], "Corn")
         self.assertEqual(len(forecast["days"]), 3)
         self.assertNotIn("latitude", json.dumps(forecast))
+
+    def test_weather_day_reaches_the_session_and_the_forecast_tool(self):
+        field = self.login_with_field()
+        base = FakeGemini(call("get_weather_forecast"), text("ok"))
+        self.chat(base, field_id=field["id"])
+        days = [d["date"] for d in tool_responses(base.requests[1])[0]["response"]["days"]]
+        later = days[1]
+        gemini = FakeGemini(
+            call("get_weather_forecast"),
+            call("get_weather_forecast", date=days[2]),
+            call("get_weather_forecast", date="2099-01-01"),
+            text("ok"),
+        )
+        self.chat(gemini, field_id=field["id"], weather_date=later)
+        system = gemini.requests[0]["systemInstruction"]["parts"][0]["text"]
+        self.assertIn(f'"weather_day": "{later}"', system)
+        first = tool_responses(gemini.requests[1])[0]["response"]
+        self.assertEqual(first["selectedDate"], later)  # defaults to the open day
+        second = tool_responses(gemini.requests[2])[-1]["response"]
+        self.assertEqual(second["selectedDate"], days[2])
+        third = tool_responses(gemini.requests[3])[-1]["response"]
+        self.assertEqual(third["status"], "unavailable")
+        self.assertIn("forecast covers", third["reason"])
+        bad = self.client.post(PATH, json={"messages": MESSAGES, "weather_date": "later"})
+        self.assertEqual(bad.status_code, 422)
 
     def test_neighbour_evidence_tool_filters_arguments_and_trims_the_result(self):
         field = self.login_with_field()
@@ -557,6 +584,8 @@ class AssistantChatTests(unittest.TestCase):
                 "get_calendar_events",
                 "get_soil_moisture",
                 "get_rotation_advice",
+                "get_crop_production",
+                "get_crop_revenue",
                 "get_crop_zones",
             ],
         )

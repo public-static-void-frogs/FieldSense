@@ -34,6 +34,10 @@ class ChatRequest(BaseModel):
         default=None,
         description="The day selected on the calendar page. The session block tells the model, which reads that day's events with get_calendar_events.",
     )
+    weather_date: date | None = Field(
+        default=None,
+        description="The forecast day open on the weather page. The session block tells the model, which reads that day with get_weather_forecast.",
+    )
     tools: list[str] | None = Field(
         default=None,
         max_length=20,

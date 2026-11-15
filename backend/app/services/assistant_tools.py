@@ -43,7 +43,14 @@ class ChatContext:
     """Per-request inputs shared by all tools. Plain data only; see the module docstring."""
 
     def __init__(
-        self, state, location, field, locale: str, fields=(), calendar_date: date | None = None
+        self,
+        state,
+        location,
+        field,
+        locale: str,
+        fields=(),
+        calendar_date: date | None = None,
+        weather_date: date | None = None,
     ):
         self.state = state
         self.location = location  # snapshot of the account's saved location and units
@@ -51,6 +58,7 @@ class ChatContext:
         self.locale = locale
         self.fields = list(fields)  # snapshot of all the account's fields (calendar tool)
         self.calendar_date = calendar_date  # day selected on the calendar page, or None
+        self.weather_date = weather_date  # forecast day open on the weather page, or None
 
     @cached_property
     def series(self):
@@ -129,7 +137,16 @@ def weather_forecast_tool(ctx: ChatContext, args: dict) -> dict | None:
     records = ctx.series.get("records")
     if not records:
         return None
-    return forecast_insight_input(ctx.series, records[0]["date"], ctx.locale)
+    day = args.get("date") or (ctx.weather_date.isoformat() if ctx.weather_date else None)
+    day = day if isinstance(day, str) else records[0]["date"]
+    result = forecast_insight_input(ctx.series, day, ctx.locale)
+    if result is None:
+        first, last = records[0]["date"], records[-1]["date"]
+        return {
+            "status": "unavailable",
+            "reason": f"No forecast for {day}; the forecast covers {first} to {last}.",
+        }
+    return result
 
 
 def m3_insights_tool(ctx: ChatContext, args: dict) -> dict | None:
@@ -253,6 +270,96 @@ def calendar_events_tool(ctx: ChatContext, args: dict) -> dict | None:
     }
 
 
+def _field_point(field) -> tuple[float, float]:
+    lng, lat = field["geometry"]["coordinates"]
+    return lat, lng
+
+
+def _optional_number(value) -> float | None:
+    return float(value) if isinstance(value, int | float) and not isinstance(value, bool) else None
+
+
+def crop_production_tool(ctx: ChatContext, args: dict) -> dict | None:
+    """Past-year crop production of the selected field or of counties/a state, from USDA NASS."""
+    from app.services import crop_production
+    from app.services.nass import NassUnavailable
+
+    nass = ctx.state.nass
+    try:
+        year = int(args["year"])
+    except (KeyError, TypeError, ValueError):
+        return {"status": "unavailable", "reason": "year is required (a past crop year)"}
+    try:
+        if args.get("counties") or args.get("state"):
+            counties = args.get("counties")
+            result = crop_production.region_production(
+                nass,
+                year,
+                counties if isinstance(counties, list) else None,
+                args.get("state"),
+                [args["crop"]] if args.get("crop") else None,
+            )
+        else:
+            if not ctx.field:
+                return NO_FIELD
+            lat, lng = _field_point(ctx.field)
+            result = crop_production.field_production(
+                nass,
+                year,
+                lat,
+                lng,
+                args.get("crop"),
+                ctx.field["area"],
+                min(_optional_number(args.get("snap_m")) or 0.0, 500.0),
+            )
+    except (NassUnavailable, ValueError) as error:
+        return {"status": "unavailable", "reason": str(error)}
+    return {"status": "ready", **result}
+
+
+def _overrides(rows) -> dict:
+    """[{crop, value}] from the model as {crop: value}."""
+    if not isinstance(rows, list):
+        return {}
+    return {
+        str(row.get("crop")): row.get("value")
+        for row in rows
+        if isinstance(row, dict) and row.get("crop")
+    }
+
+
+def crop_revenue_tool(ctx: ChatContext, args: dict) -> dict | None:
+    """Expected gross revenue and ROI of a crop plan for the selected field, from USDA NASS."""
+    from app.services import crop_revenue
+
+    if not ctx.field:
+        return NO_FIELD
+    plan = args.get("plan")
+    if not isinstance(plan, list) or not plan:
+        return {"status": "unavailable", "reason": "plan is required: [{startDate, crop}, ...]"}
+    crops = {
+        str(entry.get("startDate")): entry.get("crop") for entry in plan if isinstance(entry, dict)
+    }
+    investment = args.get("investment")
+    if isinstance(investment, list):
+        investment = {
+            str(row.get("year")): row.get("amount") for row in investment if isinstance(row, dict)
+        }
+    lat, lng = _field_point(ctx.field)
+    result = crop_revenue.forecast(
+        ctx.state.nass,
+        lat,
+        lng,
+        crops,
+        area_ha=ctx.field["area"],
+        investment=investment,
+        attribute="harvest" if args.get("attribute") == "harvest" else "start",
+        price_override=_overrides(args.get("prices")),
+        yield_override=_overrides(args.get("yields")),
+    )
+    return {"status": "ready" if result["crops"] else "unavailable", **result}
+
+
 PRIORITIES = ("water", "soil", "erosion", "income", "pest_break")
 DETAILED_CANDIDATES = 3  # the intended crop and the best-ranked crops get full detail
 
@@ -331,8 +438,19 @@ def default_registry() -> ToolRegistry:
             "saved location when no field is selected: conditions, temperature, overnight low, "
             "rainfall, rain chance, soil moisture, humidity, wind, plus crop-risk level and "
             "rule alerts (e.g. frost, heat, waterlogging) for the field's crop. Use for "
-            "questions about upcoming weather, frost or rain, or short-term crop risk.",
+            "questions about upcoming weather, frost or rain, or short-term crop risk. Starts "
+            "at the day open on the weather page when there is one, else today.",
             weather_forecast_tool,
+            {
+                "type": "object",
+                "properties": {
+                    "date": {
+                        "type": "string",
+                        "description": "First day, YYYY-MM-DD, within the 14-day forecast. "
+                        "Defaults to the day open on the weather page, else today.",
+                    }
+                },
+            },
         )
     )
     registry.register(
@@ -474,6 +592,112 @@ def default_registry() -> ToolRegistry:
                         "scores. Set only when the user states priorities.",
                     },
                 },
+            },
+        )
+    )
+    registry.register(
+        Tool(
+            "get_crop_production",
+            "How much crop the selected field, or counties or a state, produced in a PAST year, "
+            "from USDA NASS (U.S. only; needs the server's NASS key). For the field it is its "
+            "area x the county-average yield of that year, in bushels or tons, short tons and "
+            "tonnes: an expected value, never a harvest record. Crop defaults to the "
+            "satellite crop map (CDL) at the field point; pass crop to override. For a region "
+            "give counties (5-digit FIPS) or a state (2-digit FIPS) to get NASS production "
+            "totals. Unpublished (current-season) years have no data.",
+            crop_production_tool,
+            {
+                "type": "object",
+                "properties": {
+                    "year": {"type": "integer", "description": "Past crop year, e.g. 2023."},
+                    "crop": {
+                        "type": "string",
+                        "description": "corn, soybeans, winter wheat, spring wheat, oats, "
+                        "barley, rye, sorghum, alfalfa hay, other hay. Field: overrides the "
+                        "map crop. Region: limits the result to one crop (default all).",
+                    },
+                    "counties": {
+                        "type": "array",
+                        "items": {"type": "string"},
+                        "description": "5-digit county FIPS codes for a region result.",
+                    },
+                    "state": {
+                        "type": "string",
+                        "description": "2-digit state FIPS for a whole-state region result.",
+                    },
+                    "snap_m": {
+                        "type": "number",
+                        "description": "Field only: if the point is not a crop pixel, look "
+                        "this many metres around it (max 500) for the crop.",
+                    },
+                },
+                "required": ["year"],
+            },
+        )
+    )
+    registry.register(
+        Tool(
+            "get_crop_revenue",
+            "Expected gross revenue (low, base, high) of a crop plan on the selected field, and "
+            "ROI when an investment is given, from USDA NASS yield trends and prices received "
+            "(U.S. only; nominal dollars; county-average yields; no costs except the given "
+            "investment). Use it to compare what crops could earn or to judge a plan. The plan "
+            "is the sowing date and crop of each season; the field area is used. Report the "
+            "returned warnings and say the figures are estimates from past years. Needs a "
+            "selected field.",
+            crop_revenue_tool,
+            {
+                "type": "object",
+                "properties": {
+                    "plan": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "startDate": {"type": "string", "description": "YYYY-MM-DD"},
+                                "crop": {"type": "string"},
+                            },
+                            "required": ["startDate", "crop"],
+                        },
+                        "description": "Planned crops with the start day of growing.",
+                    },
+                    "investment": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "year": {"type": "integer"},
+                                "amount": {"type": "number"},
+                            },
+                        },
+                        "description": "Money spent on growing the whole field, per year "
+                        "([{year, amount}]); one entry for a single total.",
+                    },
+                    "attribute": {
+                        "type": "string",
+                        "enum": ["start", "harvest"],
+                        "description": "Book revenue to the sowing year (default) or harvest year.",
+                    },
+                    "prices": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {"crop": {"type": "string"}, "value": {"type": "number"}},
+                        },
+                        "description": "The user's own price per crop ($/bu, $/cwt sorghum, "
+                        "$/ton hay), e.g. a contract. Only when the user gives one.",
+                    },
+                    "yields": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {"crop": {"type": "string"}, "value": {"type": "number"}},
+                        },
+                        "description": "The user's own yield per acre (bu or tons). Only when "
+                        "the user gives one.",
+                    },
+                },
+                "required": ["plan"],
             },
         )
     )

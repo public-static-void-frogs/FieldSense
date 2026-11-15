@@ -5,10 +5,12 @@ import type { AssistantErrorKind } from '../constants/assistant.constants.ts';
 import { buildHistory, type ChatEntry } from '../utils/chatHistory.ts';
 import { classifyChatError } from '../utils/chatErrors.ts';
 
+export type ChatDayContext = { calendarDate?: string; weatherDate?: string };
+
 export function useAssistantChat(
   fieldId: string | undefined,
   locale: string,
-  calendarDate?: string,
+  day: ChatDayContext = {},
 ) {
   const chat = useMutation(assistantMutations.chat());
   const [entries, setEntries] = useState<ChatEntry[]>([]);
@@ -43,7 +45,7 @@ export function useAssistantChat(
       await chat.mutateAsync({
         messages: buildHistory([...previous, question]),
         fieldId,
-        calendarDate,
+        ...day,
         locale,
         signal: abort.signal,
         onDelta: (delta) => {

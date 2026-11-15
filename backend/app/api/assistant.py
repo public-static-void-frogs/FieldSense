@@ -72,7 +72,15 @@ def chat(request: Request, body: ChatRequest, user: CurrentUser, store: Store):
         units=settings.units,
         location=settings.location,
     )
-    ctx = ChatContext(state, location, field, body.locale, store.fields(), body.calendar_date)
+    ctx = ChatContext(
+        state,
+        location,
+        field,
+        body.locale,
+        store.fields(),
+        body.calendar_date,
+        body.weather_date,
+    )
     return StreamingResponse(
         service.stream_chat(
             state.config, body, service.build_system_prompt(prompt, ctx), registry, ctx

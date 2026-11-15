@@ -14,6 +14,7 @@ keeps the context small however many data sources are added.
   "messages": [{"role": "user", "content": "When can I plant corn?"}],
   "field_id": "optional field uuid",
   "calendar_date": "optional YYYY-MM-DD",
+  "weather_date": "optional YYYY-MM-DD",
   "tools": ["get_weather_forecast", "get_m3_insights"],
   "locale": "en"
 }
@@ -24,6 +25,8 @@ keeps the context small however many data sources are added.
 - `field_id`: the selected field. Field-specific tools use it. Optional.
 - `calendar_date`: the day selected on the calendar page. The session block tells the model, which
   then reads that day with `get_calendar_events`. Optional.
+- `weather_date`: the forecast day open on the weather page. The session block tells the model;
+  `get_weather_forecast` starts at that day (its optional `date` argument overrides it).
 - `tools`: names of tools the model may call. Omit to allow all, send `[]` to disable tools.
   `GET /api/v1/assistant/tools` lists names and descriptions; an unknown name returns 422.
 - The client cannot send a system prompt.
@@ -72,6 +75,8 @@ frontend endpoints) and never modify them.
 | `get_calendar_events` | `services/calendar_events.py` | planned events of the selected field (all fields when none is selected) on one day or up to 14 days: rotation dates and weather/drought warnings with description, priority, duration and rationale. `date` defaults to `calendar_date`, else today. Capped at 30 events. |
 | `get_soil_moisture` | `services/soil_moisture.py` | latest modelled soil moisture per layer and profile mean at the field's reference point (Open-Meteo). Optional `compare_to_past_years` adds anomaly and percentile against past years (slower). Needs a field. |
 | `get_rotation_advice` | `services/rotation_advice.py` | the data behind the crop recommendation page (`GET /fields/{id}/rotation-advice`): ranked candidate crops with score breakdown, risks, benefits, advisories, yield/revenue, sowing calendar, off-season options, history and data gaps. Optional `crop` (the page's `:cropId`) and `priorities`. Only the intended crop and the top 3 get yield, revenue, calendar and soil detail; the season timing block is left to `get_m3_insights`. An unknown crop returns the valid ids. Needs a field. |
+| `get_crop_production` | `services/crop_production.py`, `services/nass.py` | production of the selected field in a past year (area x county-average NASS yield, in bu or tons, short tons and tonnes) or NASS production totals for counties or a state; args `year`, `crop`, `counties`, `state`, `snap_m`. Needs `NASS_API_KEY`; U.S. only; expected value, not a harvest record |
+| `get_crop_revenue` | `services/crop_revenue.py`, `services/nass.py` | expected gross revenue (low / base / high) of a crop plan on the selected field from NASS yield trends and prices received, plus ROI when an investment is given; args `plan`, `investment`, `attribute`, `prices`, `yields`. Needs a selected field and `NASS_API_KEY`; nominal dollars, no seed or other costs |
 | `get_soil_depletion` | `services/soil_depletion.py` via `SoilAssessments` | same cache as `GET /fields/{id}/soil-depletion`. Never waits: the first call starts the background calculation and returns `status: pending`; once it is ready (up to ~100 s) later calls return the full assessment. Needs a field. |
 
 ## Adding a tool (for example an ML model)

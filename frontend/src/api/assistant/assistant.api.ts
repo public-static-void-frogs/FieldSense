@@ -5,6 +5,7 @@ export type ChatStreamRequest = {
   messages: ChatMessage[];
   fieldId?: string;
   calendarDate?: string;
+  weatherDate?: string;
   locale: string;
   signal: AbortSignal;
   onDelta: (delta: string) => void;
@@ -71,6 +72,7 @@ export const assistantApi = {
     messages,
     fieldId,
     calendarDate,
+    weatherDate,
     locale,
     signal,
     onDelta,
@@ -84,6 +86,7 @@ export const assistantApi = {
           messages,
           field_id: fieldId,
           calendar_date: calendarDate,
+          weather_date: weatherDate,
           locale,
         }),
         signal,
