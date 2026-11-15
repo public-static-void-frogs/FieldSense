@@ -81,6 +81,8 @@ class Rule:
     applies_to: dict[str, tuple[str, ...]]
     when: tuple[Condition, ...]
     hazard: Hazard | None
+    # the rule is suppressed when all of these hold; a missing fact never suppresses it
+    unless: tuple[Condition, ...]
     effect: Effect
     evidence_strength: str
     sources: tuple[str, ...]
@@ -160,10 +162,17 @@ def _rule(raw) -> Rule:
     if raw.get("evidence_strength") not in EVIDENCE:
         raise RuleError(f"{rule_id}: unknown evidence_strength")
     applies = raw.get("applies_to") or {}
-    if set(applies) - {"crops", "groups", "traits"} or not applies:
+    if set(applies) - {"crops", "groups", "traits", "except_crops"} or not (
+        set(applies) - {"except_crops"}
+    ):
         raise RuleError(f"{rule_id}: applies_to needs crops, groups and/or traits")
     hazard = _hazard(raw["hazard"], rule_id) if "hazard" in raw else None
     when = tuple(_condition(c, rule_id) for c in raw.get("when") or ())
+    unless = tuple(_condition(c, rule_id) for c in raw.get("unless") or ())
+    if hazard is not None and when:
+        raise RuleError(f"{rule_id}: a hazard rule takes unless, not when")
+    if any(c.op in ("is_null", "not_null") for c in unless):
+        raise RuleError(f"{rule_id}: unless conditions must test a known value")
     if "explanation" in raw:
         raise RuleError(f"{rule_id}: prose explanations are not part of the rule format")
     if hazard is None and not when:
@@ -175,6 +184,7 @@ def _rule(raw) -> Rule:
         applies_to={key: tuple(values) for key, values in applies.items()},
         when=when,
         hazard=hazard,
+        unless=unless,
         effect=_effect(raw["effect"], rule_id, hazard is not None),
         evidence_strength=raw["evidence_strength"],
         sources=tuple(raw.get("sources") or ()),
@@ -217,6 +227,8 @@ def _trait_selector(crop: Crop, selector: str) -> bool:
 
 
 def applies(rule: Rule, crop: Crop, catalog: Catalog) -> bool:
+    if crop.id in rule.applies_to.get("except_crops", ()):
+        return False
     if crop.id in rule.applies_to.get("crops", ()):
         return True
     if crop.group.id in rule.applies_to.get("groups", ()):

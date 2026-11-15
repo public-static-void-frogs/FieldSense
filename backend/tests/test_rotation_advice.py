@@ -186,6 +186,49 @@ class RotationAdviceTests(unittest.TestCase):
         )
         self.assertEqual(self.advice(self.catalog_field_id, seasons=9).status_code, 422)
 
+    def test_learned_planner_falls_back_without_a_policy_and_plans_with_one(self):
+        field_id = self.catalog_field()
+        body = self.advice(field_id, planner="learned").json()
+        self.assertEqual(body["plan"]["method"], "dynamic_programming_fixed_sequence")
+        self.assertEqual(
+            body["plan"]["planner"],
+            {
+                "requested": "learned",
+                "used": "exact",
+                "learnedAvailable": False,
+                "learnedUnavailable": "no_policy_file",
+            },
+        )
+        self.assertIsNone(body["plan"]["crops"][0]["belowOptimumUsdPerAcre"])
+        self.assertEqual(self.advice(field_id, planner="oracle").status_code, 422)
+        try:
+            import torch
+        except ModuleNotFoundError:
+            self.skipTest("torch is not installed")
+        from rule_engine.planner.learned import observation_size
+        from rule_engine.planner.ppo import LearnedPolicy, PolicyNet
+
+        torch.manual_seed(0)
+        with tempfile.TemporaryDirectory() as root:
+            saved = Path(root) / "policy.pt"
+            LearnedPolicy(PolicyNet(observation_size(), 16)).save(saved)
+            self.app.state.rotation = RotationAdvice(None, soil_lookup=False, policy_path=saved)
+            exact = self.advice(field_id).json()["plan"]
+            learned = self.advice(field_id, planner="learned").json()["plan"]
+        self.assertEqual((exact["method"], exact["planner"]["used"]), (body["plan"]["method"], "exact"))
+        self.assertTrue(exact["planner"]["learnedAvailable"])
+        self.assertEqual(learned["method"], "learned_policy")
+        self.assertEqual(learned["planner"]["used"], "learned")
+        self.assertEqual({c["crop"] for c in learned["crops"]}, {c["crop"] for c in exact["crops"]})
+        best = {c["crop"]: c["planObjectiveUsdPerAcre"] for c in exact["crops"]}
+        for crop in learned["crops"]:  # an untrained network: valid plans, never above the optimum
+            self.assertGreaterEqual(crop["belowOptimumUsdPerAcre"], 0.0)
+            self.assertAlmostEqual(
+                crop["planObjectiveUsdPerAcre"] + crop["belowOptimumUsdPerAcre"],
+                best[crop["crop"]],
+                delta=0.02,
+            )
+
     def test_season_results_set_the_history_and_the_yield_level(self):
         field_id = self.catalog_field()
         url = f"{BASE}/fields/{field_id}/season-results"

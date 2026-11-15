@@ -1,13 +1,65 @@
 """Turn a field, its crop history and its season summaries into flat facts for the rules."""
 
+import csv
 import re
 from dataclasses import dataclass
+from functools import cache
+from pathlib import Path
 from typing import Literal
 
 from rule_engine.catalog import Catalog, Crop
 from rule_engine.reference import StageCalendar
 from rule_engine.rules import Hazard
 from rule_engine.summary import SeasonSummary
+
+COUNTY_IRRIGATED = Path(__file__).resolve().parent / "data" / "county_irrigated_share.csv"
+
+
+@cache
+def _county_irrigated() -> dict[tuple[str, str], float]:
+    if not COUNTY_IRRIGATED.exists():
+        return {}
+    with COUNTY_IRRIGATED.open(newline="") as handle:
+        return {(r["crop"], r["county_fips"]): float(r["share"]) for r in csv.DictReader(handle)}
+
+
+HAZARD_LOSS = Path(__file__).resolve().parent / "data" / "hazard_yield_loss.csv"
+
+
+@cache
+def _hazard_losses() -> dict[tuple[str, str], dict]:
+    """{(rule, crop): the row of hazard_yield_loss.csv}; scripts/build_hazard_yield_loss.py."""
+    if not HAZARD_LOSS.exists():
+        return {}
+    with HAZARD_LOSS.open(newline="") as handle:
+        return {(r["rule"], r["crop"]): r for r in csv.DictReader(handle)}
+
+
+def hazard_loss(rule_id: str, crop_id: str) -> dict | None:
+    """Share of yield lost in a season the hazard hits, measured in county yields, or None.
+
+    {loss, se, sample (all | dryland counties), finding (loss | no_loss_found), countyYears}.
+    """
+    row = _hazard_losses().get((rule_id, crop_id))
+    if row is None:
+        return None
+    return {
+        "loss": float(row["loss"]),
+        "se": float(row["se"]),
+        "sample": row["sample"],
+        "finding": row["finding"],
+        "countyYears": int(row["county_years"]),
+    }
+
+
+def irrigation_facts(crop: Crop, county_fips: str | None) -> dict:
+    """Census 2022 irrigated share of the crop's harvested acres in the field's county.
+
+    A county average, not the field's own practice; absent for crops the Census does not split.
+    """
+    share = _county_irrigated().get((crop.id, str(county_fips or "")))
+    return {} if share is None else {"county.irrigated_share": share}
+
 
 CDL_KEY = re.compile(r"^CDL(\d{4})$")
 HISTORY_WINDOW = 5

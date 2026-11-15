@@ -43,6 +43,12 @@ export function SoilSurveyCard({ advice }: SoilSurveyCardProps) {
   const name = cropNamer(advice);
   const effects = advice.plan?.soilTest ?? [];
   const soilYield = advice.plan?.soilYield ?? [];
+  // A cost the farmer typed is used as it is: the fertilizer change is not added to it.
+  const ownCost = new Set(
+    (advice.plan?.economics?.crops ?? [])
+      .filter((crop) => crop.costSource === 'farmer')
+      .map((crop) => crop.crop),
+  );
 
   const submit = (values: RotationSoilSurvey) => {
     const survey = Object.fromEntries(
@@ -170,10 +176,15 @@ export function SoilSurveyCard({ advice }: SoilSurveyCardProps) {
               <Typography.Text type="secondary">
                 {effect.crops
                   .map((crop) =>
-                    t('{{crop}}: fertilizer cost {{change}} per acre', {
-                      crop: name(crop.crop),
-                      change: formatSigned(crop.costChangeUsdPerAcre, i18n.language),
-                    }),
+                    t(
+                      ownCost.has(crop.crop)
+                        ? '{{crop}}: fertilizer cost {{change}} per acre, not added because you entered your own cost for this crop'
+                        : '{{crop}}: fertilizer cost {{change}} per acre',
+                      {
+                        crop: name(crop.crop),
+                        change: formatSigned(crop.costChangeUsdPerAcre, i18n.language),
+                      },
+                    ),
                   )
                   .join('; ')}
               </Typography.Text>

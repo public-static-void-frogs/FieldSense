@@ -1,6 +1,6 @@
 import logging
 from datetime import date, datetime, timezone
-from typing import get_args
+from typing import Literal, get_args
 from uuid import UUID
 
 from fastapi import APIRouter, HTTPException, Query, Request
@@ -37,7 +37,12 @@ from app.schemas.soil_moisture import (
 )
 from app.services import fields as service
 from app.services import soil_moisture as moisture_service
-from app.services.rotation_plan import DEFAULT_SEASONS, MAX_SEASONS, MIN_SEASONS
+from app.services.rotation_plan import (
+    DEFAULT_SEASONS,
+    EXACT_PLANNER,
+    MAX_SEASONS,
+    MIN_SEASONS,
+)
 
 logger = logging.getLogger(__name__)
 router = APIRouter(tags=["fields"])
@@ -152,6 +157,11 @@ def rotation_advice(
         le=MAX_SEASONS,
         description="Seasons the plan covers",
     ),
+    planner: Literal["exact", "learned"] = Query(
+        default=EXACT_PLANNER,
+        description="Who plans the seasons after the first: the exact optimum, or the learned "
+        "policy. `plan.planner` reports which one was used and whether a policy is installed",
+    ),
 ):
     """Rank the candidate crops for the coming season with the rotation rule engine.
 
@@ -168,6 +178,7 @@ def rotation_advice(
         seasons,
         store.season_results(field_id),
         store.economics(field_id),
+        planner=planner,
     )
 
 

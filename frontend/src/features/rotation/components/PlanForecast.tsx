@@ -11,7 +11,7 @@ import type {
 } from '../../../types/rotation/rotation.types.ts';
 import { autumnActionLabels, tillageLabels, yieldModeLabels } from '../constants/rotationLabels.ts';
 import { cropNamer, formatSignedUsd, rankedPlanCrops } from '../utils/planPresentation.ts';
-import { formatNumber, formatPercent } from '../utils/rotationPresentation.ts';
+import { formatNumber, formatPercent, formatUsd } from '../utils/rotationPresentation.ts';
 import { OutcomeChart } from './OutcomeChart';
 import { SeasonResultChart } from './SeasonResultChart';
 
@@ -30,6 +30,8 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
   const yieldValue = (value: number) => formatNumber(value, language);
   const priceValue = (value: number) => formatNumber(value, language, 2);
   const chartLabel = t('Result per acre in {{year}} under each past year', { year });
+  const firstStep = entry.steps[0];
+  const operatingCost = firstStep?.operatingCostUsdPerAcre;
   const previousYear = firstSeason.outcomes.find((outcome) => outcome.year + 1 === year);
   const previousYield = previousYear?.yieldMode === 'none' ? undefined : previousYear?.yieldPerAcre;
   const compare = (
@@ -61,10 +63,32 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
         <OutcomeTable outcomes={firstSeason.outcomes} yieldUnit={yields.unit} />
       )}
       <Typography.Title level={5}>{t('Forecast for {{year}}', { year })}</Typography.Title>
+      {typeof operatingCost === 'number' && (
+        <Typography.Paragraph type="secondary">
+          {t(
+            'Operating costs are what the crop takes in the season: seed, fertilizer, chemicals, fuel, repairs and interest, {{operating}} of the {{cost}} per acre. All costs add labour (your own included), machinery ownership and overhead, as USDA counts them.',
+            {
+              operating: formatUsd(operatingCost, language),
+              cost: formatUsd(firstStep.costUsdPerAcre, language),
+            },
+          )}
+        </Typography.Paragraph>
+      )}
       <dl className="rotation-forecast-metrics">
-        <ForecastMetric label={t('Chance of a loss')}>
-          {formatPercent(firstSeason.lossProbability, language)}
-        </ForecastMetric>
+        {typeof firstSeason.operatingLossProbability === 'number' ? (
+          <>
+            <ForecastMetric label={t('Chance of not covering operating costs')}>
+              {formatPercent(firstSeason.operatingLossProbability, language)}
+            </ForecastMetric>
+            <ForecastMetric label={t('Chance of not covering all costs')}>
+              {formatPercent(firstSeason.lossProbability, language)}
+            </ForecastMetric>
+          </>
+        ) : (
+          <ForecastMetric label={t('Chance of a loss')}>
+            {formatPercent(firstSeason.lossProbability, language)}
+          </ForecastMetric>
+        )}
         <ForecastMetric
           label={t('Typical result per acre')}
           comparison={compare(firstSeason.p50UsdPerAcre, previousYear?.netUsdPerAcre, usd)}
@@ -135,10 +159,23 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
             {t('All {{seasons}} seasons together', { seasons: plan.seasons })}
           </Typography.Title>
           <dl className="rotation-stats rotation-stats-wide">
-            <div>
-              <dt>{t('Chance of a loss')}</dt>
-              <dd>{formatPercent(wholePlan.lossProbability, language)}</dd>
-            </div>
+            {typeof wholePlan.operatingLossProbability === 'number' ? (
+              <>
+                <div>
+                  <dt>{t('Chance of not covering operating costs')}</dt>
+                  <dd>{formatPercent(wholePlan.operatingLossProbability, language)}</dd>
+                </div>
+                <div>
+                  <dt>{t('Chance of not covering all costs')}</dt>
+                  <dd>{formatPercent(wholePlan.lossProbability, language)}</dd>
+                </div>
+              </>
+            ) : (
+              <div>
+                <dt>{t('Chance of a loss')}</dt>
+                <dd>{formatPercent(wholePlan.lossProbability, language)}</dd>
+              </div>
+            )}
             <div>
               <dt>{t('Typical result per acre')}</dt>
               <dd>{usd(wholePlan.p50UsdPerAcre)}</dd>

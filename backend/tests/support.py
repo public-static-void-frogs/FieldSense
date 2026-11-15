@@ -34,7 +34,12 @@ def isolated_app(**settings):
         database_url=f"sqlite:///{Path(directory.name) / 'test.db'}",
         jwt_secret=TEST_SECRET,
         jwt_issuer=TEST_ISSUER,
-        **{"rotation_data_root": "", "rotation_soil_lookup": False, **settings},
+        **{
+            "rotation_data_root": "",
+            "rotation_soil_lookup": False,
+            "rotation_policy_path": "",
+            **settings,
+        },
     )
     app = create_app(config)
     Base.metadata.create_all(app.state.engine)

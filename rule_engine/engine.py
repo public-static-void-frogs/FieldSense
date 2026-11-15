@@ -17,8 +17,10 @@ from rule_engine.facts import (
     county_facts,
     crop_history,
     field_facts,
+    hazard_loss,
     hazard_result,
     history_facts,
+    irrigation_facts,
 )
 from rule_engine.herbicide import herbicide_facts, load_plantback
 from rule_engine.offseason import off_season
@@ -56,6 +58,12 @@ INCOME_BONUS_MAX = 2.0
 RESULT_VERSION = "2026-11-14.3"
 MIN_SEASONS_FOR_HIGH = 3  # one or two seasons cannot establish a recurring hazard
 MIN_HAZARD_SHARE = 0.1  # a hazard seen in fewer than 1 season in 10 is not reported as a risk
+# A weather hazard's level is the yield it is expected to cost per season: the share of seasons it
+# hits x the loss in a season it hits (data/hazard_yield_loss.csv). A hazard that hits most years
+# and costs nothing measurable is "low"; one that hits one year in three and costs a fifth of the
+# crop (6.7 % a season) is "medium". Without a measured loss the share of seasons grades it
+# (the rule's level_bands), never above "medium". The two cut-offs are a judgement, not a fit.
+EXPECTED_LOSS_BANDS = {"high": 0.08, "medium": 0.03, "low": 0.0}
 MIN_HISTORY_SEASONS = 3
 METRIC_UNITS = {
     "tmax_max": "degC",
@@ -248,6 +256,9 @@ class RotationAdvisor:
             **history_facts(history, crop, self.catalog),
             **county_facts(seasons),
             **field_facts(field, history, seasons),
+            **irrigation_facts(
+                crop, field.get("countyFips") or (seasons[-1].county_fips if seasons else None)
+            ),
         }
         calendar = self._calendar(crop, region, field)
         season_year = seasons[-1].year if seasons else None
@@ -265,6 +276,25 @@ class RotationAdvisor:
         for rule in self.rules.rules:
             if not applies(rule, crop, self.catalog):
                 continue
+            if rule.unless:
+                offsets = [(c, *check(c, facts)) for c in rule.unless]
+                if all(ok for _, ok, _, _ in offsets):
+                    gaps.append(
+                        _gap(
+                            "rule_suppressed",
+                            ruleId=rule.id,
+                            conditions=[
+                                {
+                                    "fact": c.fact,
+                                    "op": c.op,
+                                    "expected": _json(e),
+                                    "actual": _json(a),
+                                }
+                                for c, _, a, e in offsets
+                            ],
+                        )
+                    )
+                    continue
             if rule.hazard is not None:
                 if rule.hazard.stage not in calendar.stages:
                     gaps.append(
@@ -283,7 +313,7 @@ class RotationAdvisor:
                     continue
                 if result.seasons_hit == 0 or result.share < MIN_HAZARD_SHARE:
                     continue
-                finding = self._timed_finding(rule, result, calendar, season_year)
+                finding = self._timed_finding(rule, result, calendar, season_year, crop.id)
                 finding["trigger"]["record"] = "weather_record" if long_record else "field_seasons"
             else:
                 checks = [(c, *check(c, facts)) for c in rule.when]
@@ -435,14 +465,21 @@ class RotationAdvisor:
         }
 
     def _timed_finding(
-        self, rule: Rule, result: HazardResult, calendar: StageCalendar, year: int
+        self, rule: Rule, result: HazardResult, calendar: StageCalendar, year: int, crop_id: str
     ) -> dict:
         bands = rule.effect.level_bands or {}
+        loss = hazard_loss(rule.id, crop_id) if rule.effect.kind == "risk" else None
+        if loss is not None:
+            graded, grade_bands, basis = result.share * loss["loss"], EXPECTED_LOSS_BANDS, "loss"
+        else:
+            graded, grade_bands, basis = result.share, bands, "frequency"
         level = "low"
         for name in ("high", "medium"):
-            if name in bands and result.share >= bands[name] and result.share > 0:
+            if name in grade_bands and graded >= grade_bands[name] and graded > 0:
                 level = name
                 break
+        if loss is None and level == "high":
+            level = "medium"  # how much it costs is not measured
         capped = level == "high" and result.seasons_total < MIN_SEASONS_FOR_HIGH
         if capped:
             level = "medium"
@@ -473,6 +510,10 @@ class RotationAdvisor:
             "worstValue": None if result.worst_value is None else round(result.worst_value, 2),
             "levelBands": bands,
             "levelCapped": capped,
+            "levelBasis": basis,
+            "lossBands": EXPECTED_LOSS_BANDS if loss else None,
+            "lossWhenHit": loss,
+            "expectedLoss": round(result.share * loss["loss"], 4) if loss else None,
             "perSeason": [{"year": y, "value": v, "hit": hit} for y, v, hit in result.per_season],
         }
         if calendar.kind != "nass_region":

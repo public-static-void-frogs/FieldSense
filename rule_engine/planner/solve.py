@@ -207,15 +207,27 @@ def myopic(model: RotationModel) -> Plan:
     )
 
 
-def crop_options(model: RotationModel) -> list[dict]:
+def crop_options(model: RotationModel, policy: Policy | None = None) -> list[dict]:
     """For every crop, the best fixed plan that starts with it; the best plan first.
 
     Each item: {"value": expected total over the horizon, "steps": [(state, action), ...],
     "coverGain": value with a rye cover crop before the first crop minus value without one, for
     the same first crop and tillage (None when a cover crop does not fit there)}.
+
+    The seasons after the first follow the exact optimum, or `policy` (state -> action) when one
+    is given, for example a learned one. An action the policy returns that the state does not
+    allow is replaced by the optimum's, so a plan is always one the model can score.
     """
     start = model.open_loop_state
-    best = _solve(model, start)
+    optimum = _solve(model, start)
+    if policy is None:
+        best = optimum
+    else:
+
+        def best(state: State) -> Action:
+            chosen = policy(state)
+            return chosen if chosen in model.actions(state) else optimum(state)
+
     worth: dict[Action, tuple[float, list]] = {}
     for action in model.actions(start):
         steps, state = [(start, action)], model.transition(start, action)
@@ -245,10 +257,18 @@ def _quantile(values: list[float], weights: list[float], q: float) -> float:
     return max(values)
 
 
-def _spread(values: list[float], weights: list[float]) -> dict:
+def _spread(values: list[float], weights: list[float], overhead: float | None = None) -> dict:
+    """`overhead`: the part of the cost that is not an operating cost (RotationModel.overhead).
+    A result above -overhead still covers the operating costs of the season."""
     total = sum(weights)
+
+    def below(level: float) -> float:
+        return sum(w for v, w in zip(values, weights) if v < level) / total
+
     return {
-        "lossProbability": sum(w for v, w in zip(values, weights) if v < 0) / total,
+        "lossProbability": below(0.0),
+        "operatingLossProbability": None if overhead is None else below(-overhead),
+        "overhead": overhead,
         "mean": sum(v * w for v, w in zip(values, weights)) / total,
         "p10": _quantile(values, weights, 0.1),
         "p50": _quantile(values, weights, 0.5),
@@ -263,7 +283,11 @@ def replay(model: RotationModel, steps: list) -> dict:
     "first": the first season under every year, weighted by that year's odds.
     "runs": the whole plan started in every year that is followed by enough consecutive years,
     so a run keeps the real order of years (a drought followed by its real next year).
+    "lossProbability" is against the whole cost; "operatingLossProbability" against the
+    operating costs only, None when a crop of the plan has no known split.
     """
+    overheads = [model.overhead(state.history, action) for state, action in steps]
+    plan_overhead = None if None in overheads else sum(overheads)
     cash = [
         [o.revenue - o.cost for o in model._base_outcomes(state.history, action)]
         for state, action in steps
@@ -279,7 +303,7 @@ def replay(model: RotationModel, steps: list) -> dict:
             runs.append((year, odds[i], sum(cash[k][j] for k, j in enumerate(following))))
     return {
         "first": {
-            **_spread(cash[0], odds),
+            **_spread(cash[0], odds, overheads[0]),
             "yield": _spread([o.yield_per_acre for o in outcomes], odds),
             "years": [
                 {
@@ -294,7 +318,7 @@ def replay(model: RotationModel, steps: list) -> dict:
             ],
         },
         "runs": {
-            **_spread([r[2] for r in runs], [r[1] for r in runs]),
+            **_spread([r[2] for r in runs], [r[1] for r in runs], plan_overhead),
             "starts": [{"year": y, "odds": w, "cash": v} for y, w, v in runs],
         }
         if runs

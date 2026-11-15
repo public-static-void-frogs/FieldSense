@@ -25,6 +25,18 @@ export type RotationTrigger =
       seasonsTotal: number;
       worstYear: number | null;
       worstValue: number | null;
+      /** 'loss': level from expectedLoss; 'frequency': no measured loss, level from share. */
+      levelBasis?: 'loss' | 'frequency';
+      /** Share of yield lost in a season the hazard hits, measured in county yields. */
+      lossWhenHit?: {
+        loss: number;
+        se: number;
+        sample: 'all' | 'dryland';
+        finding: 'loss' | 'no_loss_found';
+        countyYears: number;
+      } | null;
+      /** Share of seasons hit x lossWhenHit.loss. */
+      expectedLoss?: number | null;
       perSeason: RotationHazardSeason[];
     };
 
@@ -232,6 +244,8 @@ export type RotationPlanStep = {
   worstYear: number;
   revenueUsdPerAcre: number;
   costUsdPerAcre: number;
+  /** The part of the cost spent on the crop in the season; null when the split is not known. */
+  operatingCostUsdPerAcre?: number | null;
   riskPenaltyUsdPerAcre: number;
   soilValueUsdPerAcre: number;
   yieldPerAcre: number;
@@ -242,7 +256,10 @@ export type RotationPlanStep = {
 export type RotationSimulatedYear = { year: number; netUsdPerAcre: number };
 
 export type RotationSimulatedSpread = {
+  /** Share of results below the full cost (with labour, machinery ownership and overhead). */
   lossProbability: number;
+  /** Share of results below the operating costs alone; null when the split is not known. */
+  operatingLossProbability?: number | null;
   meanUsdPerAcre: number;
   p10UsdPerAcre: number;
   p50UsdPerAcre: number;
@@ -286,6 +303,8 @@ export type RotationPlanCrop = {
   tier: 'top' | 'alternative';
   demoted: 'autumn_establishment_unlikely' | null;
   planObjectiveUsdPerAcre: number;
+  /** Learned plans only: how far the plan is below the exact best plan starting with this crop. */
+  belowOptimumUsdPerAcre?: number | null;
   planNetUsdPerAcre: number;
   autumn: {
     action: RotationAutumnAction;
@@ -307,8 +326,18 @@ export type RotationOwnYieldLevel = {
   points: { year: number; yieldPerAcre: number; referenceYieldPerAcre: number }[];
 };
 
+/** How a plan is built: every rotation compared, or a trained policy choosing each season. */
+export type RotationPlanner = 'exact' | 'learned';
+
 export type RotationPlan = {
   status: 'ok' | 'no_modellable_crop';
+  method?: 'dynamic_programming_fixed_sequence' | 'learned_policy' | null;
+  planner?: {
+    requested: RotationPlanner;
+    used: RotationPlanner;
+    learnedAvailable: boolean;
+    learnedUnavailable: string | null;
+  } | null;
   seasons: number;
   firstSeason: number | null;
   years: {
@@ -469,4 +498,5 @@ export type RotationAdviceRequest = {
   crop?: string;
   priorities: RotationPriority[];
   seasons?: number;
+  planner?: RotationPlanner;
 };

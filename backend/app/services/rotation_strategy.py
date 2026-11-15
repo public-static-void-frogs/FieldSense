@@ -10,9 +10,11 @@ The crop after the next one comes from a second engine run with the next crop ap
 field's history. When that is impossible (no satellite crop history) the best-ranked crop of a
 different group takes its place, and the plan says so.
 
-Dates are medians of past seasons, not forecasts. The "fit" numbers rescale the engine's risk
-score (lower is better) between the best-scoring candidate (100) and the worst (0); they compare
-crops for this field and are not a yield or health prediction.
+Dates are medians of past seasons, not forecasts. The "fit" numbers rescale the measure the
+candidates are ranked by between the best candidate (100) and the worst (0): the plan objective
+when the plan prices at least two crops (a crop it cannot price gets 0), otherwise the engine's
+risk score (lower is better). They compare crops for this field and are not a yield or health
+prediction.
 """
 
 import logging
@@ -77,8 +79,25 @@ def _ranked(advice: dict) -> list[dict]:
     return sorted(advice["candidates"], key=lambda item: item["rank"])
 
 
-def _fit(candidates: list[dict]):
-    """Rescale scores so the best candidate is 100 and the worst 0."""
+def _fit(advice: dict, candidates: list[dict]):
+    """Rescale the ranking measure so the best candidate is 100 and the worst 0.
+
+    Candidates are ranked by the plan objective when a plan prices them, so the fit uses it too;
+    scoring the plan's best crop on the risk score alone could put it near 0.
+    """
+    priced = (advice.get("plan") or {}).get("crops") or []
+    objective = {c["crop"]: c["planObjectiveUsdPerAcre"] for c in priced}
+    if len(objective) > 1:
+        low, high = min(objective.values()), max(objective.values())
+
+        def fit(candidate: dict) -> int:
+            value = objective.get(candidate["crop"])
+            if value is None:  # not priced: ranked below every priced crop
+                return 0
+            return 100 if high == low else round(100 * (value - low) / (high - low))
+
+        return fit
+
     scores = [c["score"] for c in candidates]
     low, high = min(scores), max(scores)
 
@@ -261,7 +280,7 @@ def build_strategy(field: dict, advice: dict, follow: dict | None, today: date) 
         for event in events
     ]
     ranked = _ranked(advice)
-    fit = _fit(ranked)
+    fit = _fit(advice, ranked)
     intended = next((c for c in ranked if c["isIntended"]), None)
     current = fit(intended) if intended else round(sum(map(fit, ranked)) / len(ranked))
     projected = fit(best)

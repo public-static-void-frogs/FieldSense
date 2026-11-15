@@ -17,8 +17,13 @@ this script asks, region by region:
 Season summaries hold the weeks from day 91 (1 April) to day 307; temperature and rain from
 1981, the Drought Monitor from 2000, SMAP root-zone moisture from 2015. County yields mix
 irrigated and dryland fields, so a hazard that irrigation removes shows less loss where much of
-the crop is irrigated (the Plains, the West, the Delta). CDL labels are not used: every sampled
-field of a county counts, whatever it grew.
+the crop is irrigated (the Plains, the West, the Delta). The "dryland" row repeats the test on
+the counties where under 10 % of the crop's harvested acres are irrigated
+(rule_engine/data/county_irrigated_share.csv; a county or crop without a Census row counts as
+dryland). CDL labels are not used: every sampled field of a county counts, whatever it grew.
+
+rule_engine/scripts/build_hazard_yield_loss.py turns <dir>/result.json into the loss table the
+engine sets risk levels from.
 
     python rule_engine/planner/scripts/regional_hazard_panel.py --root data/local/usa_sample_v3 \
         --out <dir>
@@ -54,6 +59,8 @@ from rule_engine.summary import WEEK0_DOY, WEEKS  # noqa: E402
 
 REGIONS = ROOT / "rule_engine" / "planner" / "data" / "ers_regions.csv"
 STATE_CROPS = ROOT / "rule_engine" / "data" / "state_crops.csv"
+IRRIGATED = ROOT / "rule_engine" / "data" / "county_irrigated_share.csv"
+DRYLAND_BELOW = 0.1  # share of the crop's harvested acres irrigated
 YEARS = range(1981, 2026)
 LEVEL_YEARS = range(1996, 2026)  # the engine counts weather hazards over its 1996-2025 record
 SERIES = {  # catalog crop: NASS county yield series (corn and soybeans: nass_yield.parquet)
@@ -278,6 +285,12 @@ def main() -> None:
             WHERE y."yield" > 0"""
     ).df()
     panel["region"] = panel.county.map(region)
+    with IRRIGATED.open(newline="") as handle:
+        irrigated = {
+            (r["crop"], r["county_fips"]): float(r["share"]) for r in csv.DictReader(handle)
+        }
+    share = [irrigated.get(key, 0.0) for key in zip(panel.crop, panel.county, strict=True)]
+    panel["dryland"] = np.array(share) < DRYLAND_BELOW
     levels = con.execute(
         f"""SELECT county, rule, crop, hits / seasons AS share FROM
             read_parquet('{out}/levels.parquet') WHERE seasons >= 10"""
@@ -285,7 +298,7 @@ def main() -> None:
     levels["region"] = levels.county.map(region)
     result = {}
     for (rule, crop), d in panel.groupby(["rule", "crop"]):
-        rows = {"all": effect(d)}
+        rows = {"all": effect(d), "dryland": effect(d[d.dryland])}
         for reg, dr in d.groupby("region"):
             rows[reg] = effect(dr)
         lv = levels[(levels.rule == rule) & (levels.crop == crop)]

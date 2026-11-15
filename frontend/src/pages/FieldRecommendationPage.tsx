@@ -37,9 +37,11 @@ export function FieldRecommendationPage() {
     retry,
     selectedCrop,
     selectedSeasons,
+    selectedPlanner,
     priorities,
     setCrop,
     setSeasons,
+    setPlanner,
     togglePriority,
   } = useRotationAdvice(fieldId);
   const plan = advice ? pricedPlan(advice) : null;
@@ -135,10 +137,12 @@ export function FieldRecommendationPage() {
                 advice={advice}
                 selectedCrop={selectedCrop}
                 selectedSeasons={selectedSeasons}
+                selectedPlanner={selectedPlanner}
                 priorities={priorities}
                 isUpdating={isUpdating}
                 onCropChange={setCrop}
                 onSeasonsChange={setSeasons}
+                onPlannerChange={setPlanner}
                 onPriorityToggle={togglePriority}
               />
               <div className="rotation-stack" aria-busy={isUpdating}>

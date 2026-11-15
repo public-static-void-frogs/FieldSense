@@ -1,7 +1,7 @@
 import unittest
 from pathlib import Path
 
-from rule_engine.summary import WEEKS, SeasonSummary, SeasonSummaryStore
+from rule_engine.summary import WEEKS, SeasonSummary, SeasonSummaryStore, _weekly
 
 FIXTURES = Path(__file__).parent / "fixtures" / "season_summary"
 
@@ -38,3 +38,16 @@ class SummaryStoreTests(unittest.TestCase):
         self.assertEqual(season.window("tmin", 91, 111, "min"), -3.0)
         self.assertIsNone(season.window("tmin", 200, 210, "min"))
         self.assertIsNone(season.window("unknown", 91, 100, "sum"))
+
+    def test_day_counts_without_data_are_missing(self):
+        # a summary built without SMAP holds 0 root-zone days; read as no data, not as no drought
+        weekly = _weekly(
+            {
+                "rz_lt20_days": [0, 0, 3],
+                "rz_pctl_min": [None, float("nan"), 12.0],
+                "tmax_ge35_days": [0, 1, 0],
+                "tmax_max": [30.0, 36.0, 31.0],
+            }
+        )
+        self.assertEqual(weekly["rz_lt20_days"], [None, None, 3])
+        self.assertEqual(weekly["tmax_ge35_days"], [0, 1, 0])

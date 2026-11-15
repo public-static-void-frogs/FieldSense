@@ -68,6 +68,14 @@ class Settings:
             str(Path(__file__).resolve().parents[3] / "data" / "local" / "usa_sample"),
         )
     )
+    # A rotation policy trained by rule_engine/planner/scripts/train_policy.py; without the file
+    # the "learned" planner is not offered and the exact plan is used.
+    rotation_policy_path: str = field(
+        default_factory=lambda: os.getenv(
+            "ROTATION_POLICY_PATH",
+            str(Path(__file__).resolve().parents[3] / "data/local/planner/policy/policy.pt"),
+        )
+    )
     # Ask USDA Soil Data Access for the soil at a field point that has no stored soil block.
     rotation_soil_lookup: bool = field(
         default_factory=lambda: os.getenv("ROTATION_SOIL_LOOKUP", "true").lower() == "true"

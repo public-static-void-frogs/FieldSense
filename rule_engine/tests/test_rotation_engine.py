@@ -1,6 +1,8 @@
 import json
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 from rule_engine.catalog import load_catalog
 from rule_engine.engine import RotationAdvisor
@@ -56,7 +58,9 @@ class EngineTests(unittest.TestCase):
         wet = next(r for r in corn["risks"] if r["ruleId"] == "wet_planting_window")
         t = wet["trigger"]
         self.assertEqual((t["seasonsHit"], t["seasonsTotal"], t["stage"]), (1, 1, "planted"))
-        self.assertEqual(wet["level"], "medium")  # one season cannot justify "high"
+        # hit in the one season on record, but no yield loss is found for corn: low
+        self.assertEqual((wet["level"], t["levelBasis"], t["expectedLoss"]), ("low", "loss", 0.0))
+        self.assertEqual(t["lossWhenHit"]["finding"], "no_loss_found")
         trigger = wet["trigger"]
         self.assertEqual((trigger["type"], trigger["metric"]), ("hazard", "pr_ge25_days"))
         self.assertEqual([s["hit"] for s in trigger["perSeason"]], [True])
@@ -69,6 +73,70 @@ class EngineTests(unittest.TestCase):
         self.assertEqual(result["historySource"]["kind"], "cdl")
         self.assertTrue(result["historySource"]["satelliteEstimate"])
         self.assertNotIn("explanation", json.dumps(result))
+
+    def test_hazard_level_is_the_expected_loss_and_frequency_alone_stops_at_medium(self):
+        props = {f"CDL{y}": 1 for y in range(2020, 2025)}
+
+        def wet(loss):
+            row = {"loss": loss, "se": "0.02", "sample": "all", "finding": "loss"}
+            table = {("wet_planting_window", "corn"): row | {"county_years": "100"}}
+            with mock.patch("rule_engine.facts._hazard_losses", return_value=table if loss else {}):
+                result = self.advisor.advise(
+                    field("191825000014246", props=props), "corn", [], "metric"
+                )
+            corn = next(c for c in result["candidates"] if c["crop"] == "corn")
+            found = next(r for r in corn["risks"] if r["ruleId"] == "wet_planting_window")
+            return found["level"], found["trigger"]
+
+        # the hazard hit the one season on record (share 1.0)
+        level, trigger = wet("0.02")
+        self.assertEqual((level, trigger["expectedLoss"]), ("low", 0.02))
+        level, trigger = wet("0.05")
+        self.assertEqual((level, trigger["levelBasis"]), ("medium", "loss"))
+        level, trigger = wet("0.2")  # high by expected loss, but one season cannot justify it
+        self.assertEqual((level, trigger["levelCapped"]), ("medium", True))
+        level, trigger = wet(None)  # no measured loss: graded by frequency, never above medium
+        self.assertEqual((level, trigger["levelBasis"]), ("medium", "frequency"))
+        self.assertEqual((trigger["levelCapped"], trigger["lossWhenHit"]), (False, None))
+
+    def test_unless_gate_suppresses_hazard_only_when_the_fact_holds(self):
+        source = Path(load_rules.__code__.co_filename).parent / "data" / "rules"
+        with tempfile.TemporaryDirectory() as folder:
+            for path in source.glob("*.yaml"):
+                text = path.read_text()
+                if "id: wet_planting_window" in text:
+                    start = text.index("id: wet_planting_window")
+                    at = text.index("    hazard:", start)
+                    gate = (
+                        "    unless:\n      - {fact: county.irrigated_share, op: ge, value: 0.5}\n"
+                    )
+                    text = text[:at] + gate + text[at:]
+                (Path(folder) / path.name).write_text(text)
+            advisor = RotationAdvisor(
+                load_catalog(),
+                load_rules(Path(folder)),
+                load_reference(),
+                SeasonSummaryStore(FIXTURES),
+                CountyTrendYieldModel(),
+            )
+        props = {f"CDL{y}": 1 for y in range(2020, 2025)}
+
+        def corn(shares):
+            with mock.patch("rule_engine.facts._county_irrigated", return_value=shares):
+                result = advisor.advise(field("191825000014246", props=props), "corn", [], "metric")
+            return next(c for c in result["candidates"] if c["crop"] == "corn")
+
+        irrigated = corn({("corn", "19015"): 0.9})
+        self.assertNotIn("wet_planting_window", {r["ruleId"] for r in irrigated["risks"]})
+        suppressed = {
+            g["ruleId"]: g for g in irrigated["dataGaps"] if g["code"] == "rule_suppressed"
+        }
+        self.assertIn("heat_at_flowering", suppressed)  # the shipped gate applies as well
+        self.assertEqual(suppressed["wet_planting_window"]["conditions"][0]["actual"], 0.9)
+        unknown = corn({})  # no Census row: the hazard still fires
+        self.assertIn("wet_planting_window", {r["ruleId"] for r in unknown["risks"]})
+        dry = corn({("corn", "19015"): 0.1})
+        self.assertIn("wet_planting_window", {r["ruleId"] for r in dry["risks"]})
 
     def test_fall_cereal_calendar_and_diversity_benefit_has_no_yield_factor(self):
         props = {"CDL2022": 1, "CDL2023": 5, "CDL2024": 1, "CDL2025": 5}

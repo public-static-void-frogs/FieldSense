@@ -245,3 +245,11 @@
 .rotation-verdict.ant-alert .ant-alert-description {
   font-size: 13px;
 }
+
+.rotation-planner-grid {
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 240px), 1fr));
+}
+
+.rotation-planner-grid .rotation-option > span {
+  text-align: center;
+}

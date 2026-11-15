@@ -31,6 +31,29 @@ SCALAR_KEYS = (
 )
 
 
+# day counts and the weekly metric of the same daily series: a week with no data in the series has
+# no count either (summaries built before this fix hold 0 there, e.g. root-zone days without SMAP)
+COUNT_SOURCES = {
+    "tmax_ge35_days": "tmax_max",
+    "tmax_ge30_days": "tmax_max",
+    "tmin_le0_days": "tmin_min",
+    "tmin_lem2_days": "tmin_min",
+    "pr_ge25_days": "pr_mm",
+    "rz_lt20_days": "rz_pctl_min",
+}
+
+
+def _weekly(row: dict) -> dict[str, list]:
+    weekly = {k: list(v) for k, v in row.items() if isinstance(v, (list, tuple))}
+    for count, source in COUNT_SOURCES.items():
+        if count in weekly and source in weekly:
+            weekly[count] = [
+                None if _clean(s) is None else c
+                for c, s in zip(weekly[count], weekly[source], strict=False)
+            ]
+    return weekly
+
+
 def _clean(value):
     if value is None:
         return None
@@ -123,7 +146,7 @@ class SeasonSummaryStore:
                     cdl_prev1=_clean(row.get("cdl_prev1")),
                     cdl_prev2=_clean(row.get("cdl_prev2")),
                     scalars={k: _clean(row.get(k)) for k in SCALAR_KEYS},
-                    weekly={k: list(v) for k, v in row.items() if isinstance(v, list)},
+                    weekly=_weekly(row),
                 )
             )
         return out
@@ -229,7 +252,7 @@ class ClimateRecordStore:
                 cdl_prev1=None,
                 cdl_prev2=None,
                 scalars={},
-                weekly={k: list(v) for k, v in row.items() if isinstance(v, (list, tuple))},
+                weekly=_weekly(row),
                 week0_doy=int(grid["week0_doy"]),
             )
             for row in years

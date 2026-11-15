@@ -1,9 +1,12 @@
-version: "2026-11-10"
+version: "2026-11-15"
 rules:
   - id: heat_at_flowering
     title: Heat at flowering or pollination
     category: temperature
-    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, fiber_crop, paddy_grain]}
+    # rice and peanuts: -2% and -4% yield in hit years across the panel, at any heat threshold
+    applies_to: {groups: [warm_season_grain, grain_legume, small_grain, fiber_crop], except_crops: [peanuts]}
+    unless:
+      - {fact: county.irrigated_share, op: ge, value: 0.5}
     hazard:
       stage: flowering
       window_days: [-10, 10]
@@ -16,12 +19,15 @@ rules:
     sources:
       - "UNL CropWatch 2019, extended high heat and corn pollination"
       - "Schlenker and Roberts 2009, PNAS"
+      - "FieldSense regional hazard panel 2026-11: no or small yield loss where >= 50% of the crop is irrigated"
     needs_local_review: false
 
   - id: warm_days_at_flowering
     title: Warm spell at flowering
     category: temperature
     applies_to: {groups: [small_grain]}
+    unless:
+      - {fact: county.irrigated_share, op: ge, value: 0.5}
     hazard:
       stage: flowering
       window_days: [-7, 7]
@@ -33,6 +39,7 @@ rules:
     evidence_strength: moderate
     sources:
       - "Plant Soil Environ 2017, wheat heat at anthesis; Thuenen heat-stress project"
+      - "FieldSense regional hazard panel 2026-11: no or small yield loss where >= 50% of the crop is irrigated"
     needs_local_review: false
 
   - id: frost_after_emergence
@@ -73,6 +80,8 @@ rules:
     title: Root-zone drought in the critical stage
     category: water
     applies_to: {groups: [warm_season_grain, grain_legume, small_grain, perennial_forage_legume, fiber_crop, root_crop, perennial_cane]}
+    unless:
+      - {fact: county.irrigated_share, op: ge, value: 0.5}
     hazard:
       stage: flowering
       window_days: [-7, 21]
@@ -91,6 +100,8 @@ rules:
     title: Drought Monitor D1 or worse in the critical stage
     category: water
     applies_to: {groups: [warm_season_grain, grain_legume, small_grain, fiber_crop, root_crop, perennial_cane]}
+    unless:
+      - {fact: county.irrigated_share, op: ge, value: 0.5}
     hazard:
       stage: grain_fill
       window_days: [-14, 14]
@@ -102,6 +113,7 @@ rules:
     evidence_strength: moderate
     sources:
       - "US Drought Monitor weekly classification (county-scale context)"
+      - "FieldSense regional hazard panel 2026-11: no or small yield loss where >= 50% of the crop is irrigated"
     needs_local_review: false
 
   - id: wet_planting_window

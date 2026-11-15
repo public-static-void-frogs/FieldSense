@@ -343,6 +343,17 @@ class RotationModel:
             weather.append(-self.weights.risk_usd_per_point * points)
         return gain, weather
 
+    def overhead(self, history: tuple[str, ...], action: Action) -> float | None:
+        """USD/acre of the crop's cost that is not an operating cost: labour, machinery ownership
+        and general overhead. A season that covers its operating costs earns cash + this. None
+        when the split of the budget is not known (CostTable.operating_share)."""
+        previous = history[-1] if history else None
+        share = self.costs.operating_share(action.crop, previous)
+        if share is None:
+            return None
+        cost = self.costs.crop_cost(action.crop, previous, action.tillage)
+        return (1.0 - share) * cost.usd_per_acre
+
     def _base_outcomes(self, history: tuple[str, ...], action: Action) -> list[Outcome]:
         """Everything except the soil term, for every drawable year."""
         key = (history, action)

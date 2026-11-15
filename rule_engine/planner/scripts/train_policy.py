@@ -33,6 +33,7 @@ def main() -> None:
     parser.add_argument("--tables", required=True)
     parser.add_argument("--out", required=True)
     parser.add_argument("--iterations", type=int, default=Config.iterations)
+    parser.add_argument("--minutes", type=float, help="stop training after this many minutes")
     parser.add_argument("--envs", type=int, default=Config.envs)
     parser.add_argument("--hidden", type=int, default=Config.hidden)
     parser.add_argument("--entropy", type=float, default=Config.entropy)
@@ -56,6 +57,7 @@ def main() -> None:
     config = Config(
         envs=args.envs,
         iterations=args.iterations,
+        minutes=args.minutes,
         hidden=args.hidden,
         entropy=args.entropy,
         lr=args.lr,

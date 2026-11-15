@@ -9,14 +9,21 @@ field and shapes the result: codes and numbers, no wording.
 
 `netUsdPerAcre` is revenue less cost. `objectiveUsdPerAcre` also carries the risk penalty and
 the soil value: it is what the plan maximises, not money in hand.
+
+The cost is the full economic cost (USDA ERS: operating costs plus labour, machinery ownership
+and overhead). `lossProbability` is measured against it; `operatingLossProbability` against the
+operating costs alone (`operatingCostUsdPerAcre`), the money spent on the crop in the season.
 """
 
 from dataclasses import replace
 
-NOT_MODELLED = ("no_cost_budget", "no_price", "no_yield")
+NOT_MODELLED = ("no_cost_budget", "no_price", "no_yield", "not_marketed")
 TOP = 3
 RYE_COVER = "cereal_rye"  # the off-season option the planner's rye cover crop is
 MIN_SEASONS, MAX_SEASONS, DEFAULT_SEASONS = 1, 5, 3
+EXACT, LEARNED = "dynamic_programming_fixed_sequence", "learned_policy"  # plan.method
+EXACT_PLANNER, LEARNED_PLANNER = "exact", "learned"  # the request's choice
+PLANNERS = (EXACT_PLANNER, LEARNED_PLANNER)
 
 
 def _fall_sown() -> set[str]:
@@ -36,6 +43,7 @@ def _step(model, state, action, season: int, fall_sown: set[str]) -> dict:
         before = "sow_cover_crop"
     else:
         before = "none"
+    overhead = model.overhead(state.history, action)
     return {
         "season": season,
         "crop": action.crop,
@@ -49,6 +57,9 @@ def _step(model, state, action, season: int, fall_sown: set[str]) -> dict:
         "worstYear": found["worstCashYear"],
         "revenueUsdPerAcre": found["revenueUsdPerAcre"],
         "costUsdPerAcre": found["costUsdPerAcre"],
+        "operatingCostUsdPerAcre": None
+        if overhead is None
+        else round(found["costUsdPerAcre"] - overhead, 2),
         "riskPenaltyUsdPerAcre": found["riskPenaltyUsdPerAcre"],
         "soilValueUsdPerAcre": found["soilValueUsdPerAcre"],
         "yieldPerAcre": found["yieldPerAcre"],
@@ -76,8 +87,10 @@ def _autumn(first: dict, option: dict, off_season: dict | None) -> dict:
 
 
 def _money(spread: dict) -> dict:
+    operating = spread["operatingLossProbability"]
     return {
         "lossProbability": round(spread["lossProbability"], 3),
+        "operatingLossProbability": None if operating is None else round(operating, 3),
         "meanUsdPerAcre": round(spread["mean"], 2),
         "p10UsdPerAcre": round(spread["p10"], 2),
         "p50UsdPerAcre": round(spread["p50"], 2),
@@ -189,21 +202,18 @@ def rotation_plan(
     reference_aws_mm: float | None,
     off_season: dict | None,
     as_of_year: int,
+    policy=None,
 ) -> dict:
-    from rule_engine.planner import RotationModel, build_context
+    """`policy` (a rule_engine LearnedPolicy) plans the seasons after the first instead of the
+    exact optimum; each crop then also reports how far its plan is below that optimum."""
+    from rule_engine.planner import RotationModel, build_context, with_climate
     from rule_engine.planner.solve import crop_options, replay
 
     context = build_context(record, advisor, [summary_root] if summary_root else [])
     context = replace(context, reference_aws_mm=reference_aws_mm)
     years_source = "field_seasons" if context.seasons else "price_years"
-    climate = None
-    if advisor.climate:
-        climate = advisor.climate.record(record.get("latitude"), record.get("longitude"))
-    if climate:
-        # the field's own seasons (with county yields and drought) replace the same years
-        merged = {s.year: s for s in climate.seasons} | context.seasons
-        gaps = tuple(g for g in context.gaps if g["code"] != "no_season_summary")
-        context = replace(context, seasons=merged, gaps=gaps)
+    context, long_record = with_climate(context, advisor)
+    if long_record:
         years_source = "climate_record"
     try:
         model = RotationModel(
@@ -214,7 +224,9 @@ def rotation_plan(
     first_season = (context.last_history_year or as_of_year - 1) + 1
     fall_sown = _fall_sown()
     crops = []
-    for option in crop_options(model):
+    learned = policy is not None
+    optimum = {o["steps"][0][1].crop: o["value"] for o in crop_options(model)} if learned else {}
+    for option in crop_options(model, policy.act_for(model) if learned else None):
         steps = [
             _step(model, state, action, first_season + i, fall_sown)
             for i, (state, action) in enumerate(option["steps"])
@@ -228,6 +240,10 @@ def rotation_plan(
                 if autumn["establishment"] == "unlikely"
                 else None,
                 "planObjectiveUsdPerAcre": round(option["value"], 2),
+                # a learned plan against the exact optimum that starts with the same crop
+                "belowOptimumUsdPerAcre": round(optimum[steps[0]["crop"]] - option["value"], 2)
+                if learned
+                else None,
                 "planNetUsdPerAcre": round(sum(s["netUsdPerAcre"] for s in steps), 2),
                 "autumn": autumn,
                 "steps": steps,
@@ -251,7 +267,7 @@ def rotation_plan(
     return {
         "status": "ok",
         "objective": "expected_return_less_risk_plus_soil",
-        "method": "dynamic_programming_fixed_sequence",
+        "method": LEARNED if learned else EXACT,
         "seasons": seasons,
         "firstSeason": first_season,
         "weights": {
