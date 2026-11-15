@@ -6,6 +6,8 @@ from sqlalchemy.orm import Mapped, Session, mapped_column, relationship
 
 from app.core.database import Base
 
+DEMO_USER_ID = "63e73d36-c4d5-47a1-9c9a-a4b1c4c3e129"
+
 
 class User(Base):
     __tablename__ = "users"
@@ -19,6 +21,10 @@ class User(Base):
         DateTime(timezone=True), default=lambda: datetime.now(timezone.utc)
     )
     settings: Mapped["UserSettings"] = relationship(cascade="all, delete-orphan", uselist=False)
+
+    @property
+    def is_demo(self) -> bool | None:
+        return True if self.id == DEMO_USER_ID else None
 
 
 class UserSettings(Base):

@@ -1,5 +1,6 @@
 import { Alert, Button, Checkbox, Progress } from 'antd';
 import { Plus, ScanLine, X } from 'lucide-react';
+import { useDemoMode } from '../../demo/hooks/useDemoMode.ts';
 import { useSaveCropAreas } from '../hooks/useSaveCropAreas.ts';
 import { useTranslation } from 'react-i18next';
 import { useMapControlEvents } from '../hooks/useMapControlEvents.ts';
@@ -29,6 +30,7 @@ export function SectionPanel({
   analysisActions,
 }: SectionPanelProps) {
   const { t, i18n } = useTranslation();
+  const demo = useDemoMode();
   const panel = useSectionFocus(section);
   useMapControlEvents(panel);
   const { analyze, progress } = useSectionAnalysis(section, analysisActions);
@@ -93,7 +95,7 @@ export function SectionPanel({
       {section.analysisError && <Alert type="error" title={section.analysisError} />}
       {pending && <SectionAnalysisProgress progress={progress} />}
       <div className="map-section-actions">
-        {complete ? (
+        {complete && !demo && (
           <Button
             type="primary"
             block
@@ -104,7 +106,8 @@ export function SectionPanel({
           >
             {t('Add areas')}
           </Button>
-        ) : (
+        )}
+        {!complete && (
           <Button
             type="primary"
             block

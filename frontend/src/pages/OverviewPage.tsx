@@ -14,9 +14,11 @@ import {
 } from '../features/overview/components/OverviewOperations';
 import '../features/legal/components/legal.css';
 import '../features/overview/components/Overview.css';
+import { useDemoMode } from '../features/demo/hooks/useDemoMode.ts';
 
 export function OverviewPage() {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const [{ data: fields }, { data: profile }] = useSuspenseQueries({
     queries: [fieldQueries.list(), farmQueries.profile()],
   });
@@ -33,9 +35,11 @@ export function OverviewPage() {
             </p>
           )}
         </div>
-        <RouterButton type="primary" icon={<Plus size={18} />} to="/map/add">
-          {t('Add field')}
-        </RouterButton>
+        {!demo && (
+          <RouterButton type="primary" icon={<Plus size={18} />} to="/map/add">
+            {t('Add field')}
+          </RouterButton>
+        )}
       </header>
       <div className="farm-overview-grid">
         {fields.length > 0 ? (
@@ -43,12 +47,18 @@ export function OverviewPage() {
         ) : (
           <section className="farm-panel farm-panel-wide farm-empty">
             <Sprout size={32} aria-hidden />
-            <h2>{t('Add your first field')}</h2>
-            <p>{t('Choose your fields on the map to start tracking crop conditions.')}</p>
+            <h2>{t(demo ? 'No saved demo fields' : 'Add your first field')}</h2>
+            <p>
+              {t(
+                demo
+                  ? 'Use the field map to select and analyze an area.'
+                  : 'Choose your fields on the map to start tracking crop conditions.',
+              )}
+            </p>
             <RouterButton to="/map/add">{t('Explore map')}</RouterButton>
           </section>
         )}
-        <OverviewWeather profile={profile} />
+        {(!demo || profile.latitude != null) && <OverviewWeather profile={profile} />}
         {fields.length > 0 && <OverviewMonitoring fields={fields} />}
         <OverviewAgenda />
         <OverviewNotifications />

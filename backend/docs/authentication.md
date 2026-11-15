@@ -3,7 +3,7 @@
 Accounts, settings, the shared field catalog and per-user field selections use
 PostgreSQL. Registration starts with no selected fields. Users can create catalog
 fields or select existing entries; see [persistent fields](field-storage.md).
-Weather comes from Open-Meteo, and no demo domain fixtures are loaded.
+Weather for registered accounts comes from Open-Meteo.
 
 ## Local setup
 
@@ -37,14 +37,14 @@ The API rejects unsafe requests from untrusted origins or cross-site browsers.
 All paths below are relative to `/api/v1`. Requests and responses use JSON and
 camelCase. The generated `openapi.json` describes the complete schema. The frontend
 sends `credentials: 'include'`; no JavaScript token storage or Authorization header
-is used. Account responses contain only `id`, `fullName`, and `email`.
+is used. Regular account responses contain `id`, `fullName`, and `email`. Demo session responses also include `isDemo: true`.
 
 | Method | Path | Behavior |
 | --- | --- | --- |
 | POST | `/auth/register` | Create an account and settings atomically; sign in; return 201 |
-| POST | `/auth/login` | Verify email/password; sign in; return 200 |
-| POST | `/auth/logout` | Revoke all existing sessions for this account and clear its cookie |
-| GET | `/auth/me` | Current account |
+| POST | `/auth/login` | Verify account email and password; sign in; return 200 |
+| POST | `/auth/logout` | Revoke registered-account sessions and clear the current cookie |
+| GET | `/auth/me` | Current account or the visitor demo profile |
 | PUT | `/auth/me` | Replace fullName and email; reject duplicate email with 409 |
 | GET | `/users/me/settings` | Current user's settings |
 | PUT | `/users/me/settings` | Replace current user's settings and reissue the cookie |
@@ -74,10 +74,22 @@ stored in `user_settings`, with latitude in -90–90 and longitude in -180–180
 Both coordinates must be supplied together or both be null. Email is normalized to lowercase and unique. Names are
 trimmed; passwords are not trimmed, are 8–128 characters at registration, and are
 stored only as salted Argon2id hashes, never plaintext or reversible encryption.
-There is no seeded login: register an account first.
+The sample farm does not require a seeded database account.
 
 Login body: `{"email":"farmer@example.com","password":"your-password"}`.
 Unknown accounts and wrong passwords both return 401 with the same message.
+
+## Demo access
+
+Signed-out visitors open the read-only demo automatically. The demo uses the
+shared farm profile and saved crop areas without issuing a session cookie.
+Choose **Log in** to switch to a registered account. Logging out returns to the
+demo. Field, account and planning writes from the demo return 403.
+
+The demo shows the crop areas saved for it. Its map uses the shared field catalog
+and the standard section analysis pipeline for previews.
+
+## Settings replacement
 
 Settings replacement body (farmName, coordinates, and sessionLifetimeHours have defaults):
 

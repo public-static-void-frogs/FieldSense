@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { Button, Space, Tag } from 'antd';
 import { Check, X } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { useDemoMode } from '../../demo/hooks/useDemoMode.ts';
 import { planningQueries } from '../../../api/planning/planning.queries.ts';
 import type { PlannedEvent } from '../../../types/planning/planning.types.ts';
 import { useEventResponse } from '../hooks/useEventResponse.ts';
@@ -20,9 +21,13 @@ const decidedTags = {
  */
 export function EventDecisionControls({ event }: EventDecisionControlsProps) {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const { data: responses } = useSuspenseQuery(planningQueries.responses());
   const { respond, isPending } = useEventResponse(event);
   const decision = getEventDecision(event, responses);
+  if (demo && decision === 'proposed') {
+    return <Tag color="processing">{t('Proposed')}</Tag>;
+  }
   if (decision !== 'proposed') {
     const tag = decidedTags[decision];
 

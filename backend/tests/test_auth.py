@@ -89,22 +89,21 @@ class AuthTests(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(self.client.get(BASE + "/auth/me").status_code, 200)
 
-    def test_all_resource_routes_require_a_session_and_public_docs_stay_public(self):
+    def test_public_demo_resources_and_authenticated_writes(self):
         for path in [
             "/auth/me",
             "/users/me/settings",
             "/farm/profile",
             "/fields",
-            "/weather/current",
             "/planning/events",
-            "/maps/geojson",
+            "/maps/summary",
         ]:
-            self.assertEqual(self.client.get(BASE + path).status_code, 401, path)
+            self.assertEqual(self.client.get(BASE + path).status_code, 200, path)
         self.assertEqual(
             self.client.post(
                 BASE + "/fields", json={"parcelId": 6, "name": "No", "crop": "Corn"}
             ).status_code,
-            401,
+            403,
         )
         for path in ["/", "/docs", "/openapi.json"]:
             self.assertEqual(self.client.get(path).status_code, 200)
@@ -178,7 +177,7 @@ class AuthTests(unittest.TestCase):
                 self.assertEqual(response.status_code, 422, response.text)
         self.assertEqual(self.settings(), original)
 
-    def test_expired_tampered_wrong_algorithm_and_missing_claim_tokens_are_rejected(self):
+    def test_invalid_tokens_fall_back_to_demo(self):
         self.signup()
         claims = self.claims()
         expired = {
@@ -197,7 +196,7 @@ class AuthTests(unittest.TestCase):
         self.client.cookies.clear()
         for token in tokens:
             self.client.cookies.set(COOKIE, token)
-            self.assertEqual(self.client.get(BASE + "/auth/me").status_code, 401)
+            self.assertIs(self.client.get(BASE + "/auth/me").json()["isDemo"], True)
 
     def test_logout_clears_cookie_and_revokes_copied_tokens(self):
         self.signup()
@@ -205,9 +204,9 @@ class AuthTests(unittest.TestCase):
         response = self.client.post(BASE + "/auth/logout")
         self.assertEqual(response.status_code, 200)
         self.assertIn("Max-Age=0", response.headers["set-cookie"])
-        self.assertEqual(self.client.get(BASE + "/auth/me").status_code, 401)
+        self.assertIs(self.client.get(BASE + "/auth/me").json()["isDemo"], True)
         self.client.cookies.set(COOKIE, copied)
-        self.assertEqual(self.client.get(BASE + "/auth/me").status_code, 401)
+        self.assertIs(self.client.get(BASE + "/auth/me").json()["isDemo"], True)
         self.client.cookies.clear()
         self.assertEqual(
             self.client.post(
@@ -341,7 +340,7 @@ class AuthTests(unittest.TestCase):
         token = jwt.encode({**claims, "iss": "other-issuer"}, TEST_SECRET, algorithm="HS256")
         self.client.cookies.clear()
         self.client.cookies.set(COOKIE, token)
-        self.assertEqual(self.client.get(BASE + "/auth/me").status_code, 401)
+        self.assertIs(self.client.get(BASE + "/auth/me").json()["isDemo"], True)
         self.app.state.config.jwt_issuer = ""
         with self.assertRaisesRegex(ValueError, "JWT_ISSUER"):
             with TestClient(self.app):

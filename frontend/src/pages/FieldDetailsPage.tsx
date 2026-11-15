@@ -19,6 +19,7 @@ import { useFieldRemoval } from '../features/fields/hooks/useFieldRemoval.ts';
 import { FieldMap } from '../features/maps/components/FieldMap';
 import { useFieldLocation } from '../features/maps/hooks/useFieldLocation.ts';
 import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
+import { useDemoMode } from '../features/demo/hooks/useDemoMode.ts';
 
 const sections = {
   map: { id: 'field-location-map', label: 'Location map' },
@@ -31,6 +32,7 @@ const sections = {
 
 export function FieldDetailsPage() {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const navigate = useNavigate();
   const { search } = useLocation();
   const { fieldId } = useLoaderData<FieldRouteData>();
@@ -47,7 +49,7 @@ export function FieldDetailsPage() {
   return (
     <>
       <PageHeading
-        title={field.crop || field.name}
+        title={demo ? field.name : field.crop || field.name}
         eyebrow=""
         titlePrefix={
           <>
@@ -71,28 +73,30 @@ export function FieldDetailsPage() {
             >
               {t('Crop recommendation')}
             </RouterButton>
-            <Dropdown
-              trigger={['click']}
-              menu={{
-                items: [
-                  {
-                    key: 'map',
-                    icon: <MapPin size={16} />,
-                    label: t('Explore farm map'),
-                    onClick: () => navigate('/map'),
-                  },
-                  {
-                    key: 'remove',
-                    danger: true,
-                    icon: <Trash2 size={16} />,
-                    label: t('Remove field'),
-                    onClick: () => setConfirmRemove(true),
-                  },
-                ],
-              }}
-            >
-              <Button icon={<Pencil size={17} />}>{t('Edit')}</Button>
-            </Dropdown>
+            {!demo && (
+              <Dropdown
+                trigger={['click']}
+                menu={{
+                  items: [
+                    {
+                      key: 'map',
+                      icon: <MapPin size={16} />,
+                      label: t('Explore farm map'),
+                      onClick: () => navigate('/map'),
+                    },
+                    {
+                      key: 'remove',
+                      danger: true,
+                      icon: <Trash2 size={16} />,
+                      label: t('Remove field'),
+                      onClick: () => setConfirmRemove(true),
+                    },
+                  ],
+                }}
+              >
+                <Button icon={<Pencil size={17} />}>{t('Edit')}</Button>
+              </Dropdown>
+            )}
           </Space>
         }
       />

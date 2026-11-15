@@ -11,7 +11,7 @@ def farm_profile(store, user):
         fullName=user.full_name,
         initials="".join(part[0] for part in user.full_name.split()[:2]).upper(),
         email=user.email,
-        role="Farm owner",
+        role="Demo visitor" if user.is_demo else "Farm owner",
         locationLabel=user.settings.location,
     )
 
