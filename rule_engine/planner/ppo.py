@@ -15,6 +15,7 @@ Invalid actions are masked in the policy (logits set to -inf), the standard mask
 Requires PyTorch; nothing else in the planner imports this module.
 """
 
+import time
 import zlib
 from dataclasses import dataclass
 
@@ -188,6 +189,7 @@ class FieldSet:
 class Config:
     envs: int = 8192
     iterations: int = 400
+    minutes: float | None = None  # stop after this training time; the schedules follow the clock
     epochs: int = 4
     minibatches: int = 8
     lr: float = 3e-4
@@ -261,8 +263,14 @@ def train(data: FieldSet, config: Config = Config(), watch: FieldSet | None = No
     horizon = int(data.horizon.max())
     if int(data.horizon.min()) != horizon:
         raise ValueError("all fields must share one horizon")
+    started = time.monotonic()
     for iteration in range(config.iterations):
         progress = iteration / config.iterations
+        if config.minutes:
+            progress = max(progress, (time.monotonic() - started) / (60 * config.minutes))
+            if progress >= 1.0:
+                config.iterations = iteration  # the iterations actually run
+                break
         for group in optimiser.param_groups:
             group["lr"] = config.lr * (1.0 - progress)
         entropy_weight = config.entropy + (config.entropy_end - config.entropy) * progress

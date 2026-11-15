@@ -113,7 +113,10 @@ order it was trained with, and `learned.load_policy` refuses a file whose order 
   (`learnedAvailable`, with the reason code in `learnedUnavailable` when it is not).
 - Each plan crop of a learned plan has `belowOptimumUsdPerAcre`: how far it is below the exact
   best plan that starts with the same crop.
+- The server needs PyTorch for it: `pip install -r backend/requirements-ml.txt`.
 - Without a usable policy file, or without PyTorch installed, the exact plan is returned.
+- `train_policy.py --minutes N` stops training after N minutes; the learning-rate and entropy
+  schedules then follow the clock.
 
 ## Where each number comes from
 
