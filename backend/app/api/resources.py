@@ -9,7 +9,7 @@ from app.api.auth import CurrentUser
 from app.api.dependencies import Store
 from app.schemas.maps import MapSummary, MapView
 from app.schemas.resources import (
-    DemoSource,
+    DataSource,
     FarmProfile,
     Notification,
     Overview,
@@ -188,7 +188,7 @@ def team(store: Store):
 
 @router.get("/help/sources", response_model=list[DataSource], tags=["help"])
 def sources(store: Store):
-    return []
+    return service.sources()
 
 
 @router.get(
