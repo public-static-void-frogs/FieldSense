@@ -24,6 +24,7 @@ import { useCalendarRoute } from '../features/planning/hooks/useCalendarRoute.ts
 import { useCalendarView } from '../features/planning/hooks/useCalendarView.ts';
 import { getCalendarEvents, getEventDecision } from '../features/planning/utils/eventResponses.ts';
 import { formatPlanDate } from '../features/planning/utils/planningDates.ts';
+import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
 import type { PlannedEvent } from '../types/planning/planning.types.ts';
 
 export function CalendarPage() {
@@ -173,8 +174,8 @@ export function CalendarPage() {
               <RouterButton type="primary" to={`/fields/${selectedEvent.fieldId}`}>
                 {t('View field')}
               </RouterButton>
-              <RouterButton to={`/fields/${selectedEvent.fieldId}/strategy`}>
-                {t('View strategy')}
+              <RouterButton to={recommendationPath(selectedEvent.fieldId)}>
+                {t('Crop recommendation')}
               </RouterButton>
             </Flex>
           ) : (

@@ -7,6 +7,7 @@ import { fieldQueries } from '../api/fields/fields.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
+import { FieldStrategySection } from '../features/planning/components/FieldStrategySection';
 import { AdviceControls } from '../features/rotation/components/AdviceControls';
 import { AdviceVerdict } from '../features/rotation/components/AdviceVerdict';
 import { CandidateList } from '../features/rotation/components/CandidateList';
@@ -23,7 +24,7 @@ export function FieldRecommendationPage() {
   const { data: field } = useSuspenseQuery(fieldQueries.byId(fieldId));
   const { advice, isLoading, isUpdating, error, retry, priorities, setCrop, togglePriority } =
     useRotationAdvice(fieldId);
-  if (!field || advice === null) {
+  if (!field) {
     return (
       <Result
         status="404"
@@ -60,40 +61,43 @@ export function FieldRecommendationPage() {
           />
         }
       />
-      {isLoading && (
-        <Card>
-          <Skeleton active paragraph={{ rows: 6 }} />
-        </Card>
-      )}
-      {error && !advice && (
-        <Result
-          status="warning"
-          title={t('The recommendation could not be loaded')}
-          extra={<Button onClick={() => retry()}>{t('Try again')}</Button>}
-        />
-      )}
-      {advice && (
-        <div className="rotation-stack" aria-busy={isUpdating}>
-          <AdviceControls
-            advice={advice}
-            priorities={priorities}
-            onCropChange={setCrop}
-            onPriorityToggle={togglePriority}
+      <div className="rotation-stack">
+        {isLoading && (
+          <Card>
+            <Skeleton active paragraph={{ rows: 6 }} />
+          </Card>
+        )}
+        {!advice && (error || advice === null) && (
+          <Result
+            status="warning"
+            title={t('The recommendation could not be loaded')}
+            extra={<Button onClick={() => retry()}>{t('Try again')}</Button>}
           />
-          <AdviceVerdict advice={advice} />
-          <CropHistoryStrip advice={advice} />
-          <CandidateList advice={advice} />
-          <OffSeasonCard advice={advice} />
-          {advice.dataGaps.length > 0 && (
-            <Card>
-              <InformationGaps
-                title={t('What we do not know about this field')}
-                gaps={advice.dataGaps}
-              />
-            </Card>
-          )}
-        </div>
-      )}
+        )}
+        {advice && (
+          <div className="rotation-stack" aria-busy={isUpdating}>
+            <AdviceControls
+              advice={advice}
+              priorities={priorities}
+              onCropChange={setCrop}
+              onPriorityToggle={togglePriority}
+            />
+            <AdviceVerdict advice={advice} />
+            <CropHistoryStrip advice={advice} />
+            <CandidateList advice={advice} />
+            <OffSeasonCard advice={advice} />
+            {advice.dataGaps.length > 0 && (
+              <Card>
+                <InformationGaps
+                  title={t('What we do not know about this field')}
+                  gaps={advice.dataGaps}
+                />
+              </Card>
+            )}
+          </div>
+        )}
+        <FieldStrategySection field={field} />
+      </div>
     </div>
   );
 }

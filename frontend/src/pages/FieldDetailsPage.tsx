@@ -1,16 +1,14 @@
-import { useQuery, useSuspenseQueries } from '@tanstack/react-query';
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { Button, Dropdown, Modal, Result, Space } from 'antd';
-import { ArrowLeft, ListOrdered, MapPin, Pencil, Sprout, Trash2 } from 'lucide-react';
+import { ArrowLeft, ListOrdered, MapPin, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
-import { planningQueries } from '../api/planning/planning.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
 import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
 import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
-import { CropRotationPlan } from '../features/fields/components/CropRotationPlan';
 import { FieldCropHistory } from '../features/fields/components/FieldCropHistory';
 import { FieldM2Insights } from '../features/fields/components/FieldM2Insights';
 import { FieldM3Insights } from '../features/fields/components/FieldM3Insights';
@@ -20,10 +18,10 @@ import { FieldStatus } from '../features/fields/components/FieldStatus';
 import { useFieldRemoval } from '../features/fields/hooks/useFieldRemoval.ts';
 import { FieldMap } from '../features/maps/components/FieldMap';
 import { useFieldLocation } from '../features/maps/hooks/useFieldLocation.ts';
+import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
 
 const sections = {
   map: { id: 'field-location-map', label: 'Location map' },
-  rotation: { id: 'crop-rotation-plan', label: 'Rotation recommendation' },
   properties: { id: 'field-properties', label: 'Field properties' },
   recommendations: { id: 'crop-recommendations', label: 'Crop strategies for next season' },
   history: { id: 'crop-history', label: 'Crop history' },
@@ -38,11 +36,6 @@ export function FieldDetailsPage() {
   const { fieldId } = useLoaderData<FieldRouteData>();
   const [{ data: field }, { data: propertyData }] = useSuspenseQueries({
     queries: [fieldQueries.byId(fieldId), fieldQueries.properties(fieldId)],
-  });
-  const { data: plan } = useQuery({
-    ...planningQueries.rotation(fieldId),
-    enabled: Boolean(field),
-    throwOnError: true,
   });
   const geojson = useFieldLocation(fieldId);
   const { confirmRemove, setConfirmRemove, isRemovingField, handleRemove } =
@@ -71,18 +64,10 @@ export function FieldDetailsPage() {
           <Space wrap>
             {field.status && <FieldStatus status={field.status} />}
             <FieldAssistant key={field.id} field={field} />
-            {propertyData && field.crop && (
-              <RouterButton
-                type="primary"
-                icon={<Sprout size={19} />}
-                to={`/fields/${field.id}/strategy`}
-              >
-                {t('Rotation strategy')}
-              </RouterButton>
-            )}
             <RouterButton
+              type="primary"
               icon={<ListOrdered size={19} />}
-              to={`/fields/${field.id}/recommendation`}
+              to={recommendationPath(field.id)}
             >
               {t('Crop recommendation')}
             </RouterButton>
@@ -115,7 +100,6 @@ export function FieldDetailsPage() {
         <span className="field-detail-nav-label">{t('On this page')}</span>
         <ul>
           {Object.values(sections)
-            .filter((section) => section !== sections.rotation || plan)
             .filter((section) => section !== sections.properties || propertyData)
             .map(({ id, label }) => (
               <li key={id}>
@@ -140,11 +124,6 @@ export function FieldDetailsPage() {
         />
       </div>
       <div className="field-detail-stack">
-        {plan && (
-          <div className="field-detail-anchor" id={sections.rotation.id}>
-            <CropRotationPlan field={field} plan={plan} />
-          </div>
-        )}
         {propertyData && (
           <div className="field-detail-anchor" id={sections.properties.id}>
             <FieldProperties field={field} data={propertyData} />

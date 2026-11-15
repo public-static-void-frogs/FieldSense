@@ -1200,6 +1200,7 @@
   "the main crop of this state": "основна культура цього штату",
   "Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.": "Можливі культури на сезон {{year}}, упорядковані за ризиком сівозміни на цьому полі. Першою йде культура з найменшим ризиком.",
   "The recommendation could not be loaded": "Не вдалося завантажити рекомендацію",
+  "The rotation strategy could not be loaded": "Не вдалося завантажити стратегію сівозміни",
   "What we do not know about this field": "Чого ми не знаємо про це поле",
   "Poorly drained": "Погано дренований",
   "Somewhat poorly drained": "Недостатньо дренований",
