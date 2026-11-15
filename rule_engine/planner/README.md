@@ -80,22 +80,22 @@ python -m rule_engine.planner --field <id> ... --policy data/local/planner/polic
   (`is_test_county`), so the test fields are in places the policy never saw.
 - Every score is the exact expected plan value of the policy, not a sampled return.
 
-Result of the run above with the years 1981–2025 and inflation-adjusted prices (9,969 fields
-with at least two modellable crops; 8,859 for training, 1,110 in held-out counties; 6 minutes on
-one GPU; USD per acre over five years):
+Result of a short run with the 25-crop vocabulary, the years 1981–2025 and inflation-adjusted
+prices. It used a sample of the fields, not all of them: the first 1,000 fields of the list plus
+every sixth of the rest, 2,543 in all; 2,254 for training, 289 in held-out counties; 9 minutes
+(1,238 iterations) on one GPU; USD per acre over five years:
 
 | Held-out fields | Exact optimum | Learned policy | Year-by-year rule | Gap closed |
 | --------------- | ------------- | -------------- | ----------------- | ---------- |
-| All 1,110       | 410.5         | 404.9          | 363.3             | 88 %       |
-| 2 crops (474)   | 231.7         | 229.2          | 215.8             | 84 %       |
-| 3 crops (283)   | 583.3         | 577.2          | 502.6             | 93 %       |
-| 4 crops (353)   | 512.2         | 502.8          | 449.5             | 85 %       |
+| All 289         | 611.5         | 600.8          | 547.6             | 83 %       |
+| 3 crops (16)    | 834.1         | 833.2          | 714.4             | 99 %       |
+| 4 crops (10)    | 488.6         | 463.4          | 441.8             | 46 %       |
+| 5 crops (262)   | 606.2         | 595.4          | 544.8             | 82 %       |
 
-The learned policy is within 1 % of the optimum on 72 % of held-out fields. It beats the
-year-by-year rule on 47 % of them (by 92 USD on average), ties on 32 %, and trails it on 21 % (by
-8 USD on average, 114 USD at worst). It is an approximation: where the exact plan is affordable, use
-it. With only the years 2015–2025 the same training closed 91 % of the gap (optimum 472.0,
-learned 467.5, year-by-year rule 421.0).
+One held-out field has two crops and is not shown. The learned policy is within 1 % of the optimum
+on 69 % of held-out fields, falls 10.7 USD short of it on average, and trails the year-by-year
+rule on 18 %. On its training fields it closes 94 % of the gap. It is an approximation: where the
+exact plan is affordable, use it. A longer run on every field is the next step.
 
 The vocabulary is the 25 crops of `tables.CROPS`, in that order. A policy file stores the crop
 order it was trained with, and `learned.load_policy` refuses a file whose order or sizes differ
