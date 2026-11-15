@@ -1,4 +1,4 @@
-.main-content.ant-layout-content:has(> .rotation-page) {
+.main-content.ant-layout-content:has(> .rotation-recommendation-page) {
   max-width: none;
   padding: 0;
 }

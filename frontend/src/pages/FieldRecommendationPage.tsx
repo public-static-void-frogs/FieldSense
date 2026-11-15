@@ -65,7 +65,7 @@ export function FieldRecommendationPage() {
   }
 
   return (
-    <div className="rotation-page">
+    <div className="rotation-recommendation-page">
       <CustomMetricsBanner
         key={fieldId}
         fieldId={fieldId}
