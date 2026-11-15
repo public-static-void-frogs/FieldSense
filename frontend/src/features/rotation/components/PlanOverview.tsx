@@ -1,5 +1,5 @@
-import { Card, Flex, Tag, Typography } from 'antd';
-import { ArrowRight } from 'lucide-react';
+import { Card, Tag, Typography } from 'antd';
+import { ArrowRight, ChevronDown } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { useLocation } from 'react-router-dom';
 import { CropIcon } from '../../../components/common/CropIcon';
@@ -14,8 +14,6 @@ import {
   autumnActionLabels,
   establishmentColors,
   establishmentLabels,
-  levelColors,
-  levelLabels,
   notModelledLabels,
   planGapLabels,
 } from '../constants/rotationLabels.ts';
@@ -26,23 +24,20 @@ import {
   rankedPlanCrops,
   unpricedCandidates,
 } from '../utils/planPresentation.ts';
-import {
-  distinctGapCodes,
-  formatNumber,
-  formatPercent,
-  highestRiskLevel,
-} from '../utils/rotationPresentation.ts';
+import { distinctGapCodes, formatNumber, formatPercent } from '../utils/rotationPresentation.ts';
 import { recommendationPath } from '../utils/rotationRoutes.ts';
+import { CandidateRow, CandidateSummary } from './CandidateList';
 
 type PlanOverviewProps = { advice: RotationAdvice; plan: RotationPlan };
 
 export function PlanOverview({ advice, plan }: PlanOverviewProps) {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const crops = rankedPlanCrops(plan);
   const top = crops.filter(({ tier }) => tier === 'top');
   const others = crops.filter(({ tier }) => tier !== 'top');
   const unpriced = unpricedCandidates(advice, plan);
   const candidates = new Map(advice.candidates.map((candidate) => [candidate.crop, candidate]));
+  const name = cropNamer(advice);
   const first = plan.firstSeason;
   const last = lastSeason(plan);
   const title =
@@ -57,7 +52,7 @@ export function PlanOverview({ advice, plan }: PlanOverviewProps) {
           'Each option is the best plan that starts with that crop. Money is per acre: sales less production cost, land rent not included.',
         )}
       </Typography.Paragraph>
-      <ol className="rotation-plan-top">
+      <ol className="rotation-plan-top" role="list">
         {top.map((entry) => (
           <PlanCard
             key={entry.crop}
@@ -71,27 +66,44 @@ export function PlanOverview({ advice, plan }: PlanOverviewProps) {
       {others.length > 0 && (
         <section className="rotation-plan-section">
           <Typography.Title level={5}>{t('Other options')}</Typography.Title>
-          <ul className="rotation-candidates">
-            {others.map((entry) => (
-              <PlanRow
-                key={entry.crop}
-                advice={advice}
-                plan={plan}
-                entry={entry}
-                candidate={candidates.get(entry.crop)}
+          <ol className="rotation-candidates" role="list">
+            {others.map(({ crop, rank, simulation: { firstSeason } }) => (
+              <CandidateRow
+                key={crop}
+                fieldId={advice.fieldId}
+                crop={crop}
+                label={name(crop)}
+                rank={rank}
+                candidate={candidates.get(crop)}
+                description={t('Loss in {{share}} of years · typical {{amount}} in {{year}}', {
+                  share: formatPercent(firstSeason.lossProbability, i18n.language),
+                  amount: formatSignedUsd(firstSeason.p50UsdPerAcre, i18n.language),
+                  year: plan.firstSeason,
+                })}
               />
             ))}
-          </ul>
+          </ol>
         </section>
       )}
       {unpriced.length > 0 && (
         <section className="rotation-plan-section">
           <Typography.Title level={5}>{t('Not priced, rotation risk only')}</Typography.Title>
-          <ul className="rotation-candidates">
+          <ol className="rotation-candidates" role="list">
             {unpriced.map((candidate) => (
-              <UnpricedRow key={candidate.crop} advice={advice} candidate={candidate} />
+              <CandidateRow
+                key={candidate.crop}
+                fieldId={advice.fieldId}
+                crop={candidate.crop}
+                label={candidate.label}
+                candidate={candidate}
+                tooltipNote={
+                  candidate.notModelledCode
+                    ? t(notModelledLabels[candidate.notModelledCode] ?? candidate.notModelledCode)
+                    : undefined
+                }
+              />
             ))}
-          </ul>
+          </ol>
         </section>
       )}
       <PlanBasis plan={plan} />
@@ -117,171 +129,100 @@ function PlanCard({ advice, plan, entry, candidate }: PlanEntryProps) {
 
   return (
     <li className="rotation-plan-card">
-      <Flex gap={10} align="center" wrap>
-        <span className="rotation-rank" aria-label={t('Rank {{rank}}', { rank: entry.rank })}>
-          {entry.rank}
-        </span>
-        <CropIcon crop={name(entry.crop)} size={28} />
-        <Typography.Text strong className="rotation-candidate-name">
-          {t(name(entry.crop))}
-        </Typography.Text>
-        {candidate?.isIntended && <Tag color="green">{t('Your crop')}</Tag>}
-        <RiskTag candidate={candidate} />
-      </Flex>
-      <ol className="rotation-plan-sequence" aria-label={t('Crops by season')}>
-        {entry.steps.map((step) => (
-          <li key={step.season}>
-            <Typography.Text type="secondary">{step.season}</Typography.Text>
-            <Typography.Text>{t(name(step.crop))}</Typography.Text>
-          </li>
-        ))}
-      </ol>
-      <dl className="rotation-stats">
-        <div>
-          <dt>{t('Chance of a loss in {{year}}', { year: plan.firstSeason })}</dt>
-          <dd>{formatPercent(firstSeason.lossProbability, language)}</dd>
-        </div>
-        <div>
-          <dt>{t('Typical result')}</dt>
-          <dd>{formatSignedUsd(firstSeason.p50UsdPerAcre, language)}</dd>
-        </div>
-        <div>
-          <dt>{t('Poor year to good year')}</dt>
-          <dd>
-            {t('{{low}} to {{high}}', {
-              low: formatSignedUsd(firstSeason.p10UsdPerAcre, language),
-              high: formatSignedUsd(firstSeason.p90UsdPerAcre, language),
-            })}
-          </dd>
-        </div>
-        <div>
-          <dt>{t('Expected yield')}</dt>
-          <dd>
-            {formatNumber(firstSeason.yieldPerAcre.meanPerAcre, language)}{' '}
-            {firstSeason.yieldPerAcre.unit}
-          </dd>
-        </div>
-        {wholePlan && plan.seasons > 1 && (
-          <div className="rotation-stats-full">
-            <dt>{t('All {{seasons}} seasons, typical', { seasons: plan.seasons })}</dt>
-            <dd>
-              {t('{{amount}}, loss in {{share}}', {
-                amount: formatSignedUsd(wholePlan.p50UsdPerAcre, language),
-                share: formatPercent(wholePlan.lossProbability, language),
-              })}
-            </dd>
-          </div>
-        )}
-      </dl>
-      <Flex gap={8} align="center" wrap className="rotation-plan-autumn">
-        <Typography.Text type="secondary">{t('This autumn:')}</Typography.Text>
-        <Typography.Text>
-          {t(autumnActionLabels[autumn.action] ?? autumn.action)}
-          {autumn.species && ` · ${t(name(autumn.species))}`}
-        </Typography.Text>
-        {establishment && (
-          <Tag color={establishmentColors[establishment]}>
-            {t(establishmentLabels[establishment])}
-          </Tag>
-        )}
-      </Flex>
-      {entry.demoted && (
-        <Typography.Text type="secondary">
-          {t('Ranked lower: the autumn sowing this plan needs rarely establishes here.')}
-        </Typography.Text>
-      )}
-      <RouterButton
-        to={{ pathname: recommendationPath(advice.fieldId, entry.crop), search }}
-        icon={<ArrowRight size={16} />}
-        iconPlacement="end"
-      >
-        {t('Forecast and details')}
-      </RouterButton>
-    </li>
-  );
-}
+      <div className="rotation-candidate-row rotation-plan-card-header" data-rank={entry.rank}>
+        <CandidateSummary
+          label={name(entry.crop)}
+          rank={entry.rank}
+          candidate={candidate}
+          showNoRisks
+        />
+        <RouterButton
+          to={{ pathname: recommendationPath(advice.fieldId, entry.crop), search }}
+          icon={<ArrowRight size={16} />}
+          iconPlacement="end"
+        >
+          {t('Forecast and details')}
+        </RouterButton>
+      </div>
+      <div className="rotation-plan-card-body">
+        <ol className="rotation-plan-sequence" role="list" aria-label={t('Crops by season')}>
+          {entry.steps.map(({ season, crop }) => {
+            const label = name(crop);
 
-function PlanRow({ advice, plan, entry, candidate }: PlanEntryProps) {
-  const { t, i18n } = useTranslation();
-  const { search } = useLocation();
-  const name = cropNamer(advice);
-  const { firstSeason } = entry.simulation;
-
-  return (
-    <li className="rotation-candidate-row">
-      <Flex className="rotation-candidate-summary" gap={12} align="center" wrap>
-        <span className="rotation-rank" aria-label={t('Rank {{rank}}', { rank: entry.rank })}>
-          {entry.rank}
-        </span>
-        <Typography.Text strong className="rotation-candidate-name">
-          {t(name(entry.crop))}
-        </Typography.Text>
-        {candidate?.isIntended && <Tag color="green">{t('Your crop')}</Tag>}
-        <RiskTag candidate={candidate} />
-        <Typography.Text type="secondary">
-          {t('Loss in {{share}} of years · typical {{amount}} in {{year}}', {
-            share: formatPercent(firstSeason.lossProbability, i18n.language),
-            amount: formatSignedUsd(firstSeason.p50UsdPerAcre, i18n.language),
-            year: plan.firstSeason,
+            return (
+              <li key={season}>
+                <time dateTime={String(season)}>{season}</time>
+                <span className="rotation-plan-season-crop">
+                  <CropIcon crop={label} size={28} />
+                  <span>{t(label)}</span>
+                </span>
+              </li>
+            );
           })}
-        </Typography.Text>
-      </Flex>
-      <RouterButton
-        to={{ pathname: recommendationPath(advice.fieldId, entry.crop), search }}
-        icon={<ArrowRight size={18} />}
-        aria-label={t('View more about {{crop}}', { crop: t(name(entry.crop)) })}
-      />
+        </ol>
+        <details className="rotation-plan-disclosure">
+          <summary>
+            <ChevronDown size={16} aria-hidden="true" />
+            {t('Plan breakdown')}
+          </summary>
+          <dl className="rotation-plan-facts">
+            <div>
+              <dt>{t('Chance of a loss in {{year}}', { year: plan.firstSeason })}</dt>
+              <dd>{formatPercent(firstSeason.lossProbability, language)}</dd>
+            </div>
+            <div>
+              <dt>{t('Typical result')}</dt>
+              <dd>{formatSignedUsd(firstSeason.p50UsdPerAcre, language)}</dd>
+            </div>
+            <div>
+              <dt>{t('Poor year to good year')}</dt>
+              <dd>
+                {t('{{low}} to {{high}}', {
+                  low: formatSignedUsd(firstSeason.p10UsdPerAcre, language),
+                  high: formatSignedUsd(firstSeason.p90UsdPerAcre, language),
+                })}
+              </dd>
+            </div>
+            <div>
+              <dt>{t('Expected yield')}</dt>
+              <dd>
+                {formatNumber(firstSeason.yieldPerAcre.meanPerAcre, language)}{' '}
+                {firstSeason.yieldPerAcre.unit}
+              </dd>
+            </div>
+            {wholePlan && plan.seasons > 1 && (
+              <div>
+                <dt>{t('All {{seasons}} seasons, typical', { seasons: plan.seasons })}</dt>
+                <dd>
+                  {t('{{amount}}, loss in {{share}}', {
+                    amount: formatSignedUsd(wholePlan.p50UsdPerAcre, language),
+                    share: formatPercent(wholePlan.lossProbability, language),
+                  })}
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt>{t('This autumn')}</dt>
+              <dd>
+                {t(autumnActionLabels[autumn.action] ?? autumn.action)}
+                {autumn.species && ` · ${t(name(autumn.species))}`}
+                {establishment && (
+                  <Tag color={establishmentColors[establishment]}>
+                    {t(establishmentLabels[establishment])}
+                  </Tag>
+                )}
+              </dd>
+            </div>
+            {entry.demoted && (
+              <div>
+                <dt>{t('Ranked lower')}</dt>
+                <dd>{t('The autumn sowing this plan needs rarely establishes here.')}</dd>
+              </div>
+            )}
+          </dl>
+        </details>
+      </div>
     </li>
-  );
-}
-
-type UnpricedRowProps = { advice: RotationAdvice; candidate: RotationCandidate };
-
-function UnpricedRow({ advice, candidate }: UnpricedRowProps) {
-  const { t } = useTranslation();
-  const { search } = useLocation();
-  const reason = candidate.notModelledCode;
-
-  return (
-    <li className="rotation-candidate-row">
-      <Flex className="rotation-candidate-summary" gap={12} align="center" wrap>
-        <Typography.Text strong className="rotation-candidate-name">
-          {t(candidate.label)}
-        </Typography.Text>
-        {candidate.isIntended && <Tag color="green">{t('Your crop')}</Tag>}
-        <RiskTag candidate={candidate} />
-        {reason && (
-          <Typography.Text type="secondary">
-            {t(notModelledLabels[reason] ?? reason)}
-          </Typography.Text>
-        )}
-      </Flex>
-      <RouterButton
-        to={{ pathname: recommendationPath(advice.fieldId, candidate.crop), search }}
-        icon={<ArrowRight size={18} />}
-        aria-label={t('View more about {{crop}}', { crop: t(candidate.label) })}
-      />
-    </li>
-  );
-}
-
-function RiskTag({ candidate }: { candidate?: RotationCandidate }) {
-  const { t } = useTranslation();
-  if (!candidate) {
-    return null;
-  }
-  const level = highestRiskLevel(candidate);
-  if (!level) {
-    return <Tag>{t('No risks found')}</Tag>;
-  }
-
-  return (
-    <Tag color={levelColors[level]}>
-      {t('{{level}} · {{risks}} risks', {
-        level: t(levelLabels[level]),
-        risks: candidate.risks.length,
-      })}
-    </Tag>
   );
 }
 
