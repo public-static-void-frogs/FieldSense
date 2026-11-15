@@ -12,6 +12,12 @@ export const m2Outcomes = {
   late_ndvi: 'Late-season greenness (NDVI)',
   ndvi_area: 'Seasonal greenness (NDVI × days)',
 } as const;
+export const m2Tiers = {
+  limited: 'Small sample',
+  'one season type': 'One season type only',
+  pooled: 'All seasons pooled',
+  descriptive: 'Descriptive only',
+} as const;
 export const m2Verdicts: Record<
   string,
   { label: string; tone: 'success' | 'warning' | 'default' }

@@ -123,7 +123,7 @@ backend requirements.
 - `GET /api/v1/fields/{id}/m2-insights` looks up the saved point in the M2 neighbour-evidence
   tables written by `ml/field-prediction-model/neighbour-evidence-engine/m2_neighbour_evidence.py`.
   Set `M2_OUT` (default `data/m2_out`) and restart the backend after replacing the tables. The
-  response is a field what-if, a summary of fields within 30 km, or the study-wide result, and
+  response is a field what-if, a summary of nearby fields (30 km, widened to 120 km when thin), or the study-wide result, and
   is an adjusted association, not a guaranteed effect. A missing folder returns 503.
 - `GET /api/v1/fields/{id}/m3-insights` looks up the saved point in the supplied
   `data/m3_out` tables. Set `M3_OUT` to use another directory and restart the

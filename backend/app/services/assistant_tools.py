@@ -493,7 +493,8 @@ def default_registry() -> ToolRegistry:
             "(continuous cropping, diverse rotation, small grain or hay, winter cover, "
             "host-crop return interval) changed drought resilience, measured from satellite "
             "greenness under the same weather. Returns a verdict, the extra effect in drought "
-            "with intervals, and a what-if for this field or the fields within 30 km. It is an "
+            "with intervals, and a what-if for this field or nearby fields. Report the evidence tier "
+            "and confidence; below the full tier there is no drought-specific number. It is an "
             "adjusted association, not a guaranteed effect: state that and any warnings. Use "
             "for questions about rotation, drought resilience or what neighbours' practices "
             "suggest. Needs a selected field.",

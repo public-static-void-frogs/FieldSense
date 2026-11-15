@@ -149,6 +149,8 @@ export type M2Checks = {
   max_smd_after: number | null;
 };
 
+export type M2EvidenceTier = 'full' | 'limited' | 'one season type' | 'pooled' | 'descriptive';
+
 export type M2Outcome = {
   outcome_label: string | null;
   gamma: number | null;
@@ -157,6 +159,13 @@ export type M2Outcome = {
   theta_normal: number | null;
   theta_drought: number | null;
   verdict: string | null;
+  evidence_tier: M2EvidenceTier | null;
+  confidence: string | null;
+  tier_note: string | null;
+  headline_basis: string | null;
+  headline_effect: number | null;
+  headline_lo: number | null;
+  headline_hi: number | null;
   outcome_sees_drought: boolean | null;
   squares: number | null;
   checks: M2Checks;
@@ -169,6 +178,8 @@ export type M2Region = {
   abstain: boolean;
   abstain_reason: string | null;
   verdict: string;
+  evidence_tier: M2EvidenceTier | null;
+  confidence: string | null;
   headline: (M2Outcome & { outcome: string }) | null;
   outcomes: Record<string, M2Outcome>;
 };
@@ -182,11 +193,14 @@ export type M2FieldEffect = {
   lo95?: number | null;
   hi95?: number | null;
   effect_agrees?: boolean;
+  indicative?: { effect: number | null; lo95: number | null; hi95: number | null };
 };
 
 export type M2NeighbourEffect = {
   n_fields: number;
   n_usable: number;
+  radius_km: number;
+  note?: string;
   median?: number | null;
   p10?: number | null;
   p90?: number | null;
@@ -203,6 +217,7 @@ export type M2Insights = {
     csbid: string | null;
     distance_km: number | null;
     n_neighbour_fields: number | null;
+    radius_km?: number;
   } | null;
   region: Partial<Record<M2Crop, Partial<Record<M2Treatment, M2Region>>>> | null;
   field: M2ByCrop<M2FieldEffect> | null;

@@ -123,12 +123,57 @@ class M2EvidenceTests(unittest.TestCase):
         self.assertIn("field_effects.parquet", result["meta"]["missing_files"])
         self.assertIn("study-wide", result["warnings"][0])
 
-    def test_few_neighbours_fall_back_to_region(self):
+    def test_very_few_neighbours_fall_back_to_region(self):
         with tempfile.TemporaryDirectory() as other:
-            write_m2(Path(other), fields=5)
+            write_m2(Path(other), fields=4)
             result = M2Evidence(other).lookup(LAT + 0.1, LON)
         self.assertEqual(result["match"]["level"], "region")
-        self.assertEqual(result["match"]["n_neighbour_fields"], 5)
+        self.assertEqual(result["match"]["n_neighbour_fields"], 4)
+
+    def test_neighbourhood_radius_is_widened_until_enough_fields_are_inside(self):
+        result = self.m2.lookup(LAT + 0.6, LON)  # about 67 km from the field centroids
+        self.assertEqual(result["match"]["level"], "neighbourhood")
+        self.assertEqual(result["match"]["radius_km"], 120.0)
+        self.assertIn("widened to 120 km", result["warnings"][0])
+        with tempfile.TemporaryDirectory() as other:
+            write_m2(Path(other), fields=8)  # few fields: still a neighbourhood, but indicative
+            few = M2Evidence(other).lookup(LAT + 0.1, LON)
+        self.assertEqual(few["match"]["level"], "neighbourhood")
+        summary = few["neighbourhood"]["corn"]["T1"]["ndwi_jul_aug"]
+        self.assertIn("indicative", summary["note"])
+
+    def test_unusable_field_estimate_is_only_indicative(self):
+        result = self.m2.lookup(LAT + 0.001, LON)  # the field whose estimate has no evidence
+        self.assertEqual(result["match"]["csbid"], "1001")
+        what_if = result["field"]["corn"]["T1"]["ndwi_jul_aug"]
+        self.assertFalse(what_if["usable"])
+        self.assertNotIn("effect", what_if)
+        self.assertIn("indicative", what_if)
+        self.assertTrue(any("not a finding" in line for line in result["summary"]))
+
+    def test_lower_evidence_tier_has_no_drought_specific_number(self):
+        table = pd.read_csv(self.root / "effects.csv")
+        table["evidence_tier"] = "pooled"
+        table["confidence"] = "low"
+        table["headline_basis"] = "effect over all seasons"
+        table["headline_effect"] = -0.02
+        table["headline_lo"] = -0.04
+        table["headline_hi"] = 0.0
+        table["gamma"] = None
+        table.to_csv(self.root / "effects.csv", index=False)
+        result = M2Evidence(self.root).lookup(LAT, LON)
+        region = result["region"]["corn"]["T1"]
+        self.assertEqual(region["evidence_tier"], "pooled")
+        self.assertEqual(region["confidence"], "low")
+        self.assertIsNone(region["headline"]["gamma"])
+        self.assertAlmostEqual(region["headline"]["headline_effect"], -0.02)
+        self.assertTrue(any("Not a drought-specific effect" in line for line in result["summary"]))
+        self.assertTrue(any("evidence tier 'pooled'" in line for line in result["warnings"]))
+
+    def test_older_effects_table_is_read_as_full_tier(self):
+        region = self.m2.lookup(LAT, LON)["region"]["corn"]
+        self.assertEqual(region["T1"]["evidence_tier"], "full")
+        self.assertAlmostEqual(region["T1"]["headline"]["headline_effect"], -0.06)
 
     def test_missing_output_raises(self):
         with self.assertRaises(FileNotFoundError):
