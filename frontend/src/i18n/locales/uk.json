@@ -1499,6 +1499,7 @@
   "Earns at least as much as {{crop}}": "Дає не менше, ніж {{crop}}",
   "Yields in {{observed}} of {{years}} years are county or state records; the others are modelled from that year’s weather. \"Poor\" and \"good\" mean one year in ten is worse or better.": "Урожайність у {{observed}} з {{years}} років узято із записів округу чи штату; решту змодельовано за погодою того року. «Поганий» і «добрий» означають, що один рік із десяти гірший або кращий.",
   "Season by season": "Сезон за сезоном",
+  "USD per acre": "Дол. США на акр",
   "All {{seasons}} seasons together": "Усі сезони разом: {{seasons}}",
   "Poor run to good run": "Від поганого до доброго перебігу",
   "Worst start year": "Найгірший рік початку",

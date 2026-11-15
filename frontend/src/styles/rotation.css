@@ -526,6 +526,20 @@
   margin-bottom: 20px;
 }
 
+.rotation-season-chart {
+  margin: 0 0 20px;
+}
+
+.rotation-season-chart figcaption {
+  color: #58664d;
+  font-size: 13px;
+}
+
+.rotation-season-chart .rotation-outcomes-legend {
+  flex-wrap: wrap;
+  gap: 4px 16px;
+}
+
 .rotation-outcomes {
   margin: 0 0 8px;
 }

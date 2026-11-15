@@ -1499,6 +1499,7 @@
   "Earns at least as much as {{crop}}": "Earns at least as much as {{crop}}",
   "Yields in {{observed}} of {{years}} years are county or state records; the others are modelled from that year’s weather. \"Poor\" and \"good\" mean one year in ten is worse or better.": "Yields in {{observed}} of {{years}} years are county or state records; the others are modelled from that year’s weather. \"Poor\" and \"good\" mean one year in ten is worse or better.",
   "Season by season": "Season by season",
+  "USD per acre": "USD per acre",
   "All {{seasons}} seasons together": "All {{seasons}} seasons together",
   "Poor run to good run": "Poor run to good run",
   "Worst start year": "Worst start year",

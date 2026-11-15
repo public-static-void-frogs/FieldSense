@@ -13,12 +13,13 @@ import { autumnActionLabels, tillageLabels, yieldModeLabels } from '../constants
 import { cropNamer, formatSignedUsd, rankedPlanCrops } from '../utils/planPresentation.ts';
 import { formatNumber, formatPercent } from '../utils/rotationPresentation.ts';
 import { OutcomeChart } from './OutcomeChart';
+import { SeasonResultChart } from './SeasonResultChart';
 
 type PlanForecastProps = { advice: RotationAdvice; plan: RotationPlan; entry: RotationPlanCrop };
 
 export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
   const { t, i18n } = useTranslation();
-  const [view, setView] = useState<'chart' | 'data'>('chart');
+  const [view, setView] = useState<ForecastView>('chart');
   const language = i18n.language;
   const name = cropNamer(advice);
   const { firstSeason, plan: wholePlan } = entry.simulation;
@@ -53,25 +54,7 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
 
   return (
     <section className="rotation-forecast">
-      <Flex
-        className="rotation-forecast-toolbar"
-        align="center"
-        justify="space-between"
-        gap={8}
-        wrap
-      >
-        <Typography.Title level={5}>{chartLabel}</Typography.Title>
-        <Segmented<'chart' | 'data'>
-          size="small"
-          aria-label={t('View for {{label}}', { label: chartLabel })}
-          value={view}
-          onChange={setView}
-          options={[
-            { label: t('Chart'), value: 'chart' },
-            { label: t('Data'), value: 'data' },
-          ]}
-        />
-      </Flex>
+      <ForecastViewToolbar title={chartLabel} view={view} onChange={setView} />
       {view === 'chart' ? (
         <OutcomeChart outcomes={firstSeason.outcomes} yieldUnit={yields.unit} label={chartLabel} />
       ) : (
@@ -134,8 +117,7 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
           { observed: firstSeason.observedYieldYears, years: firstSeason.years },
         )}
       </Typography.Paragraph>
-      <Typography.Title level={5}>{t('Season by season')}</Typography.Title>
-      <StepTable advice={advice} steps={entry.steps} />
+      <SeasonForecast advice={advice} steps={entry.steps} />
       {wholePlan && plan.seasons > 1 && (
         <>
           <Typography.Title level={5}>
@@ -181,6 +163,52 @@ export function PlanForecast({ advice, plan, entry }: PlanForecastProps) {
         </>
       )}
     </section>
+  );
+}
+
+type ForecastView = 'chart' | 'data';
+
+type ForecastViewToolbarProps = {
+  title: string;
+  view: ForecastView;
+  onChange: (view: ForecastView) => void;
+};
+
+function ForecastViewToolbar({ title, view, onChange }: ForecastViewToolbarProps) {
+  const { t } = useTranslation();
+
+  return (
+    <Flex className="rotation-forecast-toolbar" align="center" justify="space-between" gap={8} wrap>
+      <Typography.Title level={5}>{title}</Typography.Title>
+      <Segmented<ForecastView>
+        size="small"
+        aria-label={t('View for {{label}}', { label: title })}
+        value={view}
+        onChange={onChange}
+        options={[
+          { label: t('Chart'), value: 'chart' },
+          { label: t('Data'), value: 'data' },
+        ]}
+      />
+    </Flex>
+  );
+}
+
+type SeasonForecastProps = { advice: RotationAdvice; steps: RotationPlanStep[] };
+
+function SeasonForecast({ advice, steps }: SeasonForecastProps) {
+  const { t } = useTranslation();
+  const [view, setView] = useState<ForecastView>('data');
+
+  return (
+    <>
+      <ForecastViewToolbar title={t('Season by season')} view={view} onChange={setView} />
+      {view === 'chart' ? (
+        <SeasonResultChart advice={advice} steps={steps} />
+      ) : (
+        <StepTable advice={advice} steps={steps} />
+      )}
+    </>
   );
 }
 
