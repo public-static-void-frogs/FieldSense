@@ -9,7 +9,6 @@ import { OverviewInventory } from '../features/overview/components/OverviewInven
 import { OverviewMonitoring } from '../features/overview/components/OverviewMonitoring';
 import {
   OverviewAgenda,
-  OverviewNotifications,
   OverviewWeather,
 } from '../features/overview/components/OverviewOperations';
 import '../features/legal/components/legal.css';
@@ -61,7 +60,6 @@ export function OverviewPage() {
         {(!demo || profile.latitude != null) && <OverviewWeather profile={profile} />}
         {fields.length > 0 && <OverviewMonitoring fields={fields} />}
         <OverviewAgenda />
-        <OverviewNotifications />
       </div>
       <footer>
         <LegalLinks />

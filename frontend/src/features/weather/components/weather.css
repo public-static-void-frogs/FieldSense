@@ -3,9 +3,7 @@
 }
 
 .environment-tab-label,
-.weather-section-title,
-.weather-source-updated,
-.weather-source-info {
+.weather-section-title {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -280,30 +278,6 @@
 .weather-chart-tooltip small {
   color: #63715a;
   font-size: 14px;
-}
-
-.weather-source {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 15px;
-  margin-top: 20px;
-  color: #63715a;
-  font-size: 14px;
-}
-
-.weather-source > a {
-  color: #63715a;
-}
-
-.weather-source-info {
-  margin-left: auto;
-  padding: 0;
-  border: 0;
-  background: transparent;
-  color: #63715a;
-  font: inherit;
-  cursor: help;
 }
 
 .weather-daily-log {

@@ -96,8 +96,7 @@ declared below the main component in the same file; keep the branch itself to a
 Field details use dedicated routes such as `/fields/<guid>`. Adding fields uses
 `/map/add` and `/map/add/6`. Navigation supports direct links, refresh, and
 browser back/forward through React Router. Production hosting must serve `index.html`
-for application paths (for example `/fields/<guid>`) so direct links and refreshes work. Settings, help,
-and notifications also have their own pages. Removal uses an inline confirmation.
+for application paths (for example `/fields/<guid>`) so direct links and refreshes work. Settings and help also have their own pages. Removal uses an inline confirmation.
 The app does not use modals.
 
 Typography and library colors are centralized in `src/app/theme.ts`: body text
@@ -207,7 +206,7 @@ and browser-history behavior.
 The data layer follows the sample Abitly project's separation of API methods,
 query-key factories, reusable query options, and a shared query client. Features
 include fields, farm profile, planning, maps, weather, overview analytics,
-notifications, and help content.
+and help content.
 
 ```text
 src/api/fields/
@@ -226,7 +225,7 @@ mutations and report write failures.
 
 Key factories include every server-side query parameter (field IDs, weather
 ranges, trend ranges, and metrics). Field mutations invalidate field resources,
-planning, overview charts, and notifications. Strategy responses update and
+planning, and overview charts. Strategy responses update and
 invalidate their shared response query. Removing a field also removes its saved
 event responses. Filtering and other temporary UI state remain in components.
 
@@ -321,7 +320,7 @@ card, plus custom date ranges and a visible daily environment log. Missing readi
 show a dash; weather errors remain within their panel. No sample weather is used.
 
 The backend shares cached current/forecast data, and React Query deduplicates readers
-across Overview, Environment, strategy, and notifications. Historical and forecast soil
+across Overview, Environment, and strategy. Historical and forecast soil
 moisture use different model depths, displayed in day details. Crop health and rotation
 recommendations remain illustrative. See the backend's `docs/weather-integration.md`
 for API semantics, source licensing, and local Postman simulations.

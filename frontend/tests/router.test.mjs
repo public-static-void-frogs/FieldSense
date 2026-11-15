@@ -33,7 +33,7 @@ test('the real route tree matches static, dynamic, optional and fallback routes'
     ['/history', 'history'],
     ['/help', 'help'],
     ['/settings', 'settings'],
-    ['/notifications', 'notifications'],
+    ['/notifications', 'not-found'],
     ['/missing/page', 'not-found'],
   ]) {
     assert.equal(matchRoutes(appRoutes, path).at(-1).route.id, id, path);

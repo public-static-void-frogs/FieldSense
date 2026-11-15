@@ -151,14 +151,6 @@ export const appRoutes: RouteObject[] = [
             lazy: async () => ({ Component: (await import('../pages/HelpPage')).HelpPage }),
           },
           {
-            id: 'notifications',
-            path: 'notifications',
-            handle: { navigationKey: '/notifications' },
-            lazy: async () => ({
-              Component: (await import('../pages/NotificationsPage')).NotificationsPage,
-            }),
-          },
-          {
             id: 'not-found',
             path: '*',
             lazy: async () => ({
