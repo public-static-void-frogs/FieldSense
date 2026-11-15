@@ -23,6 +23,11 @@ def create_field(client, **values):
     return response.json()
 
 
+class NoDrought:
+    def status(self, lat, lng, today):
+        return None
+
+
 def isolated_app(**settings):
     directory = tempfile.TemporaryDirectory()
     config = Settings(
@@ -33,6 +38,7 @@ def isolated_app(**settings):
     )
     app = create_app(config)
     Base.metadata.create_all(app.state.engine)
+    app.state.calendar.drought = NoDrought()  # never reach the U.S. Drought Monitor from tests
     return directory, app
 
 

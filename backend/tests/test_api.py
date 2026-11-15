@@ -2,6 +2,7 @@ import unittest
 from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 from pathlib import Path
+from types import SimpleNamespace
 from unittest.mock import patch
 from uuid import UUID, uuid4
 from zoneinfo import ZoneInfo
@@ -49,12 +50,14 @@ class ApiTests(unittest.TestCase):
             "/fields/catalog",
             "/notifications",
             "/planning/events",
-            "/help/sources",
         ]:
             self.assertEqual(self.get(route), [])
         team = self.get("/help/team")
         self.assertEqual([m["id"] for m in team], ["oleh", "kate", "polina", "volodymyr", "roman"])
         self.assertTrue(all(m["linkedin"].startswith("https://www.linkedin.com/in/") for m in team))
+        sources = self.get("/help/sources")
+        self.assertEqual(len(sources), 14)
+        self.assertTrue(all(m["url"].startswith("https://") for m in sources))
         self.assertEqual(self.get("/planning/responses"), {})
         self.assertEqual(self.get("/maps/geojson")["features"], [])
         self.assertEqual(self.get("/overview/charts"), dict(trends=[], cropAreas=[]))
@@ -245,14 +248,19 @@ class ApiTests(unittest.TestCase):
         fid = field["id"]
         self.assertEqual(self.get(f"/fields/{fid}/properties"), field["properties"])
         self.assertEqual(self.get(f"/fields/{fid}/history"), dict(events=[], seasons=[]))
+        # Events come only from the calendar service (see test_calendar_events.py).
+        self.app.state.calendar = SimpleNamespace(for_field=lambda field, settings: [])
         self.assertEqual(self.get(f"/fields/{fid}/events"), [])
-        for resource in ("recommendation", "strategy", "rotation"):
-            self.assertEqual(self.client.get(f"{BASE}/fields/{fid}/{resource}").status_code, 404)
+        self.assertEqual(self.client.get(f"{BASE}/fields/{fid}/recommendation").status_code, 404)
+        for resource in ("strategy", "rotation"):  # built by the rule engine; see its own tests
+            self.assertIn(
+                self.client.get(f"{BASE}/fields/{fid}/{resource}").status_code, (200, 404)
+            )
         self.assertEqual(
             self.client.put(
                 f"{BASE}/fields/{fid}/strategy/response", json={"status": "accepted"}
-            ).status_code,
-            404,
+            ).json(),
+            {},  # nothing to respond to without events
         )
         self.assertEqual(self.get("/notifications"), [])
         self.assertEqual(self.get("/overview/charts")["trends"], [])

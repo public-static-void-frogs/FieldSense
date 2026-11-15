@@ -19,7 +19,8 @@ test('the real route tree matches static, dynamic, optional and fallback routes'
     ['/register', 'register'],
     ['/fields', 'fields'],
     [`/fields/${fieldOne}`, 'field'],
-    [`/fields/${fieldTwo}/strategy`, 'strategy'],
+    [`/fields/${fieldTwo}/strategy`, 'not-found'],
+    [`/fields/${fieldTwo}/strategy/soil-cover`, 'not-found'],
     [`/fields/${fieldTwo}/recommendation`, 'recommendation'],
     [`/fields/${fieldTwo}/recommendation/alfalfa?priorities=soil`, 'recommendation-crop'],
     ['/map', 'map'],
@@ -92,15 +93,15 @@ test('router navigation preserves params, search state, and back/forward history
   try {
     await router.navigate(`/fields/${fieldOne}`);
     assert.deepEqual(router.state.loaderData.field, { fieldId: fieldOne });
-    await router.navigate(`/fields/${fieldTwo}/strategy`);
-    assert.deepEqual(router.state.loaderData.strategy, { fieldId: fieldTwo });
+    await router.navigate(`/fields/${fieldTwo}/recommendation`);
+    assert.deepEqual(router.state.loaderData.recommendation, { fieldId: fieldTwo });
     await router.navigate(-1);
     await idle(router);
     assert.equal(router.state.location.pathname, `/fields/${fieldOne}`);
     assert.deepEqual(router.state.loaderData.field, { fieldId: fieldOne });
     await router.navigate(1);
     await idle(router);
-    assert.equal(router.state.location.pathname, `/fields/${fieldTwo}/strategy`);
+    assert.equal(router.state.location.pathname, `/fields/${fieldTwo}/recommendation`);
     await router.navigate(`/fields/${fieldTwo}/recommendation/alfalfa?priorities=soil`);
     assert.deepEqual(router.state.loaderData['recommendation-crop'], {
       fieldId: fieldTwo,

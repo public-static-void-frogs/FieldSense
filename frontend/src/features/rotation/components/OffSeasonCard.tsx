@@ -21,20 +21,11 @@ const levelTags = {
   unlikely: { color: 'red', label: 'Rarely works' },
 } as const;
 
-const emptyReasons = {
-  previous_crop_unknown:
-    'The last crop on this field is not known, so the time left after harvest could not be estimated.',
-  no_harvest_in_calendar:
-    'The field is under a standing perennial crop or has no harvest date, so there is no gap after harvest to fill.',
-  no_weather_record: 'No long weather record is available for this location.',
-  weather_record_too_short: 'No long weather record is available for this location.',
-} as const;
-
 /** What can be established between the last crop's harvest and winter. */
 export function OffSeasonCard({ advice }: OffSeasonCardProps) {
   const { t, i18n } = useTranslation();
   const slot = advice.offSeason;
-  if (!slot) {
+  if (slot?.status !== 'ok' || slot.harvestDoy === null || slot.seedingDoy === null) {
     return null;
   }
   const language = i18n.language;
@@ -42,66 +33,55 @@ export function OffSeasonCard({ advice }: OffSeasonCardProps) {
   const crop = slot.afterCrop ? t(cropLabelMap(advice)[slot.afterCrop] ?? slot.afterCrop) : '';
   const record = advice.weatherRecord;
   const water = slot.afterCrop ? advice.seasonTiming?.waterAtSowing[slot.afterCrop] : undefined;
-  const emptyReason = slot.status === 'ok' ? 'no_harvest_in_calendar' : slot.status;
   const waterTag = water?.coverOk
     ? { color: 'green', label: 'Water-safe' }
     : { color: 'orange', label: 'Can leave the soil short of water' };
 
   return (
     <Card title={t('After harvest: cover crops and fall-sown crops')}>
-      {slot.status !== 'ok' || slot.harvestDoy === null || slot.seedingDoy === null ? (
-        <Typography.Paragraph type="secondary">{t(emptyReasons[emptyReason])}</Typography.Paragraph>
-      ) : (
-        <>
-          <Typography.Paragraph>
-            {t(
-              '{{crop}} is usually harvested around {{harvest}}, so the next seeding is possible from about {{seeding}}.',
-              {
-                crop,
-                harvest: formatDayOfYear(slot.harvestDoy, year, language),
-                seeding: formatDayOfYear(slot.seedingDoy, year, language),
-              },
-            )}{' '}
-            {slot.firstKillingFrostDoy !== null &&
-              t('The first hard freeze typically comes around {{frost}}.', {
-                frost: formatDayOfYear(slot.firstKillingFrostDoy, year, language),
-              })}
-          </Typography.Paragraph>
-          <Flex vertical gap={12} component="ul" className="rotation-off-season">
-            {slot.options.map((option) => (
-              <li key={option.id}>
-                <Flex gap={8} align="center" wrap>
-                  <Typography.Text strong>{t(option.label)}</Typography.Text>
-                  <Tag color={levelTags[option.level].color}>
-                    {t(levelTags[option.level].label)}
-                  </Tag>
-                </Flex>
-                <Typography.Text type="secondary">
-                  {optionDetail(option, t, language)}
-                </Typography.Text>
-              </li>
-            ))}
-          </Flex>
-          {water && water.cover.shortfall !== null && water.bare.shortfall !== null && (
-            <Typography.Paragraph>
-              <Typography.Text strong>{t('Soil water after a rye cover crop')}</Typography.Text>{' '}
-              <Tag color={waterTag.color}>{t(waterTag.label)}</Tag>
-              <br />
-              <Typography.Text type="secondary">
-                {waterDetail(water, crop, t, language)}
-              </Typography.Text>
-            </Typography.Paragraph>
-          )}
+      <Typography.Paragraph>
+        {t(
+          '{{crop}} is usually harvested around {{harvest}}, so the next seeding is possible from about {{seeding}}.',
+          {
+            crop,
+            harvest: formatDayOfYear(slot.harvestDoy, year, language),
+            seeding: formatDayOfYear(slot.seedingDoy, year, language),
+          },
+        )}{' '}
+        {slot.firstKillingFrostDoy !== null &&
+          t('The first hard freeze typically comes around {{frost}}.', {
+            frost: formatDayOfYear(slot.firstKillingFrostDoy, year, language),
+          })}
+      </Typography.Paragraph>
+      <Flex vertical gap={12} component="ul" className="rotation-off-season">
+        {slot.options.map((option) => (
+          <li key={option.id}>
+            <Flex gap={8} align="center" wrap>
+              <Typography.Text strong>{t(option.label)}</Typography.Text>
+              <Tag color={levelTags[option.level].color}>{t(levelTags[option.level].label)}</Tag>
+            </Flex>
+            <Typography.Text type="secondary">{optionDetail(option, t, language)}</Typography.Text>
+          </li>
+        ))}
+      </Flex>
+      {water && water.cover.shortfall !== null && water.bare.shortfall !== null && (
+        <Typography.Paragraph>
+          <Typography.Text strong>{t('Soil water after a rye cover crop')}</Typography.Text>{' '}
+          <Tag color={waterTag.color}>{t(waterTag.label)}</Tag>
+          <br />
           <Typography.Text type="secondary">
-            {record &&
-              t(
-                'Counted over {{seasons}} years of past weather near this field ({{first}}–{{last}}), not a forecast for this autumn.',
-                { seasons: record.seasons, first: record.firstYear, last: record.lastYear },
-              )}{' '}
-            {t('Harvest dates are regional medians; an earlier harvest leaves more time.')}
+            {waterDetail(water, crop, t, language)}
           </Typography.Text>
-        </>
+        </Typography.Paragraph>
       )}
+      <Typography.Text type="secondary">
+        {record &&
+          t(
+            'Counted over {{seasons}} years of past weather near this field ({{first}}–{{last}}), not a forecast for this autumn.',
+            { seasons: record.seasons, first: record.firstYear, last: record.lastYear },
+          )}{' '}
+        {t('Harvest dates are regional medians; an earlier harvest leaves more time.')}
+      </Typography.Text>
     </Card>
   );
 }

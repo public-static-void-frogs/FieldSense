@@ -70,7 +70,7 @@ export function CalendarCell({
             {getEventDecision(event, eventResponses) === 'proposed' && (
               <Clock3 size={11} aria-hidden="true" />
             )}
-            <span className="calendar-event-label">{`${event.category} · ${event.fieldName}`}</span>
+            <span className="calendar-event-label">{`${t(event.category)} · ${event.fieldName}`}</span>
           </Button>
         </Tooltip>
       ))}

@@ -2,20 +2,29 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import type { TableColumnsType } from 'antd';
 import { Button, Drawer, Empty, Flex, Input, Segmented, Select, Table, Tag } from 'antd';
 import dayjs from 'dayjs';
-import { Search } from 'lucide-react';
+import { Search, Sparkles } from 'lucide-react';
+import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
 import { planningQueries } from '../api/planning/planning.queries.ts';
 import { RouterButton } from '../components/common/RouterButton';
+import { ChatComposer } from '../features/assistant/components/ChatComposer';
+import {
+  CalendarDayPanel,
+  type CalendarDayTab,
+} from '../features/planning/components/CalendarDayPanel';
 import { CalendarDrawerContent } from '../features/planning/components/CalendarDrawerContent.tsx';
 import { SystemCalendar } from '../features/planning/components/SystemCalendar';
+import { calendarAssistantPlaceholder } from '../features/planning/constants/calendarAssistant.constants.ts';
 import { planCategories } from '../features/planning/constants/planning.constants.ts';
+import { useCalendarAssistant } from '../features/planning/hooks/useCalendarAssistant.ts';
 import { useCalendarDrawer } from '../features/planning/hooks/useCalendarDrawer.ts';
 import { useCalendarFilters } from '../features/planning/hooks/useCalendarFilters.ts';
 import { useCalendarRoute } from '../features/planning/hooks/useCalendarRoute.ts';
 import { useCalendarView } from '../features/planning/hooks/useCalendarView.ts';
 import { getCalendarEvents, getEventDecision } from '../features/planning/utils/eventResponses.ts';
 import { formatPlanDate } from '../features/planning/utils/planningDates.ts';
+import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
 import type { PlannedEvent } from '../types/planning/planning.types.ts';
 
 export function CalendarPage() {
@@ -32,6 +41,19 @@ export function CalendarPage() {
   const selectedEvents = filters.visible.filter((event) => event.date === route.selectedDate);
   const selectedEvent = allEvents.find((event) => event.id === route.eventId);
   const selectedField = fields.find((field) => field.id === selectedEvent?.fieldId);
+  const [dayTab, setDayTab] = useState<CalendarDayTab>('assistant');
+  const assistant = useCalendarAssistant({
+    date: route.selectedDate,
+    fieldId: route.fieldId,
+    open: drawer.isOpen && !route.eventId,
+    hasEvents: selectedEvents.length > 0,
+  });
+  const dayTitle = (
+    <Flex gap={8} align="center">
+      <Sparkles size={20} className="ai-insight-sparkle" aria-hidden="true" />
+      {formatPlanDate(route.selectedDate)}
+    </Flex>
+  );
   const columns: TableColumnsType<PlannedEvent> = [
     {
       title: t('Date'),
@@ -49,7 +71,7 @@ export function CalendarPage() {
         </Button>
       ),
     },
-    { title: t('Type'), dataIndex: 'category', render: (value: string) => <Tag>{value}</Tag> },
+    { title: t('Type'), dataIndex: 'category', render: (value: string) => <Tag>{t(value)}</Tag> },
     {
       title: t('Status'),
       key: 'response',
@@ -141,32 +163,52 @@ export function CalendarPage() {
         )}
       </div>
       <Drawer
-        title={selectedEvent ? t('Action details') : formatPlanDate(route.selectedDate)}
+        title={selectedEvent ? t('Action details') : dayTitle}
         placement="right"
         open={drawer.isOpen}
         onClose={drawer.close}
         styles={{ wrapper: { width: 'min(480px, 100vw)' } }}
         footer={
-          selectedEvent && (
+          selectedEvent ? (
             <Flex gap={8}>
               <RouterButton type="primary" to={`/fields/${selectedEvent.fieldId}`}>
                 {t('View field')}
               </RouterButton>
-              <RouterButton to={`/fields/${selectedEvent.fieldId}/strategy`}>
-                {t('View strategy')}
+              <RouterButton to={recommendationPath(selectedEvent.fieldId)}>
+                {t('Crop recommendation')}
               </RouterButton>
             </Flex>
+          ) : (
+            !route.eventId &&
+            dayTab === 'assistant' && (
+              <ChatComposer
+                isStreaming={assistant.isStreaming}
+                onSend={assistant.send}
+                onStop={assistant.stop}
+                placeholder={calendarAssistantPlaceholder}
+              />
+            )
           )
         }
       >
-        <CalendarDrawerContent
-          selectedEvent={selectedEvent}
-          selectedField={selectedField}
-          eventId={route.eventId}
-          selectedEvents={selectedEvents}
-          planningToday={planningToday}
-          openEvent={drawer.openEvent}
-        />
+        {route.eventId ? (
+          <CalendarDrawerContent
+            selectedEvent={selectedEvent}
+            selectedField={selectedField}
+            eventId={route.eventId}
+            selectedEvents={selectedEvents}
+            planningToday={planningToday}
+            openEvent={drawer.openEvent}
+          />
+        ) : (
+          <CalendarDayPanel
+            chat={assistant}
+            events={selectedEvents}
+            tab={dayTab}
+            onTabChange={setDayTab}
+            openEvent={drawer.openEvent}
+          />
+        )}
       </Drawer>
     </div>
   );

@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next';
 import type { WeatherRecord, WeatherUnits } from '../../../types/weather/weather.types.ts';
 import { useWeatherDaySummary } from '../hooks/useWeatherDaySummary.ts';
 import { WeatherCropAlert } from './WeatherCropAlert';
+import { WeatherDayChat } from './WeatherDayChat';
 import { getWeatherDayInsight } from '../utils/weatherDayInsight.ts';
 import { formatWeatherValue } from '../utils/weatherPresentation.ts';
 
@@ -61,6 +62,7 @@ export function WeatherDayInsight({ record, units, locale, fieldId }: WeatherDay
           </Typography.Text>
         </>
       )}
+      <WeatherDayChat date={record.date} locale={locale} fieldId={fieldId} />
     </Card>
   );
 }

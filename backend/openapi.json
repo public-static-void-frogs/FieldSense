@@ -253,6 +253,83 @@
         ]
       }
     },
+    "/api/v1/assistant/tools": {
+      "get": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Tools",
+        "description": "Tools the assistant can call. Names can be listed in chat `tools` to restrict it.",
+        "operationId": "tools_api_v1_assistant_tools_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "items": {
+                    "$ref": "#/components/schemas/ToolInfo"
+                  },
+                  "type": "array",
+                  "title": "Response Tools Api V1 Assistant Tools Get"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ]
+      }
+    },
+    "/api/v1/assistant/chat": {
+      "post": {
+        "tags": [
+          "assistant"
+        ],
+        "summary": "Chat",
+        "description": "Stateless chat with the farming assistant. Send the whole conversation each time. The system prompt comes from the server's prompt file and cannot be set by the client. Data is not preloaded: the model calls tools (forecast, M3 insights, soil depletion, registered ML models) when it needs them, using field_id as the selected field. Streams NDJSON: {\"delta\": text} lines, {\"tool\": name} when a tool starts, then {\"done\": true}. A stream that ends without done failed.",
+        "operationId": "chat_api_v1_assistant_chat_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChatRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "NDJSON text deltas followed by a done event on success.",
+            "content": {
+              "application/x-ndjson": {
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Field not found"
+          },
+          "422": {
+            "description": "Invalid conversation or unknown tool name"
+          },
+          "503": {
+            "description": "Assistant or its prompt file is unavailable"
+          }
+        },
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ]
+      }
+    },
     "/api/v1/fields": {
       "get": {
         "tags": [
@@ -1392,6 +1469,55 @@
         }
       }
     },
+    "/api/v1/fields/{field_id}/m2-insights": {
+      "get": {
+        "tags": [
+          "fields"
+        ],
+        "summary": "M2 Insights",
+        "description": "Read precomputed neighbour evidence on rotation and drought for the saved field point.",
+        "operationId": "m2_insights_api_v1_fields__field_id__m2_insights_get",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/M2Insights"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/v1/fields/{field_id}/m3-insights": {
       "get": {
         "tags": [
@@ -1681,6 +1807,7 @@
           "planning"
         ],
         "summary": "Respond",
+        "description": "Accept or decline the calendar events of the field; ``proposed`` clears the decisions.\n\nWith ``onlyProposed`` the events that already have a decision keep it.",
         "operationId": "respond_api_v1_fields__field_id__strategy_response_put",
         "security": [
           {
@@ -1723,6 +1850,82 @@
                 }
               }
             }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/fields/{field_id}/events/{event_id}/response": {
+      "put": {
+        "tags": [
+          "planning"
+        ],
+        "summary": "Respond To Event",
+        "description": "Accept or decline one calendar event of the field; ``proposed`` clears its decision.",
+        "operationId": "respond_to_event_api_v1_fields__field_id__events__event_id__response_put",
+        "security": [
+          {
+            "APIKeyCookie": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "field_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Field Id"
+            }
+          },
+          {
+            "name": "event_id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid",
+              "title": "Event Id"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StrategyResponse"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "additionalProperties": {
+                    "$ref": "#/components/schemas/EventResponse"
+                  },
+                  "title": "Response Respond To Event Api V1 Fields  Field Id  Events  Event Id  Response Put"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Field or event not found"
           },
           "422": {
             "description": "Validation Error",
@@ -2161,7 +2364,7 @@
               "application/json": {
                 "schema": {
                   "items": {
-                    "$ref": "#/components/schemas/DemoSource"
+                    "$ref": "#/components/schemas/DataSource"
                   },
                   "type": "array",
                   "title": "Response Sources Api V1 Help Sources Get"
@@ -2712,6 +2915,111 @@
           "needsLocalReview"
         ],
         "title": "Candidate"
+      },
+      "ChatMessage": {
+        "properties": {
+          "role": {
+            "type": "string",
+            "enum": [
+              "user",
+              "assistant"
+            ],
+            "title": "Role"
+          },
+          "content": {
+            "type": "string",
+            "maxLength": 4000,
+            "minLength": 1,
+            "title": "Content"
+          }
+        },
+        "type": "object",
+        "required": [
+          "role",
+          "content"
+        ],
+        "title": "ChatMessage"
+      },
+      "ChatRequest": {
+        "properties": {
+          "messages": {
+            "items": {
+              "$ref": "#/components/schemas/ChatMessage"
+            },
+            "type": "array",
+            "maxItems": 20,
+            "minItems": 1,
+            "title": "Messages",
+            "description": "Full conversation so far, oldest first. The server keeps no chat state. Must start and end with a user message."
+          },
+          "field_id": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "uuid"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field Id",
+            "description": "The selected field. Field-specific tools (M3 insights, soil depletion, field crop alerts) use it. Omit for general questions."
+          },
+          "calendar_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Calendar Date",
+            "description": "The day selected on the calendar page. The session block tells the model, which reads that day's events with get_calendar_events."
+          },
+          "weather_date": {
+            "anyOf": [
+              {
+                "type": "string",
+                "format": "date"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Weather Date",
+            "description": "The forecast day open on the weather page. The session block tells the model, which reads that day with get_weather_forecast."
+          },
+          "tools": {
+            "anyOf": [
+              {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array",
+                "maxItems": 20
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tools",
+            "description": "Names of tools the assistant may call (see GET /assistant/tools). Omit to allow all; send [] to disable tools."
+          },
+          "locale": {
+            "type": "string",
+            "maxLength": 64,
+            "pattern": "^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$",
+            "title": "Locale",
+            "default": "en"
+          }
+        },
+        "type": "object",
+        "required": [
+          "messages"
+        ],
+        "title": "ChatRequest"
       },
       "Comparison": {
         "properties": {
@@ -4299,6 +4607,29 @@
         ],
         "title": "CurrentWeather"
       },
+      "DataSource": {
+        "properties": {
+          "key": {
+            "type": "string",
+            "title": "Key"
+          },
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "url": {
+            "type": "string",
+            "title": "Url"
+          }
+        },
+        "type": "object",
+        "required": [
+          "key",
+          "name",
+          "url"
+        ],
+        "title": "DataSource"
+      },
       "DayRange": {
         "properties": {
           "low": {
@@ -4342,34 +4673,6 @@
           "high"
         ],
         "title": "DayRange"
-      },
-      "DemoSource": {
-        "properties": {
-          "key": {
-            "type": "string",
-            "title": "Key"
-          },
-          "name": {
-            "type": "string",
-            "title": "Name"
-          },
-          "data": {
-            "type": "string",
-            "title": "Data"
-          },
-          "format": {
-            "type": "string",
-            "title": "Format"
-          }
-        },
-        "type": "object",
-        "required": [
-          "key",
-          "name",
-          "data",
-          "format"
-        ],
-        "title": "DemoSource"
       },
       "DetectedField": {
         "properties": {
@@ -5623,6 +5926,245 @@
           "password"
         ],
         "title": "LoginInput"
+      },
+      "M2Error": {
+        "properties": {
+          "code": {
+            "type": "string",
+            "enum": [
+              "outside_coverage",
+              "bad_input"
+            ],
+            "title": "Code"
+          },
+          "nearest_field_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nearest Field Km"
+          },
+          "detail": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "title": "M2Error"
+      },
+      "M2Insights": {
+        "properties": {
+          "ok": {
+            "type": "boolean",
+            "title": "Ok"
+          },
+          "query": {
+            "additionalProperties": {
+              "type": "number"
+            },
+            "type": "object",
+            "title": "Query"
+          },
+          "evidence_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Evidence Label"
+          },
+          "match": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/M2Match"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "region": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": {
+                    "additionalProperties": {
+                      "$ref": "#/components/schemas/JsonValue"
+                    },
+                    "type": "object"
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Region"
+          },
+          "field": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": {
+                    "additionalProperties": {
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/JsonValue"
+                      },
+                      "type": "object"
+                    },
+                    "type": "object"
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Field"
+          },
+          "neighbourhood": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "additionalProperties": {
+                    "additionalProperties": {
+                      "additionalProperties": {
+                        "$ref": "#/components/schemas/JsonValue"
+                      },
+                      "type": "object"
+                    },
+                    "type": "object"
+                  },
+                  "type": "object"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Neighbourhood"
+          },
+          "summary": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Summary",
+            "default": []
+          },
+          "warnings": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array",
+            "title": "Warnings",
+            "default": []
+          },
+          "meta": {
+            "anyOf": [
+              {
+                "additionalProperties": {
+                  "$ref": "#/components/schemas/JsonValue"
+                },
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Meta"
+          },
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/M2Error"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "type": "object",
+        "required": [
+          "ok",
+          "query"
+        ],
+        "title": "M2Insights",
+        "description": "Neighbour evidence on rotation practices and drought resilience."
+      },
+      "M2Match": {
+        "properties": {
+          "level": {
+            "type": "string",
+            "enum": [
+              "field",
+              "neighbourhood",
+              "region"
+            ],
+            "title": "Level"
+          },
+          "csbid": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Csbid"
+          },
+          "distance_km": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Distance Km"
+          },
+          "n_neighbour_fields": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "N Neighbour Fields"
+          }
+        },
+        "type": "object",
+        "required": [
+          "level"
+        ],
+        "title": "M2Match"
       },
       "M3CropRisk": {
         "properties": {
@@ -8579,6 +9121,11 @@
               "declined"
             ],
             "title": "Status"
+          },
+          "onlyProposed": {
+            "type": "boolean",
+            "title": "Onlyproposed",
+            "default": false
           }
         },
         "additionalProperties": false,
@@ -8722,6 +9269,24 @@
         ],
         "title": "TimingWindow",
         "description": "A date range over past years, as month-day (\"MM-DD\"): 10%, 50% and 90% of years."
+      },
+      "ToolInfo": {
+        "properties": {
+          "name": {
+            "type": "string",
+            "title": "Name"
+          },
+          "description": {
+            "type": "string",
+            "title": "Description"
+          }
+        },
+        "type": "object",
+        "required": [
+          "name",
+          "description"
+        ],
+        "title": "ToolInfo"
       },
       "ValidationError": {
         "properties": {

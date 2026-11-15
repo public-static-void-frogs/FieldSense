@@ -5,7 +5,8 @@ export type PlanCategory =
   | 'Irrigation'
   | 'Crop inspection'
   | 'Harvest'
-  | 'Field preparation';
+  | 'Field preparation'
+  | 'Weather alert';
 
 export type PlanPriority = 'Routine' | 'Important' | 'High priority';
 

@@ -1,22 +1,15 @@
-import { Descriptions, Typography } from 'antd';
+import { Button, Flex, Tooltip, Typography } from 'antd';
+import { CircleHelp } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import type { RotationAdvice, RotationCandidate } from '../../../types/rotation/rotation.types.ts';
-import {
-  calendarKindLabels,
-  soilIndicatorLabels,
-  stageLabels,
-} from '../constants/rotationLabels.ts';
-import {
-  cropLabelMap,
-  formatDayOfYear,
-  formatNumber,
-  formatUsd,
-  formatValue,
-  seasonYear,
-} from '../utils/rotationPresentation.ts';
+import { calendarKindLabels, stageLabels } from '../constants/rotationLabels.ts';
+import { cropLabelMap, formatDayOfYear, seasonYear } from '../utils/rotationPresentation.ts';
 import { FindingList } from './FindingList';
 import { InformationGaps } from './InformationGaps';
 import { LocalTiming } from './LocalTiming';
+import { SoilEffects } from './SoilEffects';
+import { YieldRevenue } from './YieldRevenue';
+import './CandidateDetails.css';
 
 type CandidateDetailsProps = { advice: RotationAdvice; candidate: RotationCandidate };
 
@@ -25,11 +18,15 @@ export function CandidateDetails({ advice, candidate }: CandidateDetailsProps) {
   const language = i18n.language;
   const year = seasonYear(advice);
   const cropLabels = cropLabelMap(advice);
-  const stages = Object.entries(candidate.calendar.stages).filter(
-    (entry): entry is [string, number] => entry[1] !== null,
-  );
-  const { revenue } = candidate;
-  const cropYield = candidate.yield;
+  const planting = candidate.calendar.stages.planted;
+  const stages = Object.entries(candidate.calendar.stages)
+    .filter((entry): entry is [string, number] => entry[1] !== null)
+    .map(([stage, day]) => ({
+      stage,
+      day,
+      dateYear: planting != null && day < planting ? year + 1 : year,
+    }))
+    .sort((left, right) => left.dateYear - right.dateYear || left.day - right.day);
   const timing = advice.seasonTiming;
   const cropTiming = timing?.crops[candidate.crop];
 
@@ -47,110 +44,37 @@ export function CandidateDetails({ advice, candidate }: CandidateDetailsProps) {
         findings={candidate.advisories}
         cropLabels={cropLabels}
       />
-      <section>
-        <Typography.Title level={5}>{t('Yield and gross revenue')}</Typography.Title>
-        {cropYield ? (
-          <Descriptions
-            column={{ xs: 1, md: 2 }}
-            size="small"
-            items={yieldItems(candidate, t, language)}
-          />
-        ) : (
-          <Typography.Paragraph type="secondary">
-            {t('No yield or revenue estimate is available for this crop here.')}
-          </Typography.Paragraph>
-        )}
-        {revenue && (
-          <Typography.Text type="secondary">
-            {t('Gross revenue only: seed, fertiliser, fuel and other costs are not subtracted.')}
-          </Typography.Text>
-        )}
-      </section>
+      <YieldRevenue candidate={candidate} />
       {stages.length > 0 && (
         <section>
-          <Typography.Title level={5}>{t('Typical season')}</Typography.Title>
-          <ol className="rotation-stages">
-            {stages.map(([stage, day]) => (
+          <Flex className="rotation-season-heading" align="center" gap={6}>
+            <Typography.Title level={5}>{t('Typical season')}</Typography.Title>
+            <Tooltip
+              title={t(calendarKindLabels[candidate.calendar.kind] ?? candidate.calendar.kind)}
+              trigger={['hover', 'focus', 'click']}
+            >
+              <Button
+                type="text"
+                size="small"
+                shape="circle"
+                icon={<CircleHelp size={16} />}
+                aria-label={t('About {{label}}', { label: t('Typical season') })}
+              />
+            </Tooltip>
+          </Flex>
+          <ol className="rotation-stages" role="list">
+            {stages.map(({ stage, day, dateYear }) => (
               <li key={stage}>
                 <Typography.Text type="secondary">{t(stageLabels[stage] ?? stage)}</Typography.Text>
-                <Typography.Text strong>{formatDayOfYear(day, year, language)}</Typography.Text>
+                <Typography.Text strong>{formatDayOfYear(day, dateYear, language)}</Typography.Text>
               </li>
             ))}
           </ol>
-          <Typography.Text type="secondary">
-            {t(calendarKindLabels[candidate.calendar.kind] ?? candidate.calendar.kind)}
-          </Typography.Text>
         </section>
       )}
       {timing && cropTiming && <LocalTiming timing={timing} crop={cropTiming} year={year} />}
-      {candidate.soil.length > 0 && (
-        <section>
-          <Typography.Title level={5}>{t('Effect on the soil')}</Typography.Title>
-          <Descriptions
-            column={{ xs: 1, md: 2 }}
-            size="small"
-            items={candidate.soil.map((indicator) => ({
-              key: indicator.id,
-              label: t(soilIndicatorLabels[indicator.id] ?? indicator.id),
-              children: formatValue(indicator.value, t, language),
-            }))}
-          />
-        </section>
-      )}
+      {candidate.soil.length > 0 && <SoilEffects indicators={candidate.soil} />}
       <InformationGaps title={t('Information gaps for this crop')} gaps={candidate.dataGaps} />
     </div>
   );
-}
-
-type Translate = (key: string, options?: Record<string, unknown>) => string;
-
-function yieldItems(candidate: RotationCandidate, t: Translate, language: string) {
-  const cropYield = candidate.yield;
-  const { revenue } = candidate;
-  if (!cropYield) {
-    return [];
-  }
-  const items = [
-    {
-      key: 'yield',
-      label: t('Expected yield'),
-      children: t('{{mid}} {{unit}} (range {{low}} – {{high}})', {
-        mid: formatNumber(cropYield.mid, language),
-        low: formatNumber(cropYield.low, language),
-        high: formatNumber(cropYield.high, language),
-        unit: cropYield.unit,
-      }),
-    },
-    {
-      key: 'basis',
-      label: t('Yield based on'),
-      children:
-        cropYield.level === 'county'
-          ? t('County yield records and trend')
-          : t('State yield range, not field records'),
-    },
-  ];
-  if (revenue) {
-    items.push(
-      {
-        key: 'revenue',
-        label: t('Gross revenue for the field'),
-        children: t('{{mid}} (range {{low}} – {{high}})', {
-          mid: formatUsd(revenue.midUsd, language),
-          low: formatUsd(revenue.lowUsd, language),
-          high: formatUsd(revenue.highUsd, language),
-        }),
-      },
-      {
-        key: 'price',
-        label: t('Price used'),
-        children: t('${{price}} per {{unit}}', {
-          price: formatNumber(revenue.priceUsd, language, 2),
-          unit: revenue.priceUnit,
-        }),
-      },
-    );
-  }
-
-  return items;
 }

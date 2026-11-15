@@ -21,6 +21,13 @@ export const fieldInsightsQueries = {
       staleTime: tenMinutes,
       retry: false,
     }),
+  m2: (id: string, geometryKey: string) =>
+    queryOptions({
+      queryKey: [...fieldQueryKeys.byId(id), 'm2-insights', geometryKey],
+      queryFn: ({ signal }) => fieldInsightsApi.m2(id, signal),
+      staleTime: tenMinutes,
+      retry: false,
+    }),
   m3: (id: string, geometryKey: string) =>
     queryOptions({
       queryKey: [...fieldQueryKeys.byId(id), 'm3-insights', geometryKey],
