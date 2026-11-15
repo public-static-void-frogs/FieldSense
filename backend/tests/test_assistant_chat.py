@@ -369,6 +369,19 @@ class AssistantChatTests(unittest.TestCase):
         (response,) = [r["response"] for r in tool_responses(gemini.requests[1])]
         self.assertEqual(response["status"], "unavailable")
 
+    def test_rotation_advice_explanation_is_added_only_when_asked(self):
+        field = self.login_with_field()
+        gemini = FakeGemini(
+            call("get_rotation_advice"),
+            call("get_rotation_advice", explain=["why", "method", "sources", "luck"]),
+            text("done"),
+        )
+        self.chat(gemini, field_id=field["id"])
+        plain, explained = [r["response"] for r in tool_responses(gemini.requests[2])]
+        self.assertNotIn("explanation", plain)
+        self.assertEqual(set(explained["explanation"]), {"why", "method", "sources"})
+        self.assertEqual(explained["explanation"]["why"]["recommended"]["crop"], "a")
+
     def test_rotation_advice_tool_trims_detail_and_helps_with_a_bad_crop(self):
         field = self.login_with_field()
         gemini = FakeGemini(
