@@ -281,6 +281,10 @@ class AssistantChatTests(unittest.TestCase):
         self.login_with_field()
         self.assertEqual(self.chat(FakeGemini(500)), [])
         self.assertEqual(self.chat(FakeGemini(text("Hi", finish="SAFETY"))), [{"delta": "Hi"}])
+        self.assertEqual(
+            self.chat(FakeGemini(text("Hi", finish="MAX_TOKENS"))),
+            [{"delta": "Hi"}, {"done": True}],
+        )
 
     # ------------------------------------------------------------------ tool loop
     def test_weather_tool_round_trip(self):
