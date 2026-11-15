@@ -1,7 +1,7 @@
 import { useRef, type MouseEvent, type PointerEvent } from 'react';
 
 /** Allow Leaflet to handle gestures; toggle only when the pointer interaction was a click. */
-export function useCropIconClick(onToggle: () => void) {
+export function useCropIconClick(onToggle?: () => void) {
   const origin = useRef<{ x: number; y: number; id: number } | null>(null);
   const moved = useRef(false);
   const track = (event: PointerEvent<HTMLButtonElement>) => {
@@ -43,7 +43,7 @@ export function useCropIconClick(onToggle: () => void) {
         event.stopPropagation();
         return;
       }
-      onToggle();
+      onToggle?.();
     },
   };
 }

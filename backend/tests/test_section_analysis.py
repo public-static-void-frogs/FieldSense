@@ -211,12 +211,12 @@ class AnalysisEndpointTests(unittest.TestCase):
             "minItems", SectionAnalysisRequest.model_json_schema()["properties"]["points"]
         )
 
-    def test_analyze_endpoint_requires_authentication(self):
+    def test_analyze_endpoint_validates_guest_input(self):
         directory, app = isolated_app()
         try:
             with TestClient(app) as client:
                 response = client.post("/api/v1/maps/sections/analyze", json={})
-                self.assertEqual(response.status_code, 401)
+                self.assertEqual(response.status_code, 422)
         finally:
             directory.cleanup()
 

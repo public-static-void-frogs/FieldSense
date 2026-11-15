@@ -8,6 +8,7 @@ export const planCategories: PlanCategory[] = [
   'Crop inspection',
   'Harvest',
   'Field preparation',
+  'Weather alert',
 ];
 
 export const categoryColors: Record<PlanCategory, string> = {
@@ -18,6 +19,7 @@ export const categoryColors: Record<PlanCategory, string> = {
   'Crop inspection': '#62509a',
   Harvest: '#8b5b22',
   'Field preparation': '#536477',
+  'Weather alert': '#a3361f',
 };
 
 export const categoryBackgrounds: Record<PlanCategory, string> = {
@@ -28,4 +30,5 @@ export const categoryBackgrounds: Record<PlanCategory, string> = {
   'Crop inspection': '#ece5f7',
   Harvest: '#f4e8d3',
   'Field preparation': '#e6ecf2',
+  'Weather alert': '#fbe3de',
 };

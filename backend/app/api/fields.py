@@ -6,9 +6,9 @@ from uuid import UUID
 from fastapi import APIRouter, HTTPException, Query, Request
 
 from app.api.auth import CurrentUser
-from app.api.dependencies import FieldId, ParcelId, Store
+from app.api.dependencies import FieldId, ParcelId, Store, WriteAccess
 from app.schemas.crop_history import CropHistory, CropLayer
-from app.schemas.field_insights import M3Insights, SoilDepletion
+from app.schemas.field_insights import M2Insights, M3Insights, SoilDepletion
 from app.schemas.fields import (
     CreateField,
     Crop,
@@ -67,6 +67,7 @@ def catalog_field(field_id: FieldId, store: Store):
     "/fields",
     response_model=Field,
     status_code=201,
+    dependencies=[WriteAccess],
     responses={
         409: {"description": "Parcel ID already exists in the catalog"},
     },
@@ -76,7 +77,7 @@ def create_field(input: CreateField, store: Store):
     return store.create(input)
 
 
-@router.post("/fields/crop-areas", response_model=list[Field])
+@router.post("/fields/crop-areas", response_model=list[Field], dependencies=[WriteAccess])
 def add_crop_areas(input: SaveCropAreas, store: Store):
     """Merge selected polygons into the caller's saved crop areas."""
     from app.services.saved_crop_areas import save_crop_areas
@@ -84,7 +85,7 @@ def add_crop_areas(input: SaveCropAreas, store: Store):
     return save_crop_areas(store, input.areas)
 
 
-@router.put("/fields/{field_id}/selection", response_model=Field)
+@router.put("/fields/{field_id}/selection", response_model=Field, dependencies=[WriteAccess])
 def select_field(field_id: FieldId, store: Store):
     """Select a catalog field for the caller; repeated selections are idempotent."""
     return store.select(field_id)
@@ -105,7 +106,7 @@ def field(field_id: FieldId, store: Store):
     return store.require_field(field_id)
 
 
-@router.delete("/fields/{field_id}", response_model=UUID)
+@router.delete("/fields/{field_id}", response_model=UUID, dependencies=[WriteAccess])
 def delete_field(field_id: FieldId, store: Store):
     """Remove the caller's selection while preserving the shared catalog field."""
     return store.remove(field_id)
@@ -321,6 +322,20 @@ def compare_soil_moisture(
     return moisture_service.compare_to_history(
         weather, coordinates, moisture_service.current(weather, coordinates)
     )
+
+
+@router.get("/fields/{field_id}/m2-insights", response_model=M2Insights)
+def m2_insights(field_id: FieldId, store: Store, request: Request):
+    """Read precomputed neighbour evidence on rotation and drought for the saved field point."""
+    lon, lat = store.require_field(field_id)["geometry"]["coordinates"]
+    try:
+        return request.app.state.m2_evidence.lookup(lat, lon)
+    except ImportError as error:
+        logger.exception("M2 dependencies unavailable. Install backend/requirements.txt.")
+        raise HTTPException(503, "Neighbour evidence is temporarily unavailable") from error
+    except (OSError, ValueError, KeyError, TypeError) as error:
+        logger.exception("Could not read the M2 model output")
+        raise HTTPException(503, "Neighbour evidence is temporarily unavailable") from error
 
 
 @router.get("/fields/{field_id}/m3-insights", response_model=M3Insights)

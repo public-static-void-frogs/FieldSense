@@ -106,7 +106,7 @@ class SoilMoistureTests(unittest.TestCase):
     def test_routes_authentication_validation_and_provider_error(self):
         other = TestClient(self.client.app)
         self.addCleanup(other.close)
-        self.assertEqual(other.get(self.path).status_code, 401)
+        self.assertEqual(other.get(self.path).status_code, 404)
         self.assertEqual(self.client.get(self.path, params={"part": 1}).status_code, 422)
         params = {"start": "2025-01-01", "end": "2025-03-01", "frequency": "hourly"}
         self.assertEqual(self.client.get(self.path + "/history", params=params).status_code, 422)

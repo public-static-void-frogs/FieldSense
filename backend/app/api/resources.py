@@ -9,7 +9,7 @@ from app.api.auth import CurrentUser
 from app.api.dependencies import Store
 from app.schemas.maps import MapSummary, MapView
 from app.schemas.resources import (
-    DemoSource,
+    DataSource,
     FarmProfile,
     Notification,
     Overview,
@@ -136,7 +136,7 @@ def weather_forecast_insight(
     field_id: UUID | None = None,
 ):
     config = request.app.state.config
-    if not config.gemini_enabled or not config.gemini_api_key.strip():
+    if user.is_demo or not config.gemini_enabled or not config.gemini_api_key.strip():
         raise HTTPException(503, "Weather summaries are unavailable")
     series = weather_forecast(request, user, store, field_id)
     forecast = forecast_insight_input(series, day.isoformat(), locale)
@@ -186,9 +186,9 @@ def team(store: Store):
     return service.team()
 
 
-@router.get("/help/sources", response_model=list[DemoSource], tags=["help"])
+@router.get("/help/sources", response_model=list[DataSource], tags=["help"])
 def sources(store: Store):
-    return []
+    return service.sources()
 
 
 @router.get(

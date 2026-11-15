@@ -8,11 +8,16 @@ from app.api import assistant, auth, fields, planning, resources, section_analys
 from app.core.config import Settings
 from app.core.database import database_engine, session_factory
 from app.core.errors import ResourceConflict, ResourceNotFound
-from app.services.assistant_context import default_registry
+from app.services.assistant_tools import default_registry
+from app.services.calendar_events import CalendarEvents
 from app.services.crop_conditions import CropWeatherRuleEngine
+from app.services.drought import DroughtMonitor
 from app.services.field_insights import SoilAssessments
+from app.services.m2_lookup import M2Evidence
 from app.services.m3_lookup import M3Advice
+from app.services.nass import Nass
 from app.services.rotation_advice import InvalidAdviceRequest, RotationAdvice
+from app.services.rotation_strategy import AdviceCache, RotationStrategy
 from app.services.season_timing import SeasonTiming
 from app.services.section_analysis import SectionAnalyzer
 from app.services.weather import WeatherService
@@ -29,6 +34,9 @@ def create_app(config: Settings | None = None) -> FastAPI:
             yield
         finally:
             app.state.weather.close()
+            app.state.drought.close()
+            app.state.nass.close()
+            app.state.calendar.close()
             app.state.soil_assessments.close()
             engine.dispose()
 
@@ -36,7 +44,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
         lifespan=lifespan,
         title="Field Shift NASA API",
         version="1.0.0",
-        description="Authenticated farm API with SQL-backed accounts, shared fields, per-user field selections and live Open-Meteo weather. No demo field data is seeded.",
+        description="Authenticated farm API with SQL-backed accounts, shared fields, per-user field selections and live Open-Meteo weather. Signed-out visitors can browse the read-only demo.",
     )
     app.state.config = config
     app.state.engine = engine
@@ -45,14 +53,22 @@ def create_app(config: Settings | None = None) -> FastAPI:
     app.state.crop_model = CropWeatherRuleEngine()
     app.state.section_analyzer = SectionAnalyzer()
 
-    app.state.assistant_contexts = default_registry()
+    app.state.assistant_tools = default_registry()
     app.state.m3_advice = M3Advice(config.m3_out)
+    app.state.m2_evidence = M2Evidence(config.m2_out)
     app.state.rotation = RotationAdvice(
         config.rotation_data_root,
         config.rotation_soil_lookup,
         SeasonTiming(config.m3_out, app.state.m3_advice),
     )
     app.state.soil_assessments = SoilAssessments(config.nass_api_key)
+    app.state.drought = DroughtMonitor()
+    app.state.nass = Nass(config.nass_api_key)
+    app.state.advice = AdviceCache(app.state.rotation)
+    app.state.calendar = CalendarEvents(
+        app.state.weather, app.state.crop_model, app.state.advice, app.state.drought
+    )
+    app.state.strategy = RotationStrategy(app.state.advice, app.state.weather)
 
     @app.middleware("http")
     async def browser_security(request: Request, call_next):

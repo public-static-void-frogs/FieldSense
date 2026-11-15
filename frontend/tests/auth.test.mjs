@@ -5,7 +5,7 @@ import { authApi } from '../src/api/auth/auth.api.ts';
 import { authMutations } from '../src/api/auth/auth.mutations.ts';
 import { authQueries, authQueryKeys } from '../src/api/auth/auth.queries.ts';
 import { createQueryClient } from '../src/api/core/query-client.ts';
-import { ApiError, request } from '../src/api/core/http.ts';
+import { request } from '../src/api/core/http.ts';
 import { farmApi } from '../src/api/farm/farm.api.ts';
 import { farmQueryKeys } from '../src/api/farm/farm.queries.ts';
 import { settingsApi } from '../src/api/settings/settings.api.ts';
@@ -66,10 +66,15 @@ test('account switches and logout clear cached private data; settings remain iso
     assert.equal((await client.fetchQuery(authQueries.me())).email, credentials.email);
     await client.getMutationCache().build(client, authMutations.logout(client)).execute();
     assert.equal(client.getQueryCache().getAll().length, 0);
-    await assert.rejects(
-      authApi.me(),
-      (error) => error instanceof ApiError && error.status === 401,
-    );
+    assert.equal((await authApi.me()).isDemo, true);
+
+    await authApi.login(credentials);
+    await client.fetchQuery(authQueries.me());
+    client.setQueryData(farmQueryKeys.profile(), { farmName: 'Private farm' });
+    // End the server session without clearing this tab's QueryClient.
+    await authApi.logout();
+    assert.equal((await client.fetchQuery(authQueries.me())).isDemo, true);
+    assert.equal(client.getQueryData(farmQueryKeys.profile()), undefined);
     await authApi.login(credentials);
   } finally {
     client.clear();

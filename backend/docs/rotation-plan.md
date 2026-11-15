@@ -135,7 +135,7 @@ ponding were tested too and did not add enough to use (see `rule_engine/planner/
 - `landRentUsdPerAcre` is charged in every season. Without it no rent is charged
   (`landRentSource: not_charged`) and the result is a return to land.
 
-The three inputs live on `user_fields` (migrations `0007_farmer_inputs`, `0008_field_economics`).
+The three inputs live on `user_fields` (migrations `0008_farmer_inputs`, `0009_field_economics`).
 
 ## Which fields are covered
 

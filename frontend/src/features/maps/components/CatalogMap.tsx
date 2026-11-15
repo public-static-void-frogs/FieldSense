@@ -6,6 +6,8 @@ import 'leaflet/dist/leaflet.css';
 import { useTranslation } from 'react-i18next';
 import { useLocation, useSearchParams } from 'react-router-dom';
 import { MapContainer, ScaleControl, TileLayer } from 'react-leaflet';
+import { fieldQueries } from '../../../api/fields/fields.queries.ts';
+import type { Field } from '../../../types/fields/field.types.ts';
 import { mapQueries } from '../../../api/maps/maps.queries.ts';
 import { RouterButton } from '../../../components/common/RouterButton';
 import { satelliteTiles } from '../constants/maps.constants.ts';
@@ -17,6 +19,7 @@ import { useMapPosition } from '../hooks/useMapPosition.ts';
 import { parseMapPosition } from '../utils/catalogViewport.ts';
 import { MapSelectionControls } from './MapSelectionControls.tsx';
 import { MapSections } from './MapSections.tsx';
+import { SavedFieldAreas } from './SavedFieldAreas.tsx';
 import { SectionPanel } from './SectionPanel.tsx';
 import './FieldMap.css';
 import './CatalogMap.css';
@@ -24,10 +27,11 @@ import './CatalogMap.css';
 export function CatalogMap() {
   const { t } = useTranslation();
   const summary = useQuery(mapQueries.summary());
+  const fields = useQuery(fieldQueries.list());
   const { pathname, search } = useLocation();
   const [parameters] = useSearchParams();
   const savedView = parseMapPosition(parameters);
-  if (!summary.data) {
+  if (!summary.data || (!savedView && fields.isPending)) {
     return (
       <div className="catalog-map-start" role="status">
         {summary.isError ? (
@@ -79,7 +83,7 @@ export function CatalogMap() {
             noWrap
             crossOrigin="anonymous"
           />
-          <CatalogViewport />
+          <CatalogViewport fields={fields.data} fitSavedFieldsOnOpen={!savedView} />
           <ScaleControl position="bottomright" imperial={false} />
         </MapContainer>
       </section>
@@ -87,10 +91,14 @@ export function CatalogMap() {
   );
 }
 
-function CatalogViewport() {
-  const query = useCatalogViewport();
+type CatalogViewportProps = {
+  fields?: Field[];
+  fitSavedFieldsOnOpen: boolean;
+};
+
+function CatalogViewport({ fields, fitSavedFieldsOnOpen }: CatalogViewportProps) {
+  const { query, canSelect } = useCatalogViewport();
   const selection = useMapSections();
-  const canSelect = query.data?.mode === 'fields' && !query.isPlaceholderData && !query.isFetching;
   const { activeTool, setTool } = useMapSelectionTool({
     features: query.data?.features ?? [],
     available: canSelect,
@@ -107,7 +115,7 @@ function CatalogViewport() {
   );
   useMapPosition();
   const { t } = useTranslation();
-  useCatalogLayers(query.data, selection.selectedIds, selection.sections);
+  useCatalogLayers(query.data, selection.selectedIds, selection.sections, fields);
 
   return (
     <>
@@ -117,6 +125,7 @@ function CatalogViewport() {
         canSelect={canSelect}
         onSelectTool={setTool}
       />
+      {fields?.length ? <SavedFieldAreas fields={fields} fitOnOpen={fitSavedFieldsOnOpen} /> : null}
       <MapSections
         sections={selection.sections}
         activeId={selection.activeSection?.id}

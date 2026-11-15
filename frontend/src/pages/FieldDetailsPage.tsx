@@ -1,16 +1,16 @@
-import { useQuery, useSuspenseQueries } from '@tanstack/react-query';
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { Button, Dropdown, Modal, Result, Space } from 'antd';
-import { ArrowLeft, ListOrdered, MapPin, Pencil, Sprout, Trash2 } from 'lucide-react';
+import { ArrowLeft, ListOrdered, MapPin, Pencil, Trash2 } from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { Link, useLoaderData, useLocation, useNavigate } from 'react-router-dom';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
-import { planningQueries } from '../api/planning/planning.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
 import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
-import { CropRotationPlan } from '../features/fields/components/CropRotationPlan';
+import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
 import { FieldCropHistory } from '../features/fields/components/FieldCropHistory';
+import { FieldM2Insights } from '../features/fields/components/FieldM2Insights';
 import { FieldM3Insights } from '../features/fields/components/FieldM3Insights';
 import { FieldProperties } from '../features/fields/components/FieldProperties';
 import { FieldRecommendation } from '../features/fields/components/FieldRecommendation';
@@ -18,28 +18,26 @@ import { FieldStatus } from '../features/fields/components/FieldStatus';
 import { useFieldRemoval } from '../features/fields/hooks/useFieldRemoval.ts';
 import { FieldMap } from '../features/maps/components/FieldMap';
 import { useFieldLocation } from '../features/maps/hooks/useFieldLocation.ts';
+import { recommendationPath } from '../features/rotation/utils/rotationRoutes.ts';
+import { useDemoMode } from '../features/demo/hooks/useDemoMode.ts';
 
 const sections = {
   map: { id: 'field-location-map', label: 'Location map' },
-  rotation: { id: 'crop-rotation-plan', label: 'Rotation recommendation' },
   properties: { id: 'field-properties', label: 'Field properties' },
   recommendations: { id: 'crop-recommendations', label: 'Crop strategies for next season' },
   history: { id: 'crop-history', label: 'Crop history' },
   timing: { id: 'crop-timing-and-climate-risk', label: 'Crop timing and climate risk' },
+  evidence: { id: 'neighbour-evidence', label: 'Neighbour evidence' },
 } as const;
 
 export function FieldDetailsPage() {
   const { t } = useTranslation();
+  const demo = useDemoMode();
   const navigate = useNavigate();
   const { search } = useLocation();
   const { fieldId } = useLoaderData<FieldRouteData>();
   const [{ data: field }, { data: propertyData }] = useSuspenseQueries({
     queries: [fieldQueries.byId(fieldId), fieldQueries.properties(fieldId)],
-  });
-  const { data: plan } = useQuery({
-    ...planningQueries.rotation(fieldId),
-    enabled: Boolean(field),
-    throwOnError: true,
   });
   const geojson = useFieldLocation(fieldId);
   const { confirmRemove, setConfirmRemove, isRemovingField, handleRemove } =
@@ -51,7 +49,7 @@ export function FieldDetailsPage() {
   return (
     <>
       <PageHeading
-        title={field.crop || field.name}
+        title={demo ? field.name : field.crop || field.name}
         eyebrow=""
         titlePrefix={
           <>
@@ -67,43 +65,38 @@ export function FieldDetailsPage() {
         actions={
           <Space wrap>
             {field.status && <FieldStatus status={field.status} />}
-            {propertyData && field.crop && (
-              <RouterButton
-                type="primary"
-                icon={<Sprout size={19} />}
-                to={`/fields/${field.id}/strategy`}
-              >
-                {t('Rotation strategy')}
-              </RouterButton>
-            )}
+            <FieldAssistant key={field.id} field={field} />
             <RouterButton
+              type="primary"
               icon={<ListOrdered size={19} />}
-              to={`/fields/${field.id}/recommendation`}
+              to={recommendationPath(field.id)}
             >
               {t('Crop recommendation')}
             </RouterButton>
-            <Dropdown
-              trigger={['click']}
-              menu={{
-                items: [
-                  {
-                    key: 'map',
-                    icon: <MapPin size={16} />,
-                    label: t('Explore farm map'),
-                    onClick: () => navigate('/map'),
-                  },
-                  {
-                    key: 'remove',
-                    danger: true,
-                    icon: <Trash2 size={16} />,
-                    label: t('Remove field'),
-                    onClick: () => setConfirmRemove(true),
-                  },
-                ],
-              }}
-            >
-              <Button icon={<Pencil size={17} />}>{t('Edit')}</Button>
-            </Dropdown>
+            {!demo && (
+              <Dropdown
+                trigger={['click']}
+                menu={{
+                  items: [
+                    {
+                      key: 'map',
+                      icon: <MapPin size={16} />,
+                      label: t('Explore farm map'),
+                      onClick: () => navigate('/map'),
+                    },
+                    {
+                      key: 'remove',
+                      danger: true,
+                      icon: <Trash2 size={16} />,
+                      label: t('Remove field'),
+                      onClick: () => setConfirmRemove(true),
+                    },
+                  ],
+                }}
+              >
+                <Button icon={<Pencil size={17} />}>{t('Edit')}</Button>
+              </Dropdown>
+            )}
           </Space>
         }
       />
@@ -111,7 +104,6 @@ export function FieldDetailsPage() {
         <span className="field-detail-nav-label">{t('On this page')}</span>
         <ul>
           {Object.values(sections)
-            .filter((section) => section !== sections.rotation || plan)
             .filter((section) => section !== sections.properties || propertyData)
             .map(({ id, label }) => (
               <li key={id}>
@@ -136,11 +128,6 @@ export function FieldDetailsPage() {
         />
       </div>
       <div className="field-detail-stack">
-        {plan && (
-          <div className="field-detail-anchor" id={sections.rotation.id}>
-            <CropRotationPlan field={field} plan={plan} />
-          </div>
-        )}
         {propertyData && (
           <div className="field-detail-anchor" id={sections.properties.id}>
             <FieldProperties field={field} data={propertyData} />
@@ -154,6 +141,9 @@ export function FieldDetailsPage() {
         </div>
         <div className="field-detail-anchor" id={sections.timing.id}>
           <FieldM3Insights field={field} />
+        </div>
+        <div className="field-detail-anchor" id={sections.evidence.id}>
+          <FieldM2Insights field={field} />
         </div>
       </div>
       <Modal

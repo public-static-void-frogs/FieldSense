@@ -1,13 +1,7 @@
-import type {
-  CropOption,
-  FieldHistory,
-  FieldPropertyData,
-  FieldStrategyOption,
-} from '../../types/fields/api.types.ts';
+import type { CropOption, FieldPropertyData } from '../../types/fields/api.types.ts';
 import type { Field } from '../../types/fields/field.types.ts';
 import type { CropZone } from '../../types/maps/map.types.ts';
 import { request } from '../core/http.ts';
-import { sampleFieldStrategies } from './mocks/fieldStrategies.ts';
 
 export type CreateFieldInput = {
   parcelId?: number;
@@ -26,9 +20,6 @@ export const fieldsApi = {
   getCrops: (signal?: AbortSignal): Promise<CropOption[]> => request('/crops', { signal }),
   getProperties: (id: string, signal?: AbortSignal): Promise<FieldPropertyData | null> =>
     request(`/fields/${id}/properties`, { signal, allowMissing: true }),
-  getHistory: (id: string, signal?: AbortSignal): Promise<FieldHistory | null> =>
-    request(`/fields/${id}/history`, { signal, allowMissing: true }),
-  getStrategyOptions: (): Promise<FieldStrategyOption[]> => Promise.resolve(sampleFieldStrategies),
   create: (input: CreateFieldInput): Promise<Field> =>
     request('/fields', { method: 'POST', body: JSON.stringify(input) }),
   saveCropAreas: (areas: Pick<CropZone, 'crop' | 'geometry'>[]): Promise<Field[]> =>

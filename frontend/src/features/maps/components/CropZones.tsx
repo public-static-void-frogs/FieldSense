@@ -1,9 +1,9 @@
+import type { MultiPolygon, Polygon as GeoJsonPolygon } from 'geojson';
 import type { SVG } from 'leaflet';
 import { createPortal } from 'react-dom';
 import { useTranslation } from 'react-i18next';
 import { Marker, Polygon } from 'react-leaflet';
 import { CropIcon } from '../../../components/common/CropIcon';
-import type { CropZone } from '../../../types/maps/map.types.ts';
 import { useCropIconClick } from '../hooks/useCropIconClick.ts';
 import { useMapSvgRenderer } from '../hooks/useMapSvgRenderer.ts';
 import { useSectionMarker } from '../hooks/useSectionMarker.ts';
@@ -17,70 +17,110 @@ type CropZonesProps = {
 
 export function CropZones({ section, onToggle }: CropZonesProps) {
   const renderer = useMapSvgRenderer();
+  const { t } = useTranslation();
   const excluded = new Set(section.excludedZones ?? []);
 
-  return (section.cropZones ?? []).map((zone, index) => (
-    <CropZoneMarker
-      key={zone.id}
-      zone={zone}
-      renderer={renderer}
-      number={index + 1}
-      selected={!excluded.has(zone.id)}
-      onToggle={() => onToggle(section.id, zone.id)}
-    />
-  ));
+  return (section.cropZones ?? []).map((zone, index) => {
+    const selected = !excluded.has(zone.id);
+    const label = selected
+      ? 'Deselect {{crop}} area {{number}}'
+      : 'Select {{crop}} area {{number}}';
+
+    return (
+      <CropArea
+        key={zone.id}
+        crop={zone.crop}
+        areaHa={zone.areaHa}
+        center={zone.center}
+        boundary={zone.geometry}
+        renderer={renderer}
+        label={t(label, { crop: zone.crop, number: index + 1 })}
+        selected={selected}
+        onToggle={() => onToggle(section.id, zone.id)}
+      />
+    );
+  });
 }
 
-type CropZoneMarkerProps = {
+type CropAreaProps = {
   renderer: SVG;
-  zone: CropZone;
-  number: number;
+  crop: string;
+  areaHa: number;
+  center: number[];
+  boundary?: GeoJsonPolygon | MultiPolygon | null;
+  label?: string;
   selected: boolean;
-  onToggle: () => void;
+  onToggle?: () => void;
 };
 
-function CropZoneMarker({ renderer, zone, number, selected, onToggle }: CropZoneMarkerProps) {
-  const { t } = useTranslation();
+export function CropArea({
+  renderer,
+  crop,
+  areaHa,
+  center,
+  boundary,
+  label,
+  selected,
+  onToggle,
+}: CropAreaProps) {
+  const { t, i18n } = useTranslation();
   const { element, icon } = useSectionMarker('crop');
   const clickHandlers = useCropIconClick(onToggle);
-  const label = selected
-    ? t('Deselect {{crop}} area {{number}}', { crop: zone.crop, number })
-    : t('Select {{crop}} area {{number}}', { crop: zone.crop, number });
+  const polygons = boundary?.type === 'Polygon' ? [boundary.coordinates] : boundary?.coordinates;
+  const cropColor = detectedCropColors[crop] ?? '#80b377';
+  const iconClass = `map-crop-icon ${selected ? 'is-selected' : ''}`;
+  const area = new Intl.NumberFormat(i18n.language, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 3,
+  }).format(areaHa);
+  const details = `${crop} · ${area} ${t('ha')}`;
 
   return (
     <>
-      <Polygon
-        positions={zone.geometry.coordinates.map((ring) =>
-          ring.map(([longitude, latitude]) => [latitude, longitude] as [number, number]),
-        )}
-        pathOptions={{
-          renderer,
-          color: selected ? (detectedCropColors[zone.crop] ?? '#80b377') : '#8c9682',
-          weight: selected ? 2 : 1,
-          fillColor: detectedCropColors[zone.crop] ?? '#80b377',
-          fillOpacity: selected ? 0.18 : 0.025,
-          dashArray: selected ? undefined : '5 5',
-          className: 'map-detected-boundary map-section-interactive',
-        }}
-        eventHandlers={{ click: onToggle }}
-      />
-      <Marker
-        position={[zone.center[1], zone.center[0]]}
-        icon={icon}
-        keyboard={false}
-        interactive={false}
-      />
+      {polygons && (
+        <Polygon
+          positions={polygons.map((part) =>
+            part.map((ring) =>
+              ring.map(([longitude, latitude]) => [latitude, longitude] as [number, number]),
+            ),
+          )}
+          pathOptions={{
+            renderer,
+            interactive: Boolean(onToggle),
+            color: selected ? cropColor : '#8c9682',
+            weight: selected ? 2 : 1,
+            fillColor: cropColor,
+            fillOpacity: selected ? 0.18 : 0.025,
+            dashArray: selected ? undefined : '5 5',
+            className: 'map-detected-boundary map-section-interactive',
+          }}
+          eventHandlers={onToggle ? { click: onToggle } : undefined}
+        />
+      )}
+      <Marker position={[center[1], center[0]]} icon={icon} keyboard={false} interactive={false} />
       {createPortal(
-        <button
-          type="button"
-          className={`map-crop-icon ${selected ? 'is-selected' : ''}`}
-          aria-label={label}
-          title={label}
-          aria-pressed={selected}
-          {...clickHandlers}
-        >
-          <CropIcon crop={zone.crop} />
-        </button>,
+        onToggle ? (
+          <button
+            type="button"
+            className={iconClass}
+            aria-label={label}
+            aria-description={details}
+            title={details}
+            aria-pressed={selected}
+            {...clickHandlers}
+          >
+            <CropIcon crop={crop} />
+          </button>
+        ) : (
+          <span
+            className={`${iconClass} map-crop-icon-saved`}
+            role="img"
+            aria-label={details}
+            title={details}
+          >
+            <CropIcon crop={crop} />
+          </span>
+        ),
         element,
       )}
     </>

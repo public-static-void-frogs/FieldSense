@@ -23,3 +23,13 @@ export function insightDate(date: string | null | undefined, locale: string) {
     timeZone: 'UTC',
   }).format(calendarDate);
 }
+
+export function insightSigned(value: number | null | undefined, locale: string) {
+  if (value == null) {
+    return '—';
+  }
+  return new Intl.NumberFormat(locale, {
+    maximumFractionDigits: 3,
+    signDisplay: 'exceptZero',
+  }).format(value);
+}

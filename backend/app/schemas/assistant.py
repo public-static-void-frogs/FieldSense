@@ -1,3 +1,4 @@
+from datetime import date
 from typing import Literal
 from uuid import UUID
 
@@ -27,16 +28,22 @@ class ChatRequest(BaseModel):
     )
     field_id: UUID | None = Field(
         default=None,
-        description="Ground the answer in this field and its forecast. Omit for general questions.",
+        description="The selected field. Field-specific tools (M3 insights, soil depletion, field crop alerts) use it. Omit for general questions.",
     )
-    contexts: list[str] | None = Field(
+    calendar_date: date | None = Field(
+        default=None,
+        description="The day selected on the calendar page. The session block tells the model, which reads that day's events with get_calendar_events.",
+    )
+    weather_date: date | None = Field(
+        default=None,
+        description="The forecast day open on the weather page. The session block tells the model, which reads that day with get_weather_forecast.",
+    )
+    tools: list[str] | None = Field(
         default=None,
         max_length=20,
-        description="Names of context providers to include (e.g. field, weather_forecast, or registered ML models). Omit to include all.",
+        description="Names of tools the assistant may call (see GET /assistant/tools). Omit to allow all; send [] to disable tools.",
     )
-    locale: str = Field(
-        default="en", max_length=64, pattern=r"^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$"
-    )
+    locale: str = Field(default="en", max_length=64, pattern=r"^[A-Za-z]{2,8}(-[A-Za-z0-9]{1,8})*$")
 
     @field_validator("messages")
     @classmethod

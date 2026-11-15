@@ -1,9 +1,12 @@
 import { circleMarker, layerGroup, polygon, polyline, svg } from 'leaflet';
-import { useEffect, useState } from 'react';
-import { useMapEvents } from 'react-leaflet';
+import { useEffect, useEffectEvent, useState } from 'react';
+import { useMap } from 'react-leaflet';
 import type { CatalogFeature } from '../../../types/maps/map.types.ts';
 import { getLassoFieldIds, isValidLasso, type ScreenPoint } from '../utils/lassoSelection.ts';
 import type { SectionCoordinate } from '../utils/sectionSelection.ts';
+
+const controlSelector =
+  '.map-selection-controls, .leaflet-control, .map-section-add, .map-section-panel';
 
 export type MapSelectionTool = 'move' | 'lasso' | 'points';
 
@@ -21,11 +24,9 @@ export function useMapSelectionTool({
   onToggle,
 }: UseMapSelectionToolOptions) {
   const [tool, setTool] = useState<MapSelectionTool>('move');
-  const map = useMapEvents({
-    movestart: () => setTool('move'),
-    resize: () => setTool('move'),
-  });
+  const map = useMap();
   const activeTool = available ? tool : 'move';
+  const getFeatures = useEffectEvent(() => features);
   useEffect(() => {
     if (activeTool === 'move') {
       return;
@@ -63,14 +64,13 @@ export function useMapSelectionTool({
     const vertices = layerGroup().addTo(map);
     let points: ScreenPoint[] = [];
     let anchors: ScreenPoint[] = [];
+    let gestureFeatures: CatalogFeature[] = [];
     let pointerId: number | null = null;
     let frame = 0;
     const toPoint = (event: PointerEvent): ScreenPoint => {
-      const rect = container.getBoundingClientRect();
-      return [
-        Math.max(0, Math.min(rect.width, event.clientX - rect.left)),
-        Math.max(0, Math.min(rect.height, event.clientY - rect.top)),
-      ];
+      const point = map.mouseEventToContainerPoint(event);
+      const size = map.getSize();
+      return [Math.max(0, Math.min(size.x, point.x)), Math.max(0, Math.min(size.y, point.y))];
     };
     const isNearFirstPoint = ([x, y]: ScreenPoint) => {
       const first = anchors[0];
@@ -94,13 +94,14 @@ export function useMapSelectionTool({
     const reset = () => {
       resetPointer();
       anchors = [];
+      gestureFeatures = [];
       clearClosingCursor();
       vertices.clearLayers();
       outline.setLatLngs([]);
     };
     const finish = (shape: ScreenPoint[]) => {
       const ids = new Set(
-        getLassoFieldIds(features, shape, (longitude, latitude) => {
+        getLassoFieldIds(gestureFeatures, shape, (longitude, latitude) => {
           const point = map.latLngToContainerPoint([latitude, longitude]);
           return [point.x, point.y];
         }),
@@ -111,7 +112,7 @@ export function useMapSelectionTool({
       });
       onComplete(
         coordinates,
-        features.filter(
+        gestureFeatures.filter(
           (feature) => feature.properties.kind === 'field' && ids.has(String(feature.id)),
         ),
       );
@@ -139,26 +140,24 @@ export function useMapSelectionTool({
         !event.isPrimary ||
         event.button !== 0 ||
         pointerId !== null ||
-        (event.target instanceof Element &&
-          event.target.closest(
-            '.map-selection-controls, .leaflet-control, .map-section-interactive',
-          ))
+        (event.target instanceof Element && event.target.closest(controlSelector))
       ) {
         return;
       }
       stop(event);
       pointerId = event.pointerId;
       points = [toPoint(event)];
+      if (!anchors.length) {
+        // A background catalog refresh must not change the points in an in-progress selection.
+        gestureFeatures = getFeatures();
+      }
       container.setPointerCapture(pointerId);
       container.focus({ preventScroll: true });
     };
     const move = (event: PointerEvent) => {
       if (activeTool === 'points' && event.isPrimary) {
         const overControl =
-          event.target instanceof Element &&
-          event.target.closest(
-            '.map-selection-controls, .leaflet-control, .map-section-interactive',
-          );
+          event.target instanceof Element && event.target.closest(controlSelector);
         container.classList.toggle(
           'map-points-close',
           !overControl && isNearFirstPoint(toPoint(event)) && isValidLasso(anchors),
@@ -215,7 +214,7 @@ export function useMapSelectionTool({
       if (isClick) {
         let nearest: CatalogFeature | undefined;
         let nearestDistance = 9;
-        for (const feature of features) {
+        for (const feature of gestureFeatures) {
           if (feature.properties.kind !== 'field' || feature.id === undefined) {
             continue;
           }
@@ -236,16 +235,15 @@ export function useMapSelectionTool({
       }
       reset();
     };
-    const cancel = (event?: Event) => {
-      if (event?.type === 'lostpointercapture' && pointerId === null) {
-        return;
+    const cancelPointer = (event: PointerEvent) => {
+      if (pointerId === event.pointerId) {
+        reset();
       }
-      reset();
     };
     const keydown = (event: KeyboardEvent) => {
       if (event.key === 'Escape') {
         stop(event);
-        cancel();
+        reset();
         setTool('move');
       } else if (activeTool === 'points' && event.target === container && pointerId === null) {
         if (event.key === 'Enter' && isValidLasso(anchors)) {
@@ -260,10 +258,7 @@ export function useMapSelectionTool({
       }
     };
     const click = (event: MouseEvent) => {
-      if (!(
-        event.target instanceof Element &&
-        event.target.closest('.map-selection-controls, .leaflet-control, .map-section-interactive')
-      )) {
+      if (!(event.target instanceof Element && event.target.closest(controlSelector))) {
         stop(event);
       }
     };
@@ -271,11 +266,11 @@ export function useMapSelectionTool({
     container.addEventListener('pointermove', move, true);
     container.addEventListener('pointerleave', clearClosingCursor);
     container.addEventListener('pointerup', up, true);
-    container.addEventListener('pointercancel', cancel, true);
-    container.addEventListener('lostpointercapture', cancel, true);
+    container.addEventListener('pointercancel', cancelPointer, true);
+    container.addEventListener('lostpointercapture', cancelPointer, true);
     container.addEventListener('click', click, true);
     container.addEventListener('keydown', keydown, true);
-    window.addEventListener('blur', cancel);
+    window.addEventListener('blur', reset);
     map.on('movestart resize', reset);
     return () => {
       reset();
@@ -283,11 +278,11 @@ export function useMapSelectionTool({
       container.removeEventListener('pointermove', move, true);
       container.removeEventListener('pointerleave', clearClosingCursor);
       container.removeEventListener('pointerup', up, true);
-      container.removeEventListener('pointercancel', cancel, true);
-      container.removeEventListener('lostpointercapture', cancel, true);
+      container.removeEventListener('pointercancel', cancelPointer, true);
+      container.removeEventListener('lostpointercapture', cancelPointer, true);
       container.removeEventListener('click', click, true);
       container.removeEventListener('keydown', keydown, true);
-      window.removeEventListener('blur', cancel);
+      window.removeEventListener('blur', reset);
       map.off('movestart resize', reset);
       vertices.remove();
       outline.remove();
@@ -296,7 +291,7 @@ export function useMapSelectionTool({
       container.classList.remove('map-lasso-active');
       enabledHandlers.forEach((handler) => handler.enable());
     };
-  }, [map, activeTool, features, onComplete, onToggle]);
+  }, [map, activeTool, onComplete, onToggle]);
 
   return { activeTool, setTool };
 }

@@ -12,7 +12,8 @@ from app.core.security import (
     passwords,
     set_session_cookie,
 )
-from app.repositories.users import User, UserRepository, UserSettings
+from app.demo.farm import account as demo_account
+from app.repositories.users import DEMO_USER_ID, User, UserRepository, UserSettings
 from app.schemas.auth import AccountInput, LoginInput, PublicUser, RegisterInput, SettingsInput
 
 router = APIRouter(tags=["account"])
@@ -30,23 +31,39 @@ Database = Annotated[Session, Depends(database_session)]
 def current_user(
     request: Request, database: Database, token: Annotated[str | None, Depends(cookie_auth)]
 ):
+    if not token:
+        return demo_account()
+
     try:
         claims = jwt.decode(
-            token or "",
+            token,
             request.app.state.config.jwt_secret,
             algorithms=["HS256"],
             issuer=request.app.state.config.jwt_issuer,
             options={"require": ["sub", "exp", "iat", "iss", "ver", "jti"]},
         )
-        user = UserRepository(database).by_id(claims["sub"])
+        user = (
+            demo_account()
+            if claims["sub"] == DEMO_USER_ID
+            else UserRepository(database).by_id(claims["sub"])
+        )
         if user is None or claims["ver"] != user.auth_version:
             raise ValueError("Invalid session")
         return user
-    except (jwt.InvalidTokenError, ValueError, TypeError) as error:
-        raise HTTPException(status_code=401, detail="Authentication required") from error
+    except (jwt.InvalidTokenError, ValueError, TypeError):
+        return demo_account()
 
 
 CurrentUser = Annotated[User, Depends(current_user)]
+
+
+def writable_user(user: CurrentUser):
+    if user.is_demo:
+        raise HTTPException(status_code=403, detail="The demo farm is read-only")
+    return user
+
+
+WritableUser = Annotated[User, Depends(writable_user)]
 
 
 def commit_account(database: Session):
@@ -59,7 +76,9 @@ def commit_account(database: Session):
         ) from error
 
 
-@router.post("/auth/register", response_model=PublicUser, status_code=201)
+@router.post(
+    "/auth/register", response_model=PublicUser, response_model_exclude_none=True, status_code=201
+)
 def register(payload: RegisterInput, request: Request, response: Response, database: Database):
     user = User(
         email=payload.email,
@@ -79,7 +98,7 @@ def register(payload: RegisterInput, request: Request, response: Response, datab
     return user
 
 
-@router.post("/auth/login", response_model=PublicUser)
+@router.post("/auth/login", response_model=PublicUser, response_model_exclude_none=True)
 def login(payload: LoginInput, request: Request, response: Response, database: Database):
     user = UserRepository(database).by_email(payload.email)
     if user is None or not passwords.verify(payload.password, user.password_hash):
@@ -90,22 +109,23 @@ def login(payload: LoginInput, request: Request, response: Response, database: D
 
 @router.post("/auth/logout")
 def logout(request: Request, response: Response, user: CurrentUser, database: Database):
-    # Revoke all existing JWTs for this account, including copied cookies.
-    database.execute(
-        update(User).where(User.id == user.id).values(auth_version=User.auth_version + 1)
-    )
-    database.commit()
+    if not user.is_demo:
+        # Revoke all existing JWTs for a registered account, including copied cookies.
+        database.execute(
+            update(User).where(User.id == user.id).values(auth_version=User.auth_version + 1)
+        )
+        database.commit()
     clear_session_cookie(response, request.app.state.config)
     return {"message": "Logged out"}
 
 
-@router.get("/auth/me", response_model=PublicUser)
+@router.get("/auth/me", response_model=PublicUser, response_model_exclude_none=True)
 def me(user: CurrentUser):
     return user
 
 
-@router.put("/auth/me", response_model=PublicUser)
-def update_account(payload: AccountInput, user: CurrentUser, database: Database):
+@router.put("/auth/me", response_model=PublicUser, response_model_exclude_none=True)
+def update_account(payload: AccountInput, user: WritableUser, database: Database):
     user.full_name = payload.full_name
     user.email = payload.email
     commit_account(database)
@@ -126,7 +146,7 @@ def update_settings(
     payload: SettingsInput,
     request: Request,
     response: Response,
-    user: CurrentUser,
+    user: WritableUser,
     database: Database,
 ):
     for key, value in payload.model_dump().items():

@@ -4,14 +4,14 @@ import { isGuid } from '../../../utils/ids.ts';
 import { isPlanDate } from '../utils/planningDates.ts';
 import { calendarPath } from '../utils/planningRoutes.ts';
 
-export function useCalendarRoute(today: string) {
+export function useCalendarRoute(today: string, defaultDate = today) {
   const { date } = useParams<'date'>();
   const [search] = useSearchParams();
   const navigate = useNavigate();
   const rawFieldId = search.get('field');
   const fieldId = isGuid(rawFieldId) ? rawFieldId.toLowerCase() : undefined;
   const eventId = search.get('event') || undefined;
-  const selectedDate = isPlanDate(date) ? date! : today;
+  const selectedDate = isPlanDate(date) ? date! : defaultDate;
   function changeDate(value: string) {
     navigate(calendarPath(value, fieldId), { preventScrollReset: true });
   }

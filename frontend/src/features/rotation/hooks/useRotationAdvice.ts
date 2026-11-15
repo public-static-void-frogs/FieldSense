@@ -41,6 +41,7 @@ export function useRotationAdvice(fieldId: string) {
     isUpdating: query.isFetching && query.isPlaceholderData,
     error: query.error,
     retry: query.refetch,
+    selectedCrop: crop,
     priorities,
     setCrop,
     setSeasons,

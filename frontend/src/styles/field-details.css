@@ -57,19 +57,16 @@
   min-width: 0;
 }
 
-.field-properties-section,
-.land-history-section {
+.field-properties-section {
   min-width: 0;
 }
 
-.field-properties-section > h3.ant-typography,
-.land-history-section h3.ant-typography {
+.field-properties-section > h3.ant-typography {
   margin-top: 8px;
   margin-bottom: 12px;
 }
 
-.field-properties-section > .ant-typography-secondary,
-.land-history-section > .ant-typography-secondary {
+.field-properties-section > .ant-typography-secondary {
   margin-bottom: 24px;
 }
 
@@ -87,78 +84,10 @@
   margin-top: 22px;
 }
 
-.land-history-card .ant-tabs-nav {
-  margin-bottom: 24px;
-}
-
-.land-history-filters {
-  margin-bottom: 20px;
-}
-
-.land-history-filters .ant-input-affix-wrapper {
-  width: 300px;
-}
-
-.land-history-filters .ant-select {
-  min-width: 180px;
-}
-
-.land-history-scroll {
-  max-height: 680px;
-  padding: 20px 20px 0 8px;
-  border-top: 1px solid #e2e8d7;
-  overflow-y: auto;
-  scrollbar-color: #899f70 #f0f4e8;
-  scrollbar-width: auto;
-  overscroll-behavior-y: contain;
-  scroll-padding-top: 20px;
-}
-
-.land-history-scroll .ant-timeline {
-  width: 100%;
-}
-
-.land-history-event {
-  padding-bottom: 22px;
-}
-
-.land-history-event h5.ant-typography {
-  margin: 0;
-  font-size: 18px;
-  line-height: 1.6;
-}
-
-.land-history-event .ant-typography p,
-.land-history-event > .ant-typography {
-  margin: 12px 0;
-  max-width: 920px;
-}
-
-.land-history-date.ant-typography {
-  display: block;
-  margin-bottom: 9px;
-  color: #58664d;
-  font-size: 14px;
-}
-
-.land-history-card .ant-tag {
-  white-space: normal;
-}
-
 @media (max-width: 700px) {
   .field-properties-section .ant-descriptions-item-label,
   .field-properties-section .ant-descriptions-item-content {
     padding: 14px !important;
-  }
-
-  .land-history-filters .ant-input-affix-wrapper,
-  .land-history-filters .ant-select {
-    width: 100%;
-  }
-
-  .land-history-scroll {
-    max-height: 620px;
-    padding-inline: 0 10px;
   }
 }
 

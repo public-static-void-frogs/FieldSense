@@ -2,7 +2,7 @@ from alembic import context
 
 from app.core.config import Settings
 from app.core.database import Base, database_engine
-from app.repositories import fields, maps, users  # noqa: F401
+from app.repositories import fields, maps, planning, users  # noqa: F401
 
 target_metadata = Base.metadata
 

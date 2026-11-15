@@ -61,6 +61,7 @@ class LoginInput(ApiModel):
 
 
 class PublicUser(ApiModel):
+    is_demo: Literal[True] | None = None
     id: str
     full_name: str
     email: str

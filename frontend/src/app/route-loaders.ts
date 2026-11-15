@@ -23,15 +23,6 @@ export function recommendationCropLoader(args: LoaderFunctionArgs): Recommendati
   return { ...fieldLoader(args), cropId };
 }
 
-export type StrategyOptionRouteData = FieldRouteData & { strategyId: string };
-
-export function strategyOptionLoader(args: LoaderFunctionArgs): StrategyOptionRouteData {
-  const { strategyId } = args.params;
-  if (!strategyId) {
-    throw new Response(null, { status: 404 });
-  }
-  return { ...fieldLoader(args), strategyId };
-}
 export function calendarLoader({ params }: LoaderFunctionArgs) {
   if (params.date && !isPlanDate(params.date)) {
     throw new Response(null, { status: 404 });

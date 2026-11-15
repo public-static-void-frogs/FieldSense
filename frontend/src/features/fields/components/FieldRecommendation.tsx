@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
-import { Button, Card, Flex, Popover, Skeleton, Tag, Typography } from 'antd';
+import { Button, Card, Flex, Popover, Skeleton, Tag, theme, Typography } from 'antd';
 import { ArrowRight, Award, CircleAlert, CircleCheck, Medal, Trophy } from 'lucide-react';
-import { useId } from 'react';
+import { type CSSProperties, useId } from 'react';
 import { useTranslation } from 'react-i18next';
 import { rotationQueries } from '../../../api/rotation/rotation.queries.ts';
 import { CropIcon } from '../../../components/common/CropIcon';
@@ -24,6 +24,7 @@ type FieldRecommendationProps = { fieldId: string };
 
 export function FieldRecommendation({ fieldId }: FieldRecommendationProps) {
   const { t } = useTranslation();
+  const { token } = theme.useToken();
   const {
     data: advice,
     isPending,
@@ -35,10 +36,17 @@ export function FieldRecommendation({ fieldId }: FieldRecommendationProps) {
   });
   const titleId = useId();
   const candidates = advice ? rankedCandidates(advice) : [];
-  const remaining = candidates.length - previewLimit;
+  const preview = candidates.slice(0, previewLimit);
+  const [first, second, third] = preview;
+  const previewCandidates = first?.rank === 1 && second && third ? [second, first, third] : preview;
+  const remaining = candidates.length - previewCandidates.length;
 
   return (
-    <section className="field-strategies" aria-labelledby={titleId}>
+    <section
+      className="field-strategies"
+      aria-labelledby={titleId}
+      style={{ '--field-strategy-primary': token.colorPrimary } as CSSProperties}
+    >
       <Typography.Title level={3} id={titleId}>
         {t('Crop strategies for next season')}
       </Typography.Title>
@@ -53,9 +61,9 @@ export function FieldRecommendation({ fieldId }: FieldRecommendationProps) {
           {isError && <Button onClick={() => void refetch()}>{t('Try again')}</Button>}
         </Flex>
       )}
-      {candidates.length > 0 && (
-        <div className="field-strategies-grid">
-          {candidates.slice(0, previewLimit).map((candidate) => (
+      {previewCandidates.length > 0 && (
+        <div className="field-strategies-grid" data-count={previewCandidates.length}>
+          {previewCandidates.map((candidate) => (
             <CropStrategyCard key={candidate.crop} candidate={candidate} fieldId={fieldId} />
           ))}
         </div>
@@ -84,7 +92,7 @@ function CropStrategyCard({ candidate, fieldId }: CropStrategyCardProps) {
   const RankIcon = rankIcons[candidate.rank - 1] ?? Medal;
 
   return (
-    <Card className="field-strategy-card">
+    <Card className="field-strategy-card" data-rank={candidate.rank}>
       <div className="field-strategy-banner">
         <span className="field-strategy-icon">
           <CropIcon crop={candidate.label} size={38} />

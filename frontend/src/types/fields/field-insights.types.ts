@@ -137,3 +137,92 @@ export type M3Insights = {
   warnings: string[];
   error: { code: 'outside_coverage' | 'bad_input'; nearest_cell_km: number | null } | null;
 };
+
+export type M2Crop = 'corn' | 'soybeans';
+export type M2Treatment = 'T1' | 'T2' | 'T3' | 'T4' | 'T5';
+
+export type M2Checks = {
+  gamma_placebo_p: number | null;
+  neg_control_pass: boolean | null;
+  balance_pass: boolean | null;
+  few_clusters: boolean | null;
+  max_smd_after: number | null;
+};
+
+export type M2EvidenceTier = 'full' | 'limited' | 'one season type' | 'pooled' | 'descriptive';
+
+export type M2Outcome = {
+  outcome_label: string | null;
+  gamma: number | null;
+  gamma_lo: number | null;
+  gamma_hi: number | null;
+  theta_normal: number | null;
+  theta_drought: number | null;
+  verdict: string | null;
+  evidence_tier: M2EvidenceTier | null;
+  confidence: string | null;
+  tier_note: string | null;
+  headline_basis: string | null;
+  headline_effect: number | null;
+  headline_lo: number | null;
+  headline_hi: number | null;
+  outcome_sees_drought: boolean | null;
+  squares: number | null;
+  checks: M2Checks;
+};
+
+export type M2Region = {
+  treated: string;
+  control: string;
+  expected_sign: -1 | 1;
+  abstain: boolean;
+  abstain_reason: string | null;
+  verdict: string;
+  evidence_tier: M2EvidenceTier | null;
+  confidence: string | null;
+  headline: (M2Outcome & { outcome: string }) | null;
+  outcomes: Record<string, M2Outcome>;
+};
+
+export type M2FieldEffect = {
+  usable: boolean;
+  status: string;
+  n_comparable_treated: number | null;
+  n_comparable_control: number | null;
+  effect?: number | null;
+  lo95?: number | null;
+  hi95?: number | null;
+  effect_agrees?: boolean;
+  indicative?: { effect: number | null; lo95: number | null; hi95: number | null };
+};
+
+export type M2NeighbourEffect = {
+  n_fields: number;
+  n_usable: number;
+  radius_km: number;
+  note?: string;
+  median?: number | null;
+  p10?: number | null;
+  p90?: number | null;
+  share_expected_sign?: number | null;
+};
+
+type M2ByCrop<T> = Partial<Record<M2Crop, Partial<Record<M2Treatment, Record<string, T>>>>>;
+
+export type M2Insights = {
+  ok: boolean;
+  evidence_label: string | null;
+  match: {
+    level: 'field' | 'neighbourhood' | 'region';
+    csbid: string | null;
+    distance_km: number | null;
+    n_neighbour_fields: number | null;
+    radius_km?: number;
+  } | null;
+  region: Partial<Record<M2Crop, Partial<Record<M2Treatment, M2Region>>>> | null;
+  field: M2ByCrop<M2FieldEffect> | null;
+  neighbourhood: M2ByCrop<M2NeighbourEffect> | null;
+  summary: string[];
+  warnings: string[];
+  error: { code: 'outside_coverage' | 'bad_input'; nearest_field_km: number | null } | null;
+};

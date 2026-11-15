@@ -5,7 +5,7 @@ import { useTranslation } from 'react-i18next';
 const { Title, Paragraph, Text } = Typography;
 
 type PageHeadingProps = {
-  title: string;
+  title: ReactNode;
   description?: string;
   titlePrefix?: ReactNode;
   eyebrow?: string;

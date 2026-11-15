@@ -5,16 +5,16 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
+import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
-import { AdviceControls } from '../features/rotation/components/AdviceControls';
-import { AdviceVerdict } from '../features/rotation/components/AdviceVerdict';
-import { CandidateList } from '../features/rotation/components/CandidateList';
+import { FieldAssistant } from '../features/assistant/components/FieldAssistant';
 import { CropHistoryStrip } from '../features/rotation/components/CropHistoryStrip';
 import { InformationGaps } from '../features/rotation/components/InformationGaps';
 import { OffSeasonCard } from '../features/rotation/components/OffSeasonCard';
-import { PlanOverview } from '../features/rotation/components/PlanOverview';
 import { EconomicsCard } from '../features/rotation/components/EconomicsCard';
+import { PlanOverview } from '../features/rotation/components/PlanOverview';
+import { RecommendationCalculator } from '../features/rotation/components/RecommendationCalculator';
 import { SeasonResultsCard } from '../features/rotation/components/SeasonResultsCard';
 import { SoilSurveyCard } from '../features/rotation/components/SoilSurveyCard';
 import { useRotationAdvice } from '../features/rotation/hooks/useRotationAdvice.ts';
@@ -32,25 +32,14 @@ export function FieldRecommendationPage() {
     isUpdating,
     error,
     retry,
+    selectedCrop,
     priorities,
     setCrop,
     setSeasons,
     togglePriority,
   } = useRotationAdvice(fieldId);
   const plan = advice ? pricedPlan(advice) : null;
-  let description: string | undefined;
-  if (advice && plan) {
-    description = t(
-      'What to grow over the next {{seasons}} seasons, with what past years say could happen. The best plan comes first.',
-      { seasons: plan.seasons },
-    );
-  } else if (advice) {
-    description = t(
-      'Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.',
-      { year: seasonYear(advice) },
-    );
-  }
-  if (!field || advice === null) {
+  if (!field) {
     return (
       <Result
         status="404"
@@ -68,64 +57,93 @@ export function FieldRecommendationPage() {
   return (
     <div className="rotation-page">
       <PageHeading
-        title={t('Crop recommendation')}
-        eyebrow={field.crop || field.name}
-        description={description}
+        title={
+          <>
+            {field.crop && (
+              <>
+                {field.crop} <span aria-hidden="true">·</span>{' '}
+              </>
+            )}
+            {t('Crop recommendation')}
+          </>
+        }
+        eyebrow=""
+        actions={<FieldAssistant key={field.id} field={field} />}
         titlePrefix={
-          <RouterButton
-            type="text"
-            icon={<ArrowLeft size={20} />}
-            aria-label={t('Back to field')}
-            to={`/fields/${field.id}`}
-          />
+          <>
+            <RouterButton
+              type="text"
+              icon={<ArrowLeft size={20} />}
+              aria-label={t('Back to field')}
+              to={`/fields/${field.id}`}
+            />
+            {field.crop && <CropIcon crop={field.crop} size={36} />}
+          </>
         }
       />
-      {isLoading && (
-        <Card>
-          <Skeleton active paragraph={{ rows: 6 }} />
-        </Card>
-      )}
-      {error && !advice && (
-        <Result
-          status="warning"
-          title={t('The recommendation could not be loaded')}
-          extra={<Button onClick={() => retry()}>{t('Try again')}</Button>}
-        />
-      )}
-      {advice && (
-        <div className="rotation-stack" aria-busy={isUpdating}>
-          <AdviceControls
-            advice={advice}
-            priorities={priorities}
-            onCropChange={setCrop}
-            onSeasonsChange={setSeasons}
-            onPriorityToggle={togglePriority}
+      <div className="rotation-stack">
+        {isLoading && (
+          <Card>
+            <Skeleton active paragraph={{ rows: 6 }} />
+          </Card>
+        )}
+        {!advice && (error || advice === null) && (
+          <Result
+            status="warning"
+            title={t('The recommendation could not be loaded')}
+            extra={<Button onClick={() => retry()}>{t('Try again')}</Button>}
           />
-          {plan ? (
-            <PlanOverview advice={advice} plan={plan} />
-          ) : (
-            <>
-              <AdviceVerdict advice={advice} />
-              <CandidateList advice={advice} />
-            </>
-          )}
-          <div className="rotation-inputs">
-            <SeasonResultsCard advice={advice} />
-            <SoilSurveyCard advice={advice} />
-            <EconomicsCard advice={advice} />
-          </div>
-          <CropHistoryStrip advice={advice} />
-          <OffSeasonCard advice={advice} />
-          {advice.dataGaps.length > 0 && (
-            <Card>
-              <InformationGaps
-                title={t('What we do not know about this field')}
-                gaps={advice.dataGaps}
-              />
+        )}
+        {advice && (
+          <>
+            <Card className="rotation-explainer">
+              <h2>{t('How it works')}</h2>
+              <p>
+                {t(
+                  'Compare crops for the {{year}} season using this field’s available crop history, soil data, and past weather. Choose the crop you plan to grow to see how it ranks, then select any goals you want the ranking to give more weight.',
+                  { year: seasonYear(advice) },
+                )}
+              </p>
+              <p>
+                {plan
+                  ? t(
+                      'How plans are ranked: expected result per acre, less a charge for each rotation risk, plus the value of soil carbon gained.',
+                    )
+                  : t(
+                      'Crops with lower scores rank higher. The leaderboard shows each crop’s risk level and estimated gross revenue where available. Open View details to see what contributed to the recommendation.',
+                    )}
+              </p>
             </Card>
-          )}
-        </div>
-      )}
+            <RecommendationCalculator
+              advice={advice}
+              selectedCrop={selectedCrop}
+              priorities={priorities}
+              isUpdating={isUpdating}
+              onCropChange={setCrop}
+              onSeasonsChange={setSeasons}
+              onPriorityToggle={togglePriority}
+            />
+            <div className="rotation-stack" aria-busy={isUpdating}>
+              {plan && <PlanOverview advice={advice} plan={plan} />}
+              <div className="rotation-inputs">
+                <SeasonResultsCard advice={advice} />
+                <SoilSurveyCard advice={advice} />
+                <EconomicsCard advice={advice} />
+              </div>
+              <CropHistoryStrip advice={advice} />
+              <OffSeasonCard advice={advice} />
+              {advice.dataGaps.length > 0 && (
+                <Card>
+                  <InformationGaps
+                    title={t('What we do not know about this field')}
+                    gaps={advice.dataGaps}
+                  />
+                </Card>
+              )}
+            </div>
+          </>
+        )}
+      </div>
     </div>
   );
 }
