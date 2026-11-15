@@ -62,7 +62,7 @@ export const rotationApi = {
   }: {
     fieldId: string;
     inputs: RotationEconomicsInputs;
-  }): Promise<RotationEconomics> =>
+  }): Promise<RotationEconomicsInputs> =>
     request(`/fields/${fieldId}/economics`, { method: 'PUT', body: JSON.stringify(inputs) }),
   removeEconomics: (fieldId: string): Promise<void> =>
     request(`/fields/${fieldId}/economics`, { method: 'DELETE' }, async () => undefined),

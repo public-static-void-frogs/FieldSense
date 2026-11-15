@@ -1,4 +1,5 @@
 import { mutationOptions, type QueryClient } from '@tanstack/react-query';
+import type { RotationEconomics } from '../../types/rotation/rotation.types.ts';
 import { rotationApi } from './rotation.api.ts';
 import { rotationQueryKeys } from './rotation.queries.ts';
 
@@ -42,7 +43,10 @@ export const rotationMutations = {
       mutationKey: ['rotation', 'economics', fieldId],
       mutationFn: rotationApi.saveEconomics,
       onSuccess: (saved) => {
-        client.setQueryData(rotationQueryKeys.economics(fieldId), saved);
+        client.setQueryData<RotationEconomics>(
+          rotationQueryKeys.economics(fieldId),
+          (current) => current && { ...current, inputs: saved },
+        );
 
         return refresh(client, fieldId);
       },
