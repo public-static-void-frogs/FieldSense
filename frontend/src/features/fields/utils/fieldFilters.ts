@@ -1,7 +1,5 @@
 import type { Field } from '../../../types/fields/field.types.ts';
 
-import type { LandEvent } from '../../../types/fields/history.types.ts';
-
 export type FieldFilters = {
   overview: boolean;
   query: string;
@@ -48,19 +46,4 @@ export function filterFields(fields: Field[], options: FieldFilters) {
     }
     return true;
   });
-}
-export function filterLandHistory(
-  events: LandEvent[],
-  category: string,
-  year: string,
-  query: string,
-) {
-  return events.filter(
-    (event) =>
-      (category === 'All activities' || event.category === category) &&
-      (year === 'All years' || event.date.startsWith(year)) &&
-      `${event.title} ${event.description} ${event.measurements?.join(' ')}`
-        .toLowerCase()
-        .includes(query.toLowerCase()),
-  );
 }

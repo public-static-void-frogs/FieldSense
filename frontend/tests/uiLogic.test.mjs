@@ -2,7 +2,7 @@ import assert from 'node:assert/strict';
 import { readdir, readFile } from 'node:fs/promises';
 import test from 'node:test';
 import ts from 'typescript';
-import { filterFields, filterLandHistory } from '../src/features/fields/utils/fieldFilters.ts';
+import { filterFields } from '../src/features/fields/utils/fieldFilters.ts';
 import { getNitrogenAssessment } from '../src/features/fields/utils/fieldPresentation.ts';
 import { parcelStyle } from '../src/features/maps/utils/mapStyles.ts';
 import {
@@ -95,33 +95,6 @@ test('overview searches names and uses its single crop selector', () => {
   assert.deepEqual(filterFields(fields, { ...filters, overview: true, query: 'Soybeans' }), []);
   assert.deepEqual(ids(filterFields(fields, { ...filters, overview: true, query: 'meadow' })), [
     fields[0].id,
-  ]);
-});
-
-test('land history combines category, year and measurement search without reordering events', () => {
-  const events = [
-    {
-      id: 'a',
-      date: '2026-05-23',
-      category: 'Soil conditions',
-      title: 'Sample',
-      description: 'Topsoil',
-      measurements: ['Nitrogen 19 mg/kg'],
-    },
-    {
-      id: 'b',
-      date: '2025-05-23',
-      category: 'Soil conditions',
-      title: 'Sample',
-      description: 'Topsoil',
-    },
-    { id: 'c', date: '2026-04-23', category: 'Field work', title: 'Planted', description: 'Corn' },
-  ];
-  assert.deepEqual(ids(filterLandHistory(events, 'Soil conditions', '2026', 'NITROGEN')), ['a']);
-  assert.deepEqual(ids(filterLandHistory(events, 'All activities', 'All years', '')), [
-    'a',
-    'b',
-    'c',
   ]);
 });
 

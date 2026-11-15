@@ -1,4 +1,3 @@
-import type { CropSeason, LandEvent } from './history.types.ts';
 import type { FieldProperties } from './properties.types.ts';
 
 export interface CropOption {
@@ -12,8 +11,4 @@ export interface FieldPropertyData {
   lastSample: string | null;
   cultivationPractice: string | null;
   tenure: string | null;
-}
-export interface FieldHistory {
-  events: LandEvent[];
-  seasons: CropSeason[];
 }

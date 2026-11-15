@@ -21,7 +21,6 @@ export function useDemoPreload(enabled: boolean) {
     if (enabled && field) {
       void client.prefetchQuery(fieldQueries.byId(field.id));
       void client.prefetchQuery(fieldQueries.properties(field.id));
-      void client.prefetchQuery(fieldQueries.history(field.id));
       void client.prefetchQuery(planningQueries.strategy(field.id));
       void client.prefetchQuery(rotationQueries.advice({ fieldId: field.id, priorities: [] }));
     }
