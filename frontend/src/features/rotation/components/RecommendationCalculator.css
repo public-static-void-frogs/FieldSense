@@ -1,0 +1,128 @@
+.rotation-calculator {
+  display: grid;
+  gap: 16px;
+  min-width: 0;
+}
+
+.rotation-calculator-step.ant-card > .ant-card-body {
+  padding: clamp(16px, 3vw, 24px);
+}
+
+.rotation-calculator-title.ant-typography {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 16px;
+  font-size: clamp(19px, 2.4vw, 25px);
+}
+
+.rotation-step-number {
+  display: grid;
+  flex: none;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  border-radius: 9px;
+  background: #476b3c;
+  color: #fff;
+  font-size: 16px;
+}
+
+.rotation-option-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 132px), 1fr));
+  gap: 10px;
+  min-inline-size: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+
+.rotation-option {
+  position: relative;
+  display: grid;
+  min-height: 102px;
+  grid-template-rows: 40px auto;
+  align-content: start;
+  justify-items: center;
+  align-items: center;
+  gap: 6px;
+  padding: 16px 10px;
+  border: 1px solid #dfe5d5;
+  border-radius: 10px;
+  background: #f8faf4;
+  color: #303b2c;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.rotation-option > input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.rotation-option:hover {
+  border-color: #9cb58a;
+}
+
+.rotation-option:has(input:checked) {
+  border-color: #476b3c;
+  background: #edf4e6;
+  box-shadow: inset 0 0 0 1px #476b3c;
+}
+
+.rotation-option:has(input:focus-visible) {
+  outline: 2px solid #476b3c;
+  outline-offset: 3px;
+}
+
+.rotation-goal-icon {
+  color: #476b3c;
+}
+
+.rotation-option-check {
+  position: absolute;
+  inset-block-start: 8px;
+  inset-inline-end: 8px;
+  display: none;
+  color: #476b3c;
+  pointer-events: none;
+}
+
+.rotation-option:has(input:checked) .rotation-option-check {
+  display: block;
+}
+
+.rotation-calculator-note.ant-typography {
+  display: block;
+  margin-top: 12px;
+  font-size: 14px;
+}
+
+.rotation-verdict.ant-alert {
+  margin-top: 12px;
+  padding: 8px 12px;
+}
+
+.rotation-verdict.ant-alert .ant-alert-icon {
+  margin-block-start: 2px;
+  font-size: 18px;
+}
+
+.rotation-verdict.ant-alert .ant-alert-title {
+  margin-bottom: 2px;
+  font-size: 14px;
+}
+
+.rotation-verdict.ant-alert .ant-alert-description {
+  font-size: 13px;
+}

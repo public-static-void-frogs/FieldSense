@@ -10,62 +10,30 @@
   transition: opacity 0.15s ease;
 }
 
-.rotation-control {
-  display: flex;
-  flex: 1 1 280px;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
+.rotation-explainer.ant-card > .ant-card-body {
+  padding: clamp(16px, 3vw, 24px);
 }
 
-.rotation-crop-select {
-  width: 100%;
-  max-width: 340px;
+.rotation-explainer h2 {
+  margin: 0 0 8px;
+  font-size: clamp(19px, 2.4vw, 25px);
+  font-weight: 600;
 }
 
-.rotation-priority.ant-tag {
+.rotation-explainer p {
   margin: 0;
-  padding: 4px 12px;
-  border: 1px solid #cfd8c3;
-  border-radius: 16px;
-  font-size: 14px;
-}
-
-.rotation-scoring-note.ant-typography {
-  margin: 20px 0 0;
   color: #58664d;
 }
 
-.rotation-history-years {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.rotation-history-year {
-  display: flex;
-  flex-direction: column;
-  min-width: 108px;
-  padding: 10px 14px;
-  border: 1px solid #dfe5d5;
-  border-radius: 8px;
-  background: #f8faf4;
-}
-
-.rotation-history-note.ant-typography {
-  margin: 16px 0 0;
-}
-
-.rotation-estimate-tag.ant-tag {
-  display: inline-flex;
-  gap: 6px;
-  align-items: center;
-  margin: 0;
+.rotation-explainer p + p {
+  margin-top: 8px;
 }
 
 .rotation-candidates {
+  container: rotation-leaderboard / inline-size;
   margin: 0;
   padding: 0;
+  overflow: hidden;
   list-style: none;
   border: 1px solid #dfe5d5;
   border-radius: 12px;
@@ -73,11 +41,14 @@
 }
 
 .rotation-candidate-row {
-  position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 12px 16px;
+  gap: clamp(8px, 2vw, 14px);
+  padding: 12px clamp(8px, 2vw, 16px);
+  padding-inline-start: calc(clamp(8px, 2vw, 16px) + 8px - var(--rotation-rank-width, 0px));
+  border-inline-start: var(--rotation-rank-width, 0px) solid
+    var(--rotation-rank-accent, transparent);
+  background: color-mix(in srgb, var(--rotation-rank-accent, white) 11%, white);
 }
 
 .rotation-candidate-row + .rotation-candidate-row {
@@ -85,23 +56,31 @@
 }
 
 .rotation-candidate-summary {
+  display: flex;
   flex: 1;
+  align-items: center;
+  gap: clamp(8px, 2vw, 14px);
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
-.rotation-candidate-row > .ant-btn {
-  position: static;
+.rotation-candidate-summary > .crop-icon {
   flex: none;
 }
 
-.rotation-candidate-row > .ant-btn::after {
-  position: absolute;
-  inset: 0;
-  content: '';
+.rotation-candidate-row[data-rank='1'] {
+  --rotation-rank-width: 8px;
+  --rotation-rank-accent: #476b3c;
 }
 
-.rotation-candidate-row:hover {
-  background: #f8faf4;
+.rotation-candidate-row[data-rank='2'] {
+  --rotation-rank-width: 5px;
+  --rotation-rank-accent: color-mix(in srgb, #476b3c 74%, white);
+}
+
+.rotation-candidate-row[data-rank='3'] {
+  --rotation-rank-width: 3px;
+  --rotation-rank-accent: color-mix(in srgb, #476b3c 54%, white);
 }
 
 .rotation-rank {
@@ -111,91 +90,102 @@
   justify-content: center;
   width: 30px;
   height: 30px;
+  border: 1px solid #627653;
   border-radius: 50%;
-  background: #476b3c;
-  color: #fff;
+  background: #fff;
+  color: #315327;
   font-weight: 600;
+}
+
+.rotation-candidate-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px 18px;
+}
+
+.rotation-candidate-revenue {
+  display: grid;
+  color: #303b2c;
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.rotation-candidate-revenue strong {
+  font-size: clamp(18px, 2.5vw, 23px);
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.rotation-candidate-actions .ant-btn {
+  flex: none;
+  margin-inline-start: auto;
+}
+
+@container rotation-leaderboard (max-width: 550px) {
+  .rotation-candidate-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .rotation-candidate-actions {
+    flex-wrap: wrap;
+  }
 }
 
 .rotation-candidate-name.ant-typography {
   font-size: 17px;
 }
 
-.rotation-candidate-summary .ant-tag {
+.rotation-candidate-summary .rotation-candidate-badge.ant-tag {
   margin: 0;
+  padding-inline: 8px;
+  border-color: currentColor;
+  border-radius: 999px;
+  background: var(--rotation-badge-fill, #f4f5f4);
+  color: var(--rotation-badge-ink, #454d47);
+  font-weight: 600;
+  white-space: normal;
 }
 
-.rotation-candidate-revenue.ant-typography {
-  margin-left: auto;
-  color: #303b2c;
+.rotation-candidate-badge[data-tone='intended'] {
+  --rotation-badge-fill: #f1f7ed;
+  --rotation-badge-ink: #315327;
 }
 
-.rotation-candidate-details {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.rotation-candidate-badge[data-tone='low'] {
+  --rotation-badge-fill: #fff8df;
+  --rotation-badge-ink: #654a10;
 }
 
-.rotation-candidate-details h5.ant-typography {
-  margin: 0 0 8px;
+.rotation-candidate-badge[data-tone='medium'] {
+  --rotation-badge-fill: #fff0e5;
+  --rotation-badge-ink: #7e3c17;
 }
 
-.rotation-findings ul,
+.rotation-candidate-badge[data-tone='high'] {
+  --rotation-badge-fill: #fdf0ee;
+  --rotation-badge-ink: #882d32;
+}
+
+.rotation-strategy-title-crop .crop-icon {
+  display: inline-block;
+  margin-inline-end: 6px;
+  vertical-align: middle;
+}
+
+.rotation-strategy-page .page-heading .ant-typography-secondary {
+  color: #315327;
+  font-size: 19px;
+  font-weight: 600;
+}
+
 .rotation-gaps ul {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-}
-
-.rotation-gaps ul {
   gap: 4px;
-  padding-left: 18px;
-  list-style: disc;
-}
-
-.rotation-finding {
-  padding: 10px 14px;
-  border-left: 4px solid #cfd8c3;
-  border-radius: 4px;
-  background: #f8faf4;
-}
-
-.rotation-finding-risk {
-  border-left-color: #d4763b;
-}
-
-.rotation-finding-benefit {
-  border-left-color: #476b3c;
-}
-
-.rotation-finding .ant-tag {
   margin: 0;
-}
-
-.rotation-finding-reason.ant-typography {
-  margin: 6px 0 4px;
-}
-
-.rotation-finding-evidence {
-  display: block;
-  font-size: 13px;
-}
-
-.rotation-stages {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px 24px;
-  margin: 0 0 8px;
-  padding: 0;
-  list-style: none;
-}
-
-.rotation-stages li {
-  display: flex;
-  flex-direction: column;
+  padding: 0 0 0 18px;
+  list-style: disc;
 }
 
 .rotation-off-season {

@@ -5,15 +5,13 @@ import { useTranslation } from 'react-i18next';
 import { useLoaderData } from 'react-router-dom';
 import { fieldQueries } from '../api/fields/fields.queries.ts';
 import type { FieldRouteData } from '../app/route-loaders.ts';
+import { CropIcon } from '../components/common/CropIcon';
 import { PageHeading } from '../components/common/PageHeading';
 import { RouterButton } from '../components/common/RouterButton';
-import { FieldStrategySection } from '../features/planning/components/FieldStrategySection';
-import { AdviceControls } from '../features/rotation/components/AdviceControls';
-import { AdviceVerdict } from '../features/rotation/components/AdviceVerdict';
-import { CandidateList } from '../features/rotation/components/CandidateList';
 import { CropHistoryStrip } from '../features/rotation/components/CropHistoryStrip';
 import { InformationGaps } from '../features/rotation/components/InformationGaps';
 import { OffSeasonCard } from '../features/rotation/components/OffSeasonCard';
+import { RecommendationCalculator } from '../features/rotation/components/RecommendationCalculator';
 import { useRotationAdvice } from '../features/rotation/hooks/useRotationAdvice.ts';
 import { seasonYear } from '../features/rotation/utils/rotationPresentation.ts';
 import '../styles/rotation.css';
@@ -22,8 +20,17 @@ export function FieldRecommendationPage() {
   const { t } = useTranslation();
   const { fieldId } = useLoaderData<FieldRouteData>();
   const { data: field } = useSuspenseQuery(fieldQueries.byId(fieldId));
-  const { advice, isLoading, isUpdating, error, retry, priorities, setCrop, togglePriority } =
-    useRotationAdvice(fieldId);
+  const {
+    advice,
+    isLoading,
+    isUpdating,
+    error,
+    retry,
+    selectedCrop,
+    priorities,
+    setCrop,
+    togglePriority,
+  } = useRotationAdvice(fieldId);
   if (!field) {
     return (
       <Result
@@ -42,23 +49,27 @@ export function FieldRecommendationPage() {
   return (
     <div className="rotation-page">
       <PageHeading
-        title={t('Crop recommendation')}
-        eyebrow={field.crop || field.name}
-        description={
-          advice
-            ? t(
-                'Candidate crops for the {{year}} season, ranked by rotation risk on this field. The lowest risk comes first.',
-                { year: seasonYear(advice) },
-              )
-            : undefined
+        title={
+          <>
+            {field.crop && (
+              <>
+                {field.crop} <span aria-hidden="true">·</span>{' '}
+              </>
+            )}
+            {t('Crop recommendation')}
+          </>
         }
+        eyebrow=""
         titlePrefix={
-          <RouterButton
-            type="text"
-            icon={<ArrowLeft size={20} />}
-            aria-label={t('Back to field')}
-            to={`/fields/${field.id}`}
-          />
+          <>
+            <RouterButton
+              type="text"
+              icon={<ArrowLeft size={20} />}
+              aria-label={t('Back to field')}
+              to={`/fields/${field.id}`}
+            />
+            {field.crop && <CropIcon crop={field.crop} size={36} />}
+          </>
         }
       />
       <div className="rotation-stack">
@@ -75,28 +86,43 @@ export function FieldRecommendationPage() {
           />
         )}
         {advice && (
-          <div className="rotation-stack" aria-busy={isUpdating}>
-            <AdviceControls
+          <>
+            <Card className="rotation-explainer">
+              <h2>{t('How it works')}</h2>
+              <p>
+                {t(
+                  'Compare crops for the {{year}} season using this field’s available crop history, soil data, and past weather. Choose the crop you plan to grow to see how it ranks, then select any goals you want the ranking to give more weight.',
+                  { year: seasonYear(advice) },
+                )}
+              </p>
+              <p>
+                {t(
+                  'Crops with lower scores rank higher. The leaderboard shows each crop’s risk level and estimated gross revenue where available. Open View details to see what contributed to the recommendation.',
+                )}
+              </p>
+            </Card>
+            <RecommendationCalculator
               advice={advice}
+              selectedCrop={selectedCrop}
               priorities={priorities}
+              isUpdating={isUpdating}
               onCropChange={setCrop}
               onPriorityToggle={togglePriority}
             />
-            <AdviceVerdict advice={advice} />
-            <CropHistoryStrip advice={advice} />
-            <CandidateList advice={advice} />
-            <OffSeasonCard advice={advice} />
-            {advice.dataGaps.length > 0 && (
-              <Card>
-                <InformationGaps
-                  title={t('What we do not know about this field')}
-                  gaps={advice.dataGaps}
-                />
-              </Card>
-            )}
-          </div>
+            <div className="rotation-stack" aria-busy={isUpdating}>
+              <CropHistoryStrip advice={advice} />
+              <OffSeasonCard advice={advice} />
+              {advice.dataGaps.length > 0 && (
+                <Card>
+                  <InformationGaps
+                    title={t('What we do not know about this field')}
+                    gaps={advice.dataGaps}
+                  />
+                </Card>
+              )}
+            </div>
+          </>
         )}
-        <FieldStrategySection field={field} />
       </div>
     </div>
   );

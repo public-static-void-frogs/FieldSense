@@ -29,7 +29,6 @@ import {
 } from 'recharts';
 import { planningQueries } from '../../../api/planning/planning.queries.ts';
 import { RouterButton } from '../../../components/common/RouterButton';
-import type { Field } from '../../../types/fields/field.types.ts';
 import type {
   EventResponses,
   FieldStrategy,
@@ -50,15 +49,15 @@ const tooltipStyle = {
 };
 const axis = { fill: '#707d65', fontSize: 12 };
 
-type FieldStrategySectionProps = { field: Field };
+type FieldStrategySectionProps = { fieldId: string; cropLabel: string };
 
-export function FieldStrategySection({ field }: FieldStrategySectionProps) {
+export function FieldStrategySection({ fieldId, cropLabel }: FieldStrategySectionProps) {
   const { t } = useTranslation();
   const [strategy, responses] = useQueries({
-    queries: [planningQueries.strategy(field.id), planningQueries.responses()],
+    queries: [planningQueries.strategy(fieldId), planningQueries.responses()],
   });
 
-  if (strategy.data === null) {
+  if (strategy.data === null || (strategy.data && strategy.data.plan.nextCrop !== cropLabel)) {
     return null;
   }
   if (strategy.isError || responses.isError) {
@@ -82,18 +81,15 @@ export function FieldStrategySection({ field }: FieldStrategySectionProps) {
     );
   }
 
-  return (
-    <StrategySections field={field} strategy={strategy.data} eventResponses={responses.data} />
-  );
+  return <StrategySections strategy={strategy.data} eventResponses={responses.data} />;
 }
 
 type StrategySectionsProps = {
-  field: Field;
   strategy: FieldStrategy;
   eventResponses: EventResponses;
 };
 
-function StrategySections({ field, strategy, eventResponses }: StrategySectionsProps) {
+function StrategySections({ strategy, eventResponses }: StrategySectionsProps) {
   const { t } = useTranslation();
   const { animate, reviewEvents } = useStrategyReview();
   const forecastMetrics = [
@@ -123,7 +119,7 @@ function StrategySections({ field, strategy, eventResponses }: StrategySectionsP
           </Typography.Title>
           <Typography.Text type="secondary">
             {t('{{value0}} → {{value1}} → {{value2}} · {{value3}} outlook', {
-              value0: field.crop,
+              value0: plan.currentCrop,
               value1: plan.nextCrop,
               value2: plan.followingCrop,
               value3: `${plan.sowingDate.slice(0, 4)}–${plan.followingDate.slice(0, 4)}`,
@@ -134,7 +130,7 @@ function StrategySections({ field, strategy, eventResponses }: StrategySectionsP
           <Button onClick={reviewEvents}>{t('Review proposed events')}</Button>
           <RouterButton
             icon={<CalendarDays size={18} />}
-            to={calendarPath(plan.sowingDate, field.id)}
+            to={calendarPath(plan.sowingDate, plan.fieldId)}
           >
             {t('Open field calendar')}
           </RouterButton>
@@ -353,7 +349,7 @@ function StrategySections({ field, strategy, eventResponses }: StrategySectionsP
         className="strategy-proposals strategy-table-card"
         extra={
           <Suspense fallback={null}>
-            <EventResponseControls fieldId={field.id} />
+            <EventResponseControls fieldId={plan.fieldId} />
           </Suspense>
         }
       >
