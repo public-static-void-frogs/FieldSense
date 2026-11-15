@@ -5,7 +5,7 @@ This README summarises the backend services in `backend/app/services/`: what eac
 which data it reads. For setup see `backend/README.md`; for the chat assistant see
 `backend/docs/assistant.md`.
 
-## AI agent tools
+## SI agent tools
 
 The chat assistant does not get field data in its prompt. It calls these tools when it needs data
 (`assistant_tools.py`; see `backend/docs/assistant.md`):
@@ -31,7 +31,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Weather and soil moisture
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `weather.py` | Weather adapter with a bounded in-memory cache and request de-duplication. Serves current conditions, the daily forecast and historical daily weather. No demo fallback: provider failure is an error. | **Open-Meteo** forecast and archive APIs, for the field point or the account's saved location. | Yes: `get_weather_forecast` |
 | `soil_moisture.py` | Modelled soil moisture at a parcel's analysis point: current value, history over a date range, and a comparison with the same time of year in past years. | **Open-Meteo** hourly soil-moisture layers (forecast and archive) and **NASA POWER** daily wetness (`GWETTOP`, `GWETROOT`, `GWETPROF`). Reuses the `weather.py` fetcher and cache. | Yes: `get_soil_moisture` |
@@ -40,7 +40,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Crop history and soil
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `crop_history.py` | Annual crop class (2008-2025) at a field point, and rendered crop-map layers for the map. | **USDA Cropland Data Layer** image service (`pdi.scinet.usda.gov`). | Indirect: `get_soil_depletion` uses its point and history lookups |
 | `cdl_classes.py` | Lookup table from CDL class codes to crop names. | Static table, no retrieval. | No |
@@ -49,7 +49,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Climate timing and rotation advice
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `m3_lookup.py` | Reader for the precomputed **M3** model output. Matches a point to the nearest indexed field (within 1 km) or weather cell (within 45 km) and returns sowing/harvest/frost date windows, heat and frost risk, delayed-sowing scan, and Fallow-Zero cover-crop water estimates. Runs no models and calls no external service. | Local parquet/CSV/JSON files in the M3 output folder (`M3_OUT`, default `data/m3_out`): field index, cell windows and risks, 2040 risks, delay scan, Fallow-Zero units and calibration, NASS validation. | Yes: `get_m3_insights` |
 | `m2_lookup.py` | Reader for the precomputed **M2** neighbour-evidence output. Matches a point to the nearest analysed field (within 1 km), or to the analysed fields nearby (radius widened 30 → 60 → 120 km until 20 are inside, at least 5), or falls back to the study-wide result. Thin data is labelled with an evidence tier and confidence instead of being dropped. Returns how rotation practices (continuous cropping, diverse rotation, small grain/hay, winter cover, host-crop return interval) changed drought resilience against neighbours under the same weather, with intervals, validation checks and a verdict. An adjusted association, not a guaranteed effect. Runs no models and calls no external service. | Local CSV/parquet files in the M2 output folder (`M2_OUT`, default `data/m2_out`), written by `ml/field-prediction-model/neighbour-evidence-engine/m2_neighbour_evidence.py`: `effects.csv` (required), `field_effects.parquet`, `outcome_diagnostics.csv`, `county_check_<crop>.csv`. Served by `GET /fields/{id}/m2-insights`. | Yes: `get_neighbour_evidence` |
@@ -58,7 +58,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Map sections and ML
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `section_analysis.py` | Analyses a section of the map: SAM2 segments fields on the submitted map image and a trained TempCNN classifies each field's crop. Fields without enough clear observations are reported as skipped. | The submitted map PNG and point prompts; **Sentinel-2** time series through `ml/greenness.py`; local model weights (`ml/` folder, `SAM2_CHECKPOINT`, `TEMPCNN_CHECKPOINT`). | No |
 | `ml/greenness.py` | Builds 16-observation Sentinel-2 sequences per point for the crop classifier, skipping cloudy pixels. | **Sentinel-2 L2A** scenes via the Earth Search STAC API (AWS). | Indirect: `get_soil_depletion` uses its Sentinel-2 reader |
@@ -67,7 +67,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### Stored data (database)
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `maps.py` | Viewport queries for the field map: indexed point lookups when zoomed in, pre-aggregated clusters when zoomed out, at most 600 features per response. Rebuilds the cluster cells. | Database tables `field_map_cells` and `map_datasets`, plus the account's selected fields. | No |
 | `saved_crop_areas.py` | Saves one merged boundary per account and crop from analysed map zones. | Writes to the database (fields and the user's selections); computes area from the submitted polygons. | No |
@@ -83,7 +83,7 @@ and year-by-year history, and the database-backed services (`maps.py`, `saved_cr
 
 ### LLM assistant
 
-| Script | What it does | Data it retrieves | AI tool |
+| Script | What it does | Data it retrieves | SI tool |
 | --- | --- | --- | --- |
 | `llm.py` | Streaming client for **Google Gemini**. `stream_gemini` serves the weather outlook; `gemini_round` serves chat, with tool calls. | Model text from the Gemini API (`GEMINI_API_KEY`, `GEMINI_ENABLED`). | Infrastructure: model client for chat |
 | `assistant.py` | Chat orchestration: loads the system prompt from `app/prompts/assistant.txt`, runs the model, executes the tools it asks for (up to 4 rounds), and streams the answer. | None itself; it calls the tools below. | Infrastructure: runs the tool loop |

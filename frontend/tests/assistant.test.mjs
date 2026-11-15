@@ -246,7 +246,7 @@ test('an empty conversation offers suggestions and the disclaimer', async () => 
   for (const question of assistantSuggestions) {
     assert.ok(html.includes(question), question);
   }
-  assert.match(html, /AI answers can be wrong/);
+  assert.match(html, /SI answers can be wrong/);
   assert.doesNotMatch(html, /role="log"/);
   assert.match(await render({}, 'uk'), /Чи є цього тижня ризик заморозків\?/);
 });

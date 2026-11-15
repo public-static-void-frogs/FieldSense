@@ -13,6 +13,7 @@ import {
   CalendarDayPanel,
   type CalendarDayTab,
 } from '../features/planning/components/CalendarDayPanel';
+import { useResizableDrawer } from '../hooks/useResizableDrawer.ts';
 import { CalendarDrawerContent } from '../features/planning/components/CalendarDrawerContent.tsx';
 import { SystemCalendar } from '../features/planning/components/SystemCalendar';
 import { calendarAssistantPlaceholder } from '../features/planning/constants/calendarAssistant.constants.ts';
@@ -37,6 +38,7 @@ export function CalendarPage() {
   const route = useCalendarRoute(planningToday);
   const filters = useCalendarFilters(getCalendarEvents(allEvents, eventResponses), route.fieldId);
   const drawer = useCalendarDrawer(route.eventId, route);
+  const drawerSize = useResizableDrawer('calendar-drawer-width');
   const view = useCalendarView();
   const selectedEvents = filters.visible.filter((event) => event.date === route.selectedDate);
   const selectedEvent = allEvents.find((event) => event.id === route.eventId);
@@ -167,7 +169,8 @@ export function CalendarPage() {
         placement="right"
         open={drawer.isOpen}
         onClose={drawer.close}
-        styles={{ wrapper: { width: 'min(480px, 100vw)' } }}
+        {...drawerSize}
+        styles={{ wrapper: { maxWidth: '100vw' } }}
         footer={
           selectedEvent ? (
             <Flex gap={8}>
