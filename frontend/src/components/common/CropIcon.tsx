@@ -20,6 +20,17 @@ const cropIcons = [
   { code: 176, label: 'Grassland/Pasture', image: 'pasture.svg' },
 ] as const;
 
+const rotationCropCodes: Record<string, number> = {
+  corngrain: 1,
+  sorghumgrain: 4,
+  ryegrain: 27,
+  otherhaynonalfalfa: 37,
+  fallow: 61,
+  falloworidlecropland: 61,
+  grasshayorpasture: 62,
+  grasslandorpasture: 176,
+};
+
 function normalizeCropLabel(label: string) {
   return label.toLowerCase().replace(/[^a-z0-9]/g, '');
 }
@@ -31,8 +42,9 @@ type CropIconProps = {
 
 export function CropIcon({ crop, size = 24 }: CropIconProps) {
   const cropKey = typeof crop === 'string' ? normalizeCropLabel(crop) : crop;
+  const matchedCode = typeof cropKey === 'string' ? rotationCropCodes[cropKey] : cropKey;
   const icon = cropIcons.find(({ code, label }) =>
-    typeof cropKey === 'number' ? code === cropKey : normalizeCropLabel(label) === cropKey,
+    typeof matchedCode === 'number' ? code === matchedCode : normalizeCropLabel(label) === cropKey,
   );
 
   return (
