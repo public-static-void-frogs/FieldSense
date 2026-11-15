@@ -21,6 +21,9 @@ TRIGGER_KEYS = (
     "worstYear",
     "worstValue",
     "levelCapped",
+    "levelBasis",
+    "lossWhenHit",
+    "expectedLoss",
     "record",
 )
 COMPARED_FINDINGS = 4
@@ -39,8 +42,12 @@ METHOD_STEPS = (
     "family returning too soon), the county and the field's soil or declared practices hold.",
     "Weather rules are evaluated season by season over the long weather record at the field's "
     "location: in how many past seasons the threshold (for example heat at flowering) was "
-    "crossed in the crop's sensitive window. The share of seasons sets the level, low, medium or "
-    "high, and a hazard seen in fewer than 1 season in 10 is not reported.",
+    "crossed in the crop's sensitive window. A hazard seen in fewer than 1 season in 10 is not "
+    "reported. The level is the yield the hazard is expected to cost per season: the share of "
+    "seasons hit times the loss in a season it hits, measured in county yields of that crop "
+    "(8 % or more is high, 3 % or more is medium). Where that loss is not measured, the share of "
+    "seasons alone sets the level and it stops at medium. A hazard rule is skipped where most "
+    "of the crop in the county is irrigated.",
     "Each firing rule is a risk, a benefit or an advisory. A risk adds points by level, a "
     "benefit subtracts points, and an advisory adds nothing. Findings in a category the user "
     "prioritised count double.",

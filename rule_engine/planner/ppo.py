@@ -339,18 +339,22 @@ class LearnedPolicy:
 
     def __init__(self, net: PolicyNet, device: str = "cpu"):
         self.net, self.device = net.to(device).eval(), device
+        self.crops: tuple[str, ...] | None = CROPS  # the crop order it was trained with
 
     def save(self, path) -> None:
         inputs = self.net.body[0].in_features
         hidden = self.net.body[0].out_features
-        torch.save({"state": self.net.state_dict(), "inputs": inputs, "hidden": hidden}, path)
+        saved = {"state": self.net.state_dict(), "inputs": inputs, "hidden": hidden}
+        torch.save(saved | {"crops": list(CROPS)}, path)  # the crop order the network reads
 
     @classmethod
     def load(cls, path, device: str = "cpu") -> "LearnedPolicy":
         saved = torch.load(path, map_location=device, weights_only=True)
         net = PolicyNet(saved["inputs"], saved["hidden"])
         net.load_state_dict(saved["state"])
-        return cls(net, device)
+        policy = cls(net, device)
+        policy.crops = tuple(saved["crops"]) if "crops" in saved else None
+        return policy
 
     def act_for(self, model: RotationModel):
         """state -> Action, for a field the network may never have seen."""

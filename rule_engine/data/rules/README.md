@@ -15,7 +15,8 @@ still has an `explanation` key is rejected at load time.
   title: Corn rootworm pressure         # short name shown to the farmer
   category: pest_disease               # pest_disease | soil_nutrient | erosion | water |
                                        # temperature | diversity | yield | market | weed
-  applies_to: {crops: [corn]}          # any of: crops: [...], groups: [...], traits: ["n_fixer=true"]
+  applies_to: {crops: [corn]}          # any of: crops: [...], groups: [...], traits: ["n_fixer=true"];
+                                       # except_crops: [...] removes crops from the match
   when:                                # all conditions must hold (AND); missing fact = false
     - {fact: history.consecutive_same_crop, op: ge, value: 1}
   effect: {kind: risk, level: high}    # kind: risk | benefit | advisory
@@ -40,8 +41,17 @@ Timed hazards replace `when` with a `hazard` block evaluated per past season on 
     threshold: 1
   effect:
     kind: risk
-    level_bands: {high: 0.5, medium: 0.25, low: 0.0}   # share of seasons hit → level
+    level_bands: {high: 0.5, medium: 0.25, low: 0.0}   # share of seasons hit → level, used
+                                       # only where no yield loss is measured (then never
+                                       # above medium); see "Hazard levels" in ../../README.md
+  unless:                              # optional, hazard rules only: the rule is skipped when
+    - {fact: county.irrigated_share, op: ge, value: 0.5}   # all of these hold. A missing fact
+                                       # never skips it; is_null / not_null are not allowed.
 ```
+
+A hazard rule takes `unless`, not `when`. Where a row of `../hazard_yield_loss.csv` exists for
+the rule and the candidate crop, the level is the expected yield loss per season (share of
+seasons hit x that loss), not the share alone.
 
 Facts available to `when` (prefix list is validated at load time):
 
@@ -53,6 +63,8 @@ Facts available to `when` (prefix list is validated at load time):
   `history.years_since_same_family` (null if never grown), `history.years_since_same_crop` (1: grown last season; null if never grown), `history.distinct_groups_5y`,
   `history.share_same_crop_5y`, `history.corn_soy_alternation_years`,
   `history.shared_hosts_prev1` (hosts in common between the candidate and last year's crop).
+- `county.irrigated_share`: the candidate crop's irrigated share of harvested acres in the
+  county (Census of Agriculture 2022); missing where the Census withholds it.
 - `county.rma_drought_share_lag1`, `county.rma_excess_moisture_share_lag1`,
   `county.rma_heat_share_lag1`, `county.rma_freeze_share_lag1`, `county.rma_hail_share_lag1`.
 - `field.has_history`, `field.has_seasons`.

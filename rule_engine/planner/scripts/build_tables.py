@@ -3,7 +3,11 @@
     python rule_engine/planner/scripts/build_tables.py \
         --fields data/local/usa_sample/fields.jsonl \
         --summaries data/local/usa_sample/season_summary data/local/planner/season_summary \
+        --climate data/local/usa_sample/climate_record \
         --out data/local/planner/tables --workers 14
+
+With `--climate` (the long weather record, see scripts/build_climate_record.py) a field's
+drawable years are the ones the backend plans with; a policy to serve needs it.
 
 Fields are processed in a fixed random order and written in shards of `--shard` fields
 (`tables_0000.pkl`, ...), so a partial run is still a random sample. Fields where fewer than two
@@ -27,6 +31,7 @@ from rule_engine.planner import (  # noqa: E402
     build_context,
     read_fields,
     state_reference_aws,
+    with_climate,
 )
 from rule_engine.planner.tabular import tabulate  # noqa: E402
 
@@ -42,6 +47,7 @@ def work(field_id: str):
             SHARED["summaries"],
             SHARED["reference"].get(record.get("stateFips")),
         )
+        context, _ = with_climate(context, SHARED["advisor"])
         model = RotationModel(context, SHARED["advisor"], horizon=SHARED["horizon"])
         if len(model.crops) < 2:
             return field_id, "fewer_than_two_crops", None
@@ -54,6 +60,7 @@ def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
     parser.add_argument("--fields", required=True)
     parser.add_argument("--summaries", nargs="+", required=True)
+    parser.add_argument("--climate", help="folder of the long weather record")
     parser.add_argument("--out", required=True)
     parser.add_argument("--workers", type=int, default=8)
     parser.add_argument("--horizon", type=int, default=5)
@@ -66,7 +73,7 @@ def main() -> None:
     fields = read_fields(args.fields)
     SHARED.update(
         fields=fields,
-        advisor=build_advisor(),
+        advisor=build_advisor(climate_root=args.climate),
         summaries=args.summaries,
         reference=state_reference_aws(fields),
         horizon=args.horizon,

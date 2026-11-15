@@ -64,10 +64,23 @@ WEEKLY = {
     "obs_days": ("gridmet_tmax_c", "count", "INTEGER"),
 }
 
+COUNT_SOURCE = {  # day count -> the daily column it counts in
+    "tmax_ge35_days": "gridmet_tmax_c",
+    "tmax_ge30_days": "gridmet_tmax_c",
+    "tmin_le0_days": "gridmet_tmin_c",
+    "tmin_lem2_days": "gridmet_tmin_c",
+    "pr_ge25_days": "gridmet_pr_mm",
+    "rz_lt20_days": "smap_sm_rootzone_pctl",
+}
+
 
 def _weekly_sql() -> tuple[str, str]:
     per_week = ",\n".join(
-        f"{agg}({expr})::{cast} AS {name}" for name, (expr, agg, cast) in WEEKLY.items()
+        # a day count is missing, not 0, in a week with no data in its daily series
+        f"CASE WHEN count({COUNT_SOURCE[name]}) > 0 THEN count({expr}) END::{cast} AS {name}"
+        if name in COUNT_SOURCE
+        else f"{agg}({expr})::{cast} AS {name}"
+        for name, (expr, agg, cast) in WEEKLY.items()
     )
     lists = ",\n".join(f"list(w.{name} ORDER BY g.week) AS {name}" for name in WEEKLY)
     return per_week, lists

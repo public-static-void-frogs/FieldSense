@@ -19,6 +19,7 @@ from rule_engine.planner.context import (
     build_context,
     read_fields,
     state_reference_aws,
+    with_climate,
 )
 from rule_engine.planner.dynamics import Action, SoilCarbon, State
 from rule_engine.planner.env import RotationEnv
@@ -53,4 +54,5 @@ __all__ = [
     "q_learning",
     "read_fields",
     "state_reference_aws",
+    "with_climate",
 ]

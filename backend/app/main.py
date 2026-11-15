@@ -60,6 +60,7 @@ def create_app(config: Settings | None = None) -> FastAPI:
         config.rotation_data_root,
         config.rotation_soil_lookup,
         SeasonTiming(config.m3_out, app.state.m3_advice),
+        config.rotation_policy_path,
     )
     app.state.soil_assessments = SoilAssessments(config.nass_api_key)
     app.state.drought = DroughtMonitor()

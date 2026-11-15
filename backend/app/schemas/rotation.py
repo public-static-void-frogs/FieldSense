@@ -197,6 +197,10 @@ class PlanStep(BaseModel):
     worstYear: int
     revenueUsdPerAcre: float
     costUsdPerAcre: float
+    # seed, fertilizer, chemicals, fuel, repairs, custom work, interest (plus cover crop and
+    # rent when charged): the part of costUsdPerAcre spent on the crop in the season. None when
+    # the budget does not give the split or the cost is the farmer's own.
+    operatingCostUsdPerAcre: float | None = None
     riskPenaltyUsdPerAcre: float
     soilValueUsdPerAcre: float
     yieldPerAcre: float
@@ -231,7 +235,8 @@ class SimulatedOutcome(BaseModel):
 
 
 class SimulatedSpread(BaseModel):
-    lossProbability: float
+    lossProbability: float  # share of results below the full economic cost
+    operatingLossProbability: float | None = None  # below the operating costs alone
     meanUsdPerAcre: float
     p10UsdPerAcre: float  # one result in ten is worse than this
     p50UsdPerAcre: float
@@ -278,6 +283,8 @@ class PlanCrop(BaseModel):
     tier: Literal["top", "alternative"]
     demoted: Literal["autumn_establishment_unlikely"] | None = None
     planObjectiveUsdPerAcre: float  # total over the seasons
+    # learned plans only: how far the plan is below the exact optimum starting with this crop
+    belowOptimumUsdPerAcre: float | None = None
     planNetUsdPerAcre: float
     autumn: PlanAutumn
     steps: list[PlanStep]
@@ -300,10 +307,22 @@ class YearOdds(BaseModel):
     signals: list[str] = []
 
 
+class PlanPlanner(BaseModel):
+    """Who planned the seasons after the first, and whether a learned policy is installed."""
+
+    requested: Literal["exact", "learned"]
+    used: Literal["exact", "learned"]
+    learnedAvailable: bool
+    learnedUnavailable: (
+        Literal["no_policy_file", "torch_not_installed", "policy_does_not_fit"] | None
+    ) = None
+
+
 class RotationPlan(BaseModel):
     status: Literal["ok", "no_modellable_crop"]
     objective: str | None = None
-    method: str | None = None
+    method: Literal["dynamic_programming_fixed_sequence", "learned_policy"] | None = None
+    planner: PlanPlanner | None = None
     seasons: int
     firstSeason: int | None = None
     weights: dict[str, float] = {}

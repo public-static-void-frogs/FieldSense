@@ -22,6 +22,11 @@ resampling scheme of Lall and Sharma 1996 for hydrologic series, recalled, not r
 
 `strength` 0 gives independent years again. With about ten years the conditional odds rest on a
 handful of analog years: they show direction, not calibrated probabilities.
+
+A season that ends in conditions few years started from (a severe drought class in late October)
+would put nearly all the weight on one year, and the forecast would be that single year. The
+kernel of such a row is widened until the odds are spread over at least sqrt(n) years (the
+number of neighbours Lall and Sharma draw from).
 """
 
 import math
@@ -31,6 +36,12 @@ from statistics import mean, pstdev
 EDGE_WEEKS = 4  # weeks at each end of the summarised season (April; late October)
 MIN_YEARS = 5
 SIGNALS = ("drought", "price")
+WIDEN_STEP = 1.25  # kernel widening per step when a row's odds rest on too few years
+
+
+def effective_years(odds: list[float]) -> float:
+    """How many equally likely years the odds amount to (1 / sum of squares)."""
+    return 1.0 / sum(p * p for p in odds)
 
 
 @dataclass(frozen=True)
@@ -93,10 +104,16 @@ class YearChain:
                 known = [p for p in parts if p is not None]
                 neutral = mean(known) if known else 0.0  # an unknown start is neither near nor far
                 distance = [d + (neutral if p is None else p) for d, p in zip(distance, parts)]
-            weights = [math.exp(-0.5 * d) for d in distance]
-            total = sum(weights)
             s = persistence.strength
-            self.matrix.append([(1.0 - s) / n + s * w / total for w in weights])
+            widen = 1.0
+            while True:
+                weights = [math.exp(-0.5 * d / widen**2) for d in distance]
+                total = sum(weights)
+                odds = [(1.0 - s) / n + s * w / total for w in weights]
+                if effective_years(odds) >= math.sqrt(n):  # reached as the kernel flattens
+                    break
+                widen *= WIDEN_STEP
+            self.matrix.append(odds)
         self._marginal = [self.matrix[self.latest]]
 
     def marginal(self, t: int) -> list[float]:
@@ -117,7 +134,7 @@ class YearChain:
             "signals": list(self.signals),
             "planStartsAfter": self.labels[self.latest],
             "firstYearOdds": {str(y): round(p, 3) for y, p in zip(self.labels, first)},
-            "effectiveAnalogYears": round(1.0 / sum(p * p for p in first), 1),
+            "effectiveAnalogYears": round(effective_years(first), 1),
             "endOfYear": {
                 str(y): {k: _rounded(self.end[y][k]) for k in self.signals} for y in self.labels
             },

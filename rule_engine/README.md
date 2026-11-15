@@ -65,12 +65,15 @@ farmer is left to the consumer, such as an LLM agent:
   - `{type: conditions, conditions: [{fact, op, expected, actual}]}`; or
   - `{type: hazard, stage, window {startDoy, endDoy, startDate, endDate}, metric, metricUnit,
     aggregate, compare, threshold, seasonsHit, seasonsTotal, share, worstYear, worstValue,
-    levelCapped, perSeason[], record}`. `record` is `weather_record` when the seasons counted
-    are those of the long weather record and `field_seasons` when they are the field's own
-    summaries.
+    levelCapped, levelBasis, lossBands, lossWhenHit, expectedLoss, perSeason[], record}`.
+    `record` is `weather_record` when the seasons counted are those of the long weather record
+    and `field_seasons` when they are the field's own summaries. `levelBasis` is `loss` when
+    the level comes from `expectedLoss` = `share` x `lossWhenHit.loss`, and `frequency` when no
+    loss is measured for that rule and crop (see "Hazard levels").
 - `dataGaps[]` at both levels are `{code, ...params}`. The codes are `no_csb_id`,
   `no_season_summary`, `no_weather_record`, `few_weather_seasons`, `short_history`, `hazards_not_evaluated`,
-  `hazard_stage_not_in_calendar`, `calendar_not_nass`, `rule_uses_unverified_traits`,
+  `hazard_stage_not_in_calendar`, `rule_suppressed` (`ruleId`, `conditions[]`: a hazard rule
+  switched off by its `unless` gate), `calendar_not_nass`, `rule_uses_unverified_traits`,
   `no_yield_estimate`, `yield_unverified`, `no_price`, `price_unverified`,
   `price_not_local`,
   `field_area_unknown`, `price_unit_unconvertible`, `soil_not_provided` and
@@ -113,6 +116,33 @@ There are two sources:
   are still the only source for root-zone soil moisture (SMAP) and the Drought Monitor class.
 
 A hazard that was hit in fewer than 1 season in 10 is not reported (`MIN_HAZARD_SHARE`).
+
+### Hazard levels
+
+How often a hazard happens does not say how much it matters: a day of 35 C at flowering happens
+in most years over half the country. The level of a weather risk is therefore the yield it is
+expected to cost per season:
+
+    expected loss = share of seasons hit  x  loss in a season it hits
+
+- **Loss in a season it hits** comes from `data/hazard_yield_loss.csv`, one row per rule and
+  crop. It is the change in NASS county yield when every field of the county is hit, from the
+  regional panel (`planner/scripts/regional_hazard_panel.py`, 1981-2025, county effects, state
+  trends, standard errors clustered by year), written by
+  `scripts/build_hazard_yield_loss.py`. A loss under two standard errors is recorded as 0
+  (`no_loss_found`) when the estimate is precise, and left out when it is not. It is an
+  association in county yields, not a field trial.
+- **Levels** (`engine.EXPECTED_LOSS_BANDS`): 8 % or more is `high`, 3 % or more is `medium`,
+  anything less is `low`. The two cut-offs are a judgement.
+- **No row** for the rule and crop (rye, potatoes, the SMAP drought rule, ...): the share of
+  seasons grades the risk through the rule's `level_bands`, and it never exceeds `medium`.
+- A level of `high` still needs 3 seasons (`levelCapped`).
+- **Irrigation**: the heat and drought rules carry
+  `unless: county.irrigated_share >= 0.5`. The share is the crop's irrigated share of harvested
+  acres in the county (Census of Agriculture 2022, `data/county_irrigated_share.csv`, built by
+  `scripts/build_county_irrigated_share.py`). In those counties the panel finds a small loss or
+  none, so the rule is skipped and a `rule_suppressed` gap says so. It is a county average, not
+  the field's own practice; without a Census row the rule fires.
 
 ```sh
 bash data/usa_sample/download_gridmet.sh data/local/usa_sample/cache/gridmet 1996 2025

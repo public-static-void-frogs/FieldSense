@@ -24,7 +24,7 @@ from rule_engine.planner import (
 )
 from rule_engine.planner.adapter import RuleAdapter
 from rule_engine.planner.chance import YearChain, build_chain
-from rule_engine.planner.sampler import modelled_loss
+from rule_engine.planner.sampler import YearSampler, modelled_loss
 from rule_engine.planner.tables import CostTable, load_responses
 
 FIXTURES = Path(__file__).parent / "fixtures" / "season_summary"
@@ -249,6 +249,19 @@ class CarryOverTests(unittest.TestCase):
         self.assertGreaterEqual(min(chain.matrix[0]), 0.1)  # the uniform share remains
         self.assertAlmostEqual(sum(chain.marginal(3)), 1.0)
 
+    def test_one_matching_year_does_not_take_all_the_odds(self):
+        # 2025 ended in a drought class that only 2000 started from
+        labels = list(range(1981, 2026))
+        start = {y: {"drought": 0.0, "price": 1.0} for y in labels}
+        end = {y: {"drought": 0.0, "price": 1.0} for y in labels}
+        start[2000]["drought"], end[2025]["drought"] = 3.0, 3.0
+        chain = YearChain(labels, start, end, Persistence())
+        first = chain.matrix[chain.latest]
+        self.assertEqual(max(range(len(first)), key=first.__getitem__), labels.index(2000))
+        self.assertLess(first[labels.index(2000)], 0.5)
+        for row in chain.matrix:
+            self.assertGreaterEqual(1.0 / sum(p * p for p in row), 45**0.5 - 1e-9)
+
     def test_no_chain_without_strength_or_years(self):
         model = self.model(persistence=Persistence(strength=0.0))
         self.assertIsNone(model.chain)
@@ -348,6 +361,60 @@ class ZeroYieldTests(unittest.TestCase):
         basis = model.sampler.basis["corn"]
         self.assertGreater(basis.expected_yield, 0)
         self.assertNotEqual(basis.yield_level, "county")
+
+    def test_a_yield_series_that_ended_long_ago_is_not_the_yield_level(self):
+        advisor = build_advisor()
+        context = build_context(field(), advisor, [FIXTURES], reference_aws_mm=180.0)
+        # NASS published Iowa sorghum yields for 1980-1984 only: their trend read at 1985 is not
+        # a 2026 yield, so the level comes from a wider area instead (the national series)
+        crops = ("corn", "soybeans", "sorghum")
+        model = RotationModel(context, advisor, crops=crops, horizon=2)
+        basis = model.sampler.basis["sorghum"]
+        self.assertEqual(basis.yield_level, "national")
+        self.assertIn("yield_from_national", basis.notes)
+        # planned as of 1986 the same series is current
+        sampler = YearSampler(context, advisor, model.adapter, ["sorghum"], now=1986)
+        self.assertEqual(sampler.basis["sorghum"].yield_level, "state")
+
+    def county_corn(self, yields):
+        """The corn basis of a field whose county published `yields` ({year: bu/acre})."""
+        advisor = build_advisor()
+        base = build_context(field(), advisor, [FIXTURES], reference_aws_mm=180.0)
+        season = base.seasons[2025]
+        seasons = {
+            year: replace(
+                season,
+                year=year,
+                scalars={**season.scalars, "yield_corn_bu_ac": yields.get(year, 0.0)},
+            )
+            for year in range(1981, 2026)
+        }
+        model = RotationModel(
+            replace(base, seasons=seasons), advisor, crops=("corn", "soybeans"), horizon=1
+        )
+        return model, model.sampler.basis["corn"]
+
+    def test_a_county_series_that_ended_is_not_the_yield_level(self):
+        # county yields published for 1981-1993 only, at a third of today's level
+        model, basis = self.county_corn({year: 60.0 for year in range(1981, 1994)})
+        self.assertNotEqual(basis.yield_level, "county")
+        self.assertGreater(basis.expected_yield, 120)
+        self.assertIn("yield_history_ended", basis.notes)
+        self.assertIn({"code": "yield_history_ended", "crop": "corn"}, model.gaps)
+        # two recent years do not make a level either
+        _, basis = self.county_corn({2024: 60.0, 2025: 60.0})
+        self.assertNotEqual(basis.yield_level, "county")
+
+    def test_a_short_county_series_gives_its_recent_mean_not_a_trend(self):
+        # five falling years: their trend read at 2026 would be 140
+        falling = {2021: 190.0, 2022: 180.0, 2023: 170.0, 2024: 160.0, 2025: 150.0}
+        _, basis = self.county_corn(falling)
+        self.assertEqual(basis.yield_level, "county")
+        self.assertAlmostEqual(basis.expected_yield, 170.0, places=6)
+        # old years are not read as bad years against the recent level
+        _, basis = self.county_corn(falling | {1981: 60.0, 1982: 60.0})
+        self.assertAlmostEqual(basis.expected_yield, 170.0, places=6)
+        self.assertEqual(basis.observed_years, 5)
 
 
 class FarmerResultTests(unittest.TestCase):
@@ -622,3 +689,92 @@ class CellIndexTests(unittest.TestCase):
         self.assertEqual(summary_key(field), ("A", "19169", False))
         self.assertEqual(summary_source(field, [1])["kind"], "weather_cell")
         self.assertEqual(summary_source(field, [])["kind"], "none")
+
+
+class GapFillTests(unittest.TestCase):
+    """Crops without a yield or a price of their own take a documented wider level."""
+
+    @classmethod
+    def setUpClass(cls):
+        cls.advisor = build_advisor()
+        cls.context = build_context(field(), cls.advisor, [FIXTURES], reference_aws_mm=180.0)
+        cls.adapter = RuleAdapter(cls.advisor, cls.context, [])
+
+    def sampler(self, crops, context=None):
+        return YearSampler(context or self.context, self.advisor, self.adapter, crops)
+
+    def test_a_crop_whose_state_series_ended_takes_the_national_yield(self):
+        basis = self.sampler(["sorghum"]).basis["sorghum"]  # NASS stopped Iowa sorghum in 1984
+        self.assertEqual(basis.yield_level, "national")
+        self.assertIn("yield_from_national", basis.notes)
+        self.assertGreater(basis.expected_yield, 40)  # bu/acre of US grain sorghum
+        self.assertGreater(basis.observed_years, 10)
+
+    def test_a_crop_with_no_state_series_takes_the_national_or_region_yield(self):
+        # NASS publishes no Iowa spring wheat yield, and the Heartland states none either
+        basis = self.sampler(["spring_wheat"]).basis["spring_wheat"]
+        self.assertEqual(basis.yield_level, "national")
+        # corn for grain in a New England county: NASS reports silage only there, so the
+        # level is the mean of the Northern Crescent states
+        field_ct = {**self.context.field, "stateFips": "09", "countyFips": "09003"}
+        context = replace(self.context, region="CT", field=field_ct, seasons={})
+        basis = self.sampler(["corn"], context).basis["corn"]
+        self.assertEqual(basis.yield_level, "region")
+        self.assertIn("yield_from_region", basis.notes)
+        self.assertGreater(basis.expected_yield, 100)
+
+    def test_an_own_state_series_is_not_replaced_by_a_wider_one(self):
+        basis = self.sampler(["oats"]).basis["oats"]
+        self.assertEqual(basis.yield_level, "state")
+        self.assertNotIn("yield_from_national", basis.notes)
+
+    def test_regional_series_is_the_mean_of_the_region_states(self):
+        import importlib.util
+
+        path = Path(__file__).parents[1] / "planner" / "scripts" / "build_regional_history.py"
+        spec = importlib.util.spec_from_file_location("build_regional_history", path)
+        module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(module)
+
+        def row(state, year, value):
+            return {
+                "kind": "yield", "crop": "corn", "geography": state, "year": str(year),
+                "value": str(value), "unit": "bu/acre", "nass_short_desc": "CORN",
+            }  # fmt: skip
+
+        history = [row("NY", 2020, 100), row("PA", 2020, 120), row("NY", 2021, 90)]
+        history.append(row("IA", 2020, 200))
+        out = module.regional_rows(history, {"NY": "A", "PA": "A", "IA": "B"})
+        # 2021 has one state only, and the region of IA has one state
+        self.assertEqual(out, [["yield", "corn", "ERS:A", 2020, 110.0, "bu/acre", "CORN", 2]])
+
+    def test_a_crop_with_no_state_quote_takes_the_latest_published_price(self):
+        # the rule engine has no cotton quote for Iowa: the latest US marketing year stands in
+        basis = self.sampler(["cotton"]).basis["cotton"]
+        self.assertEqual(basis.price_level, "national")
+        self.assertIn("planning_price_from_history", basis.notes)
+        self.assertTrue(0.3 < basis.price < 2.0)  # USD per lb
+
+    def test_a_price_series_that_ended_is_not_todays_price(self):
+        from rule_engine.planner.sampler import _history_quote
+
+        def row(state, year, value):
+            return {
+                "kind": "price", "crop": "x", "geography": state, "year": str(year),
+                "value": str(value), "unit": "usd/cwt", "nass_short_desc": "X",
+            }  # fmt: skip
+
+        rows = [row("RI", 2015, 9), row("US", 2025, 12)]
+        quote = _history_quote(rows, "x", "RI", 2026)
+        self.assertEqual((quote.price_usd, quote.level, quote.unit), (12.0, "national", "cwt"))
+        self.assertIsNone(_history_quote(rows, "x", "RI", 2040))
+
+    def test_pasture_is_not_sold_so_it_has_no_price(self):
+        sampler = self.sampler(["grass_pasture"])
+        self.assertEqual(sampler.unavailable, {"grass_pasture": "not_marketed"})
+
+    def test_other_hay_has_a_yield_and_price_series(self):
+        basis = self.sampler(["other_hay"]).basis["other_hay"]
+        self.assertEqual(basis.yield_level, "state")
+        self.assertGreater(basis.observed_years, 30)
+        self.assertGreater(basis.price_years, 30)

@@ -1,4 +1,5 @@
 import { Typography } from 'antd';
+import type { TFunction } from 'i18next';
 import { useTranslation } from 'react-i18next';
 import type { RotationFinding } from '../../../types/rotation/rotation.types.ts';
 import {
@@ -9,7 +10,12 @@ import {
   metricLabels,
   stageLabels,
 } from '../constants/rotationLabels.ts';
-import { formatIsoDay, formatValue, sortedFindings } from '../utils/rotationPresentation.ts';
+import {
+  formatIsoDay,
+  formatPercent,
+  formatValue,
+  sortedFindings,
+} from '../utils/rotationPresentation.ts';
 
 type FindingListProps = {
   title: string;
@@ -81,6 +87,28 @@ function EvidenceStrength({ strength }: { strength: string | null }) {
   );
 }
 
+type HazardTrigger = Extract<RotationFinding['trigger'], { type: 'hazard' }>;
+
+/** Why the hazard has its level: the measured yield cost, or that none is measured. */
+function hazardCost(trigger: HazardTrigger, t: TFunction, language: string): string {
+  const measured = trigger.lossWhenHit;
+  if (trigger.levelBasis !== 'loss' || !measured) {
+    return t(
+      'How much yield it costs is not measured for this crop, so the level reflects only how often it happens.',
+    );
+  }
+  if (measured.loss <= 0) {
+    return t('County yields of this crop show no loss in the seasons when it happens.');
+  }
+  return t(
+    'In a season when it happens, county yields of this crop were about {{loss}} lower, so it is expected to cost about {{expected}} of the yield per season.',
+    {
+      loss: formatPercent(measured.loss, language),
+      expected: formatPercent(trigger.expectedLoss ?? 0, language),
+    },
+  );
+}
+
 type FindingReasonProps = { finding: RotationFinding; cropLabels: Record<string, string> };
 
 function FindingReason({ finding, cropLabels }: FindingReasonProps) {
@@ -111,6 +139,11 @@ function FindingReason({ finding, cropLabels }: FindingReasonProps) {
               year: trigger.worstYear,
               value: formatValue(trigger.worstValue, t, i18n.language),
             })}
+          </Typography.Text>
+        )}
+        {finding.kind === 'risk' && trigger.levelBasis && (
+          <Typography.Text type="secondary">
+            {hazardCost(trigger, t, i18n.language)}
           </Typography.Text>
         )}
       </div>

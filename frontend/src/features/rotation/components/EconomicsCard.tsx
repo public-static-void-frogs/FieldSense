@@ -60,6 +60,9 @@ export function EconomicsCard({ advice }: EconomicsCardProps) {
   const error = save.error ?? remove.error;
   const name = cropNamer(advice);
   const rent = economics?.defaults.landRent;
+  const soilTestCrops = [
+    ...new Set((advice.plan?.soilTest ?? []).flatMap((effect) => effect.crops.map((c) => c.crop))),
+  ];
 
   return (
     <Card
@@ -115,6 +118,14 @@ export function EconomicsCard({ advice }: EconomicsCardProps) {
               </div>
             ))}
           </div>
+          {soilTestCrops.length > 0 && (
+            <Typography.Paragraph type="secondary">
+              {t(
+                'Your soil test changes the fertilizer cost of {{crops}}. A cost you type here is used as it is: the soil test change is not added to it.',
+                { crops: soilTestCrops.map((crop) => t(name(crop))).join(', ') },
+              )}
+            </Typography.Paragraph>
+          )}
           <Form.Item
             name="rent"
             label={t('Land rent per acre')}

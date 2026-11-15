@@ -75,11 +75,23 @@ export function PlanOverview({ advice, plan }: PlanOverviewProps) {
                 label={name(crop)}
                 rank={rank}
                 candidate={candidates.get(crop)}
-                description={t('Loss in {{share}} of years · typical {{amount}} in {{year}}', {
-                  share: formatPercent(firstSeason.lossProbability, i18n.language),
-                  amount: formatSignedUsd(firstSeason.p50UsdPerAcre, i18n.language),
-                  year: plan.firstSeason,
-                })}
+                description={
+                  typeof firstSeason.operatingLossProbability === 'number'
+                    ? t(
+                        'Operating costs not covered in {{share}} of years, all costs in {{full}} · typical {{amount}} after all costs in {{year}}',
+                        {
+                          share: formatPercent(firstSeason.operatingLossProbability, i18n.language),
+                          full: formatPercent(firstSeason.lossProbability, i18n.language),
+                          amount: formatSignedUsd(firstSeason.p50UsdPerAcre, i18n.language),
+                          year: plan.firstSeason,
+                        },
+                      )
+                    : t('Loss in {{share}} of years · typical {{amount}} in {{year}}', {
+                        share: formatPercent(firstSeason.lossProbability, i18n.language),
+                        amount: formatSignedUsd(firstSeason.p50UsdPerAcre, i18n.language),
+                        year: plan.firstSeason,
+                      })
+                }
               />
             ))}
           </ol>
@@ -166,12 +178,31 @@ function PlanCard({ advice, plan, entry, candidate }: PlanEntryProps) {
             {t('Plan breakdown')}
           </summary>
           <dl className="rotation-plan-facts">
+            {typeof firstSeason.operatingLossProbability === 'number' ? (
+              <>
+                <div>
+                  <dt>
+                    {t('Chance of not covering operating costs in {{year}}', {
+                      year: plan.firstSeason,
+                    })}
+                  </dt>
+                  <dd>{formatPercent(firstSeason.operatingLossProbability, language)}</dd>
+                </div>
+                <div>
+                  <dt>
+                    {t('Chance of not covering all costs in {{year}}', { year: plan.firstSeason })}
+                  </dt>
+                  <dd>{formatPercent(firstSeason.lossProbability, language)}</dd>
+                </div>
+              </>
+            ) : (
+              <div>
+                <dt>{t('Chance of a loss in {{year}}', { year: plan.firstSeason })}</dt>
+                <dd>{formatPercent(firstSeason.lossProbability, language)}</dd>
+              </div>
+            )}
             <div>
-              <dt>{t('Chance of a loss in {{year}}', { year: plan.firstSeason })}</dt>
-              <dd>{formatPercent(firstSeason.lossProbability, language)}</dd>
-            </div>
-            <div>
-              <dt>{t('Typical result')}</dt>
+              <dt>{t('Typical result after all costs')}</dt>
               <dd>{formatSignedUsd(firstSeason.p50UsdPerAcre, language)}</dd>
             </div>
             <div>
@@ -194,10 +225,19 @@ function PlanCard({ advice, plan, entry, candidate }: PlanEntryProps) {
               <div>
                 <dt>{t('All {{seasons}} seasons, typical', { seasons: plan.seasons })}</dt>
                 <dd>
-                  {t('{{amount}}, loss in {{share}}', {
-                    amount: formatSignedUsd(wholePlan.p50UsdPerAcre, language),
-                    share: formatPercent(wholePlan.lossProbability, language),
-                  })}
+                  {typeof wholePlan.operatingLossProbability === 'number'
+                    ? t(
+                        '{{amount}}, operating costs not covered in {{share}}, all costs in {{full}}',
+                        {
+                          amount: formatSignedUsd(wholePlan.p50UsdPerAcre, language),
+                          share: formatPercent(wholePlan.operatingLossProbability, language),
+                          full: formatPercent(wholePlan.lossProbability, language),
+                        },
+                      )
+                    : t('{{amount}}, loss in {{share}}', {
+                        amount: formatSignedUsd(wholePlan.p50UsdPerAcre, language),
+                        share: formatPercent(wholePlan.lossProbability, language),
+                      })}
                 </dd>
               </div>
             )}

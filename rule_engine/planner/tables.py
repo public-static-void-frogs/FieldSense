@@ -13,6 +13,7 @@ DATA = Path(__file__).parent / "data"
 TILLAGE = ("conventional", "strip_till", "no_till")
 COVER = ("none", "rye")
 # Crops the planner can price: the ones with a cost budget (costs.csv, costs_regional.csv).
+# A trained policy reads crops by their position here: add a crop at the end, and retrain.
 CROPS = (
     "corn",
     "soybeans",
@@ -34,6 +35,11 @@ CROPS = (
     "chickpeas",
     "millet",
     "flax",
+    "other_hay",
+    "canola",
+    "rye",
+    "dry_beans",
+    "sunflower",
 )
 NATIONAL = "U.S. total"
 
@@ -140,6 +146,43 @@ def _lapsed_regions(region: str | None, state: str | None, county: str | None) -
     return out
 
 
+OPERATING_ITEMS = ("seed", "fertilizer", "chemicals", "other_operating")
+
+
+@lru_cache(maxsize=1)
+def _ers_operating() -> dict[tuple[str, str], float]:
+    """{(crop, ERS region): operating costs as a share of the cost less land}, from the latest
+    year ERS reports the region (costs_regional_history.csv).
+
+    ERS operating costs: seed, fertilizer, chemicals, custom services, fuel, repairs, purchased
+    irrigation water and interest on operating capital. The rest (hired and unpaid labour,
+    capital recovery of machinery, taxes, insurance, general overhead) is not paid per acre
+    planted in the season."""
+    latest: dict[tuple[str, str], dict[str, str]] = {}
+    for r in _rows("costs_regional_history.csv"):
+        key = (r["crop"], r["region"])
+        if r["usd_per_acre"] and (key not in latest or int(r["year"]) > int(latest[key]["year"])):
+            latest[key] = r
+    return {
+        key: sum(float(r[item]) for item in OPERATING_ITEMS) / float(r["usd_per_acre"])
+        for key, r in latest.items()
+    }
+
+
+@lru_cache(maxsize=1)
+def _budget_operating() -> dict[tuple[str, str], float]:
+    """{(crop or crop:situation, scope): operating share} of the budgets outside the ERS tables
+    (costs_operating.csv). `scope`: "reference" for a costs.csv row, else the states of a
+    costs_state.csv row. Only the budgets whose source gives the split have a row."""
+    if not (DATA / "costs_operating.csv").exists():
+        return {}
+    return {
+        (r["crop"], r["scope"]): float(r["operating_usd_per_acre"]) / float(r["total_usd_per_acre"])
+        for r in _rows("costs_operating.csv")
+        if float(r["total_usd_per_acre"]) > 0
+    }
+
+
 def state_fips(county_fips: str | None) -> str | None:
     text = str(county_fips or "").strip()
     return text.zfill(5)[:2] if text else None
@@ -213,12 +256,26 @@ class CostTable:
             for crop, cost in _lapsed_regions(region, state, county).items():
                 if crop in self.regional and not self.regional[crop].verified:
                     self.regional[crop] = cost
+        # operating costs as a share of a crop's level; a crop without a known split has none
+        ers, budgets = _ers_operating(), _budget_operating()
+        self.operating: dict[str, float] = {}
+        for crop in self.regional:
+            own = crop_region(crop, county, region, state)[0]
+            share = ers.get((crop, own), ers.get((crop, NATIONAL)))
+            if share is not None:
+                self.operating[crop] = share
         if state is not None:
             for r in state_rows if state_rows is not None else _rows("costs_state.csv"):
                 if state in r["states"].split():
                     self.regional[r["crop"]] = Cost(
                         float(r["usd_per_acre"]), _flag(r["verified"]), (r["source"],)
                     )
+                    self.operating.pop(r["crop"], None)
+                    if (r["crop"], r["states"]) in budgets:
+                        self.operating[r["crop"]] = budgets[(r["crop"], r["states"])]
+        self.reference_operating = {
+            crop: share for (crop, scope), share in budgets.items() if scope == "reference"
+        }
         self.rows = {
             (r["crop"], r["situation"], r["tillage"]): Cost(
                 float(r["usd_per_acre"]), _flag(r["verified"]), (r["source"],)
@@ -243,7 +300,17 @@ class CostTable:
         costs.csv.
         """
         self.regional[crop] = Cost(float(usd_per_acre), True, ("farmer",))
+        self.operating.pop(crop, None)  # the split of the farmer's own number is not known
         self.crops.add(crop)
+
+    def operating_share(self, crop: str, previous: str | None) -> float | None:
+        """Operating costs as a share of the crop's cost (see _ers_operating), None when the
+        budget in use does not give the split or the cost is the farmer's own."""
+        if crop in self.regional:
+            return self.operating.get(crop)
+        situation = self._situation(crop, previous)
+        found = self.reference_operating
+        return found.get(f"{crop}:{situation}", found.get(crop))
 
     def _situation(self, crop: str, previous: str | None) -> str:
         if crop == "corn":

@@ -73,6 +73,8 @@ STATIC_SCALE = {
     "latitude": (40.0, 8.0),
     "longitude": (-95.0, 15.0),
 }
+# A typical yield per acre and price per unit of each crop, in the crop's own unit (bu, ton, lb,
+# cwt), so the network reads both near 1. Every crop of CROPS needs a row in both.
 YIELD_SCALE = {
     "corn": 180.0,
     "soybeans": 55.0,
@@ -82,6 +84,23 @@ YIELD_SCALE = {
     "spring_wheat": 50.0,
     "barley": 70.0,
     "alfalfa": 3.5,
+    "durum_wheat": 40.0,
+    "cotton": 900.0,
+    "rice": 78.0,
+    "peanuts": 3800.0,
+    "sugarbeets": 30.0,
+    "potatoes": 420.0,
+    "sugarcane": 37.0,
+    "dry_peas": 20.0,
+    "lentils": 12.0,
+    "chickpeas": 15.0,
+    "millet": 30.0,
+    "flax": 18.0,
+    "other_hay": 2.0,
+    "canola": 35.0,
+    "rye": 35.0,
+    "dry_beans": 19.0,
+    "sunflower": 1600.0,
 }
 PRICE_SCALE = {
     "corn": 4.5,
@@ -92,6 +111,23 @@ PRICE_SCALE = {
     "spring_wheat": 6.0,
     "barley": 4.5,
     "alfalfa": 180.0,
+    "durum_wheat": 7.0,
+    "cotton": 0.65,
+    "rice": 13.0,
+    "peanuts": 0.25,
+    "sugarbeets": 55.0,
+    "potatoes": 11.0,
+    "sugarcane": 55.0,
+    "dry_peas": 12.0,
+    "lentils": 23.0,
+    "chickpeas": 27.0,
+    "millet": 4.5,
+    "flax": 12.0,
+    "other_hay": 170.0,
+    "canola": 10.5,
+    "rye": 5.0,
+    "dry_beans": 33.0,
+    "sunflower": 0.24,
 }
 
 

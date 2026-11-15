@@ -1,7 +1,7 @@
 """What is fixed for one planning problem: the field, its soil, its known history, its seasons."""
 
 import json
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from pathlib import Path
 from statistics import median
 
@@ -74,3 +74,20 @@ def build_context(
         reference_aws_mm=reference_aws_mm,
         gaps=tuple(gaps),
     )
+
+
+def with_climate(context: FieldContext, advisor: RotationAdvisor) -> tuple[FieldContext, bool]:
+    """(context with the long weather record of the field's location, whether one was found).
+
+    The record's years become drawable years; the field's own seasons (with county yields and
+    drought) replace the same years, and the missing-season gap no longer applies.
+    """
+    record = context.field
+    climate = None
+    if advisor.climate:
+        climate = advisor.climate.record(record.get("latitude"), record.get("longitude"))
+    if not climate:
+        return context, False
+    merged = {s.year: s for s in climate.seasons} | context.seasons
+    gaps = tuple(g for g in context.gaps if g["code"] != "no_season_summary")
+    return replace(context, seasons=merged, gaps=gaps), True

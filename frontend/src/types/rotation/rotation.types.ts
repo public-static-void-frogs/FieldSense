@@ -25,6 +25,18 @@ export type RotationTrigger =
       seasonsTotal: number;
       worstYear: number | null;
       worstValue: number | null;
+      /** 'loss': level from expectedLoss; 'frequency': no measured loss, level from share. */
+      levelBasis?: 'loss' | 'frequency';
+      /** Share of yield lost in a season the hazard hits, measured in county yields. */
+      lossWhenHit?: {
+        loss: number;
+        se: number;
+        sample: 'all' | 'dryland';
+        finding: 'loss' | 'no_loss_found';
+        countyYears: number;
+      } | null;
+      /** Share of seasons hit x lossWhenHit.loss. */
+      expectedLoss?: number | null;
       perSeason: RotationHazardSeason[];
     };
 
@@ -232,6 +244,8 @@ export type RotationPlanStep = {
   worstYear: number;
   revenueUsdPerAcre: number;
   costUsdPerAcre: number;
+  /** The part of the cost spent on the crop in the season; null when the split is not known. */
+  operatingCostUsdPerAcre?: number | null;
   riskPenaltyUsdPerAcre: number;
   soilValueUsdPerAcre: number;
   yieldPerAcre: number;
@@ -242,7 +256,10 @@ export type RotationPlanStep = {
 export type RotationSimulatedYear = { year: number; netUsdPerAcre: number };
 
 export type RotationSimulatedSpread = {
+  /** Share of results below the full cost (with labour, machinery ownership and overhead). */
   lossProbability: number;
+  /** Share of results below the operating costs alone; null when the split is not known. */
+  operatingLossProbability?: number | null;
   meanUsdPerAcre: number;
   p10UsdPerAcre: number;
   p50UsdPerAcre: number;

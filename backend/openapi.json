@@ -1016,6 +1016,22 @@
               "title": "Seasons"
             },
             "description": "Seasons the plan covers"
+          },
+          {
+            "name": "planner",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "enum": [
+                "exact",
+                "learned"
+              ],
+              "type": "string",
+              "description": "Who plans the seasons after the first: the exact optimum, or the learned policy. `plan.planner` reports which one was used and whether a policy is installed",
+              "default": "exact",
+              "title": "Planner"
+            },
+            "description": "Who plans the seasons after the first: the exact optimum, or the learned policy. `plan.planner` reports which one was used and whether a policy is installed"
           }
         ],
         "responses": {
@@ -8285,6 +8301,17 @@
             "type": "number",
             "title": "Planobjectiveusdperacre"
           },
+          "belowOptimumUsdPerAcre": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Belowoptimumusdperacre"
+          },
           "planNetUsdPerAcre": {
             "type": "number",
             "title": "Plannetusdperacre"
@@ -8393,6 +8420,54 @@
         ],
         "title": "PlanEconomics"
       },
+      "PlanPlanner": {
+        "properties": {
+          "requested": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "learned"
+            ],
+            "title": "Requested"
+          },
+          "used": {
+            "type": "string",
+            "enum": [
+              "exact",
+              "learned"
+            ],
+            "title": "Used"
+          },
+          "learnedAvailable": {
+            "type": "boolean",
+            "title": "Learnedavailable"
+          },
+          "learnedUnavailable": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "no_policy_file",
+                  "torch_not_installed",
+                  "policy_does_not_fit"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Learnedunavailable"
+          }
+        },
+        "type": "object",
+        "required": [
+          "requested",
+          "used",
+          "learnedAvailable"
+        ],
+        "title": "PlanPlanner",
+        "description": "Who planned the seasons after the first, and whether a learned policy is installed."
+      },
       "PlanSimulation": {
         "properties": {
           "firstSeason": {
@@ -8479,6 +8554,17 @@
           "costUsdPerAcre": {
             "type": "number",
             "title": "Costusdperacre"
+          },
+          "operatingCostUsdPerAcre": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operatingcostusdperacre"
           },
           "riskPenaltyUsdPerAcre": {
             "type": "number",
@@ -9502,6 +9588,17 @@
             "type": "number",
             "title": "Lossprobability"
           },
+          "operatingLossProbability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operatinglossprobability"
+          },
           "meanUsdPerAcre": {
             "type": "number",
             "title": "Meanusdperacre"
@@ -9625,6 +9722,17 @@
           "lossProbability": {
             "type": "number",
             "title": "Lossprobability"
+          },
+          "operatingLossProbability": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operatinglossprobability"
           },
           "meanUsdPerAcre": {
             "type": "number",
@@ -11697,13 +11805,27 @@
           "method": {
             "anyOf": [
               {
-                "type": "string"
+                "type": "string",
+                "enum": [
+                  "dynamic_programming_fixed_sequence",
+                  "learned_policy"
+                ]
               },
               {
                 "type": "null"
               }
             ],
             "title": "Method"
+          },
+          "planner": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PlanPlanner"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "seasons": {
             "type": "integer",

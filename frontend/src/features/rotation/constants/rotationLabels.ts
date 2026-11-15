@@ -130,6 +130,8 @@ export const gapLabels: Record<string, string> = {
   no_yield_estimate: 'No yield estimate is available for this crop here.',
   price_not_local: 'The price is not local to this state.',
   hazards_not_evaluated: 'Weather risks were not checked for this crop.',
+  rule_suppressed:
+    'A heat or drought rule was skipped because most of this crop in the county is irrigated.',
   hazard_stage_not_in_calendar:
     'A weather rule was skipped because this crop has no date for that growth stage.',
   yield_unverified: 'The yield estimate is not based on local county records.',
@@ -182,6 +184,8 @@ export const planGapLabels: Record<string, string> = {
   price_history_from_US: 'Past prices are national, not local.',
   soil_carbon_model_uncalibrated: 'The soil carbon change is a model estimate for this field.',
   year_odds_from_few_analog_years: 'The odds of each past year rest on few similar years.',
+  yield_history_ended:
+    'Yield records for a crop stopped years ago here, so a wider-area yield is used.',
   yield_not_observed_every_year:
     'Some yields are modelled from weather because no record exists for that year.',
   crop_left_out_of_plan: 'A crop was left out of the plan because it could not be priced.',

@@ -27,7 +27,13 @@ from statistics import median
 
 from app.services.economics import defaults as economics_defaults
 from app.services.economics import engine_economics
-from app.services.rotation_plan import DEFAULT_SEASONS, rotation_plan
+from app.services.rotation_plan import (
+    DEFAULT_SEASONS,
+    EXACT_PLANNER,
+    LEARNED_PLANNER,
+    PLANNERS,
+    rotation_plan,
+)
 from app.services.season_timing import local_calendar
 
 REPO = Path(__file__).resolve().parents[3]
@@ -60,8 +66,15 @@ class InvalidAdviceRequest(ValueError):
 
 
 class RotationAdvice:
-    def __init__(self, data_root: str | Path | None, soil_lookup: bool = True, timing=None):
+    def __init__(
+        self,
+        data_root: str | Path | None,
+        soil_lookup: bool = True,
+        timing=None,
+        policy_path: str | Path | None = None,
+    ):
         self.data_root = Path(data_root) if data_root else None
+        self.policy_path = Path(policy_path) if policy_path else None  # a trained policy file
         self.soil_lookup = soil_lookup
         self.timing = timing  # SeasonTiming, or None
         self._lock = threading.Lock()
@@ -73,6 +86,7 @@ class RotationAdvice:
         self._soil_cache: OrderedDict[str, dict | None] = OrderedDict()
         self._history_db = None
         self._cells = None
+        self._policy = None  # (LearnedPolicy or None, why it is missing), read once
 
     # -- engine and data files ---------------------------------------------------------
 
@@ -93,6 +107,17 @@ class RotationAdvice:
                     self._path("season_summary"), climate_root=self._path("climate_record")
                 )
             return self._advisor
+
+    def learned_policy(self):
+        """(policy, None) read from `policy_path`, or (None, the reason code)."""
+        advisor = self.advisor  # puts the rule engine on the import path
+        with self._lock:
+            if self._policy is None:
+                from rule_engine.planner.learned import load_policy
+
+                self._policy = load_policy(self.policy_path)
+            del advisor
+            return self._policy
 
     def _sampled_soil(self, source_id: str) -> dict | None:
         with self._lock:
@@ -312,8 +337,16 @@ class RotationAdvice:
         results: list[dict] | None = None,
         economics: dict | None = None,
         after: str | None = None,
+        planner: str = EXACT_PLANNER,
     ) -> dict:
-        """Ranked crops for the coming season; with ``after``, for the season after that crop."""
+        """Ranked crops for the coming season; with ``after``, for the season after that crop.
+
+        ``planner`` picks who plans the seasons after the first: the exact optimum, or the
+        learned policy. Without a usable policy file the exact plan is returned and
+        ``plan.planner`` says why.
+        """
+        if planner not in PLANNERS:
+            raise InvalidAdviceRequest(f"Unknown planner: {planner}")
         advisor = self.advisor
         record = self.engine_field(field)
         soil_inputs = self._apply_survey(record, survey)
@@ -350,6 +383,7 @@ class RotationAdvice:
         # shown next to the ranking; only its sowing date reaches the engine (see above)
         result["seasonTiming"] = timing
         result["soilInputs"] = soil_inputs
+        policy, missing = self.learned_policy()
         plan = rotation_plan(
             advisor,
             record,
@@ -360,7 +394,14 @@ class RotationAdvice:
             self._reference_aws(record.get("stateFips")),
             result.get("offSeason"),
             int(result["asOf"][:4]),
+            policy if planner == LEARNED_PLANNER else None,
         )
+        plan["planner"] = {
+            "requested": planner,
+            "used": planner if policy or planner == EXACT_PLANNER else EXACT_PLANNER,
+            "learnedAvailable": policy is not None,
+            "learnedUnavailable": missing,
+        }
         self._rank_by_plan(result, plan)
         result["plan"] = plan
         return result
